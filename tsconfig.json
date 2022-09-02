@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        // Only output d.ts files and not JavaScript files.
+        "emitDeclarationOnly": true,
+        // Generate .d.ts files from TypeScript and JavaScript files in your project.
+        "declaration": true,
+        // Create sourcemaps for d.ts files.
+        "declarationMap": true,
+        // Specify how TypeScript looks up a file from a given module specifier.
+        "moduleResolution": "node",
+        // Specify an output folder for all emitted files.
+        "outDir": "dist",
+        // The build target
+        "target": "es6",
+    }
+}

@@ -19,7 +19,9 @@ import VNode from '../VNode';
  * ```js
  * const instance = new FlipClock({
  *   face: new Counter({
- *     value: new FaceValue(100)
+ *     value: new FaceValue(100, {
+ *       format: value => value * 100
+ *     })
  *   })
  * });
  * 
@@ -33,21 +35,28 @@ export default class Counter extends Face {
      * 
      * @var {number}
      */
-    autoStart: boolean = false
+    autoStart: boolean;
     
     /**
      * Should the face count down instead of up.
      * 
      * @var {boolean}
      */
-    countdown: boolean = false;
+    countdown: boolean;
+    
+    /**
+     * The format callback function.
+     * 
+     * @var {Function}
+     */
+    format: Function;
 
     /**
      * The number to increment/decrement in the interval..
      * 
      * @var {number}
      */
-    step: number = 1;
+    step: number;
 
     /**
      * Instantiate a Clock face with a given value and attributes.
@@ -60,34 +69,33 @@ export default class Counter extends Face {
     ) {
         super(attributes);
 
-        this.countdown = prop(attributes.countdown, this.countdown);
-        this.step = prop(attributes.step, this.step);
+        this.autoStart = prop(attributes.autoStart, false);
+        this.countdown = prop(attributes.countdown, false);
+        this.step = prop(attributes.step, 1);
     }
 
     /**
      * Decrement the face value by the given value.
      * 
      * @param {Number} value
+     * @return {void}
      */
-    decrement(value?: number) {
+    decrement(value?: number): void {
         this.value = this.value.copy(
             this.value.value - prop(value, this.step)
         );
-
-        console.log(this.value);
     }
 
     /**
      * Incremebt the face value by the given value.
      * 
      * @param {Number} value
+     * @return {void}
      */
-    increment(value?: number) {
+    increment(value?: number): void {
         this.value = this.value.copy(
             this.value.value + prop(value, this.step)
         );
-
-        console.log(this.value);
     }
 
     /**

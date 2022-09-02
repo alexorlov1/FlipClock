@@ -3,8 +3,9 @@ const { defineConfig } = require('vite');
 
 export default defineConfig({
   build: {
+    minify: 'esbuild',
     lib: {
-      entry: 'src',
+      entry: './index.ts',
       name: 'FlipClock',
       fileName: (format) => `flipclock.${format}.js`,
     }

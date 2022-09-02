@@ -1,19 +1,23 @@
-<html>
-	<head>
-		<link rel="stylesheet" href="../dist/flipclock.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipClock</title>
+    <link rel="stylesheet" href="../scss/flipclock.scss">
+</head>
+<body>
+    <div class="clock"></div>
 
-		<script src="../dist/flipclock.js"></script>
-	</head>
-	<body>
-		<div class="clock" style="margin:2em;"></div>
+    <script type="module">
+        import { FlipClock } from '../index.js';
+        
+        const el = document.querySelector('.clock');
 
-		<script type="text/javascript">
-			const el = document.querySelector('.clock');
-
-			const clock = new FlipClock(el, {
-				face: 'TwelveHourClock'
-			});
-		</script>
-
-	</body>
+        const clock = new FlipClock(el, {
+            face: 'TwelveHourClock'
+        });2
+    </script>
+</body>
 </html>

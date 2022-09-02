@@ -10,18 +10,18 @@ export default class FaceValue {
     public readonly digits: ProxyConstructor
 
     /**
-     * The minimum number of digits.
+     * The callback function used to format the value.
      * 
-     * @var {number}
+     * @var {Function}
      */
-    public readonly minimumDigits: number = 0
+    public readonly format: (value: any) => any
 
     /**
-    //  * Prepend the leading zero to a single digit.
-    //  * 
-    //  * @var {boolean}
-    //  */
-    // public readonly prependLeadingZero: boolean = true
+     * The minimum number of digits.
+     * 
+     * @var {number|false}
+     */
+    public readonly minimumDigits: number|false = 0
 
     /**
      * Instnatiate the face value.
@@ -34,17 +34,20 @@ export default class FaceValue {
             attributes.minimumDigits, this.minimumDigits
         );
 
+        this.minimumDigits = prop(attributes.minimumDigits, this.minimumDigits);
+
+        const format = this.format = prop(attributes.format);
+
         this.digits = ref(digitize(prop(value, ''), {
-            minimumDigits
+            minimumDigits,
+            format
         }));
 
-        this.minimumDigits = Math.max(
-            this.digits.length, prop(attributes.minimumDigits, this.minimumDigits)
-        );
-
-        // this.prependLeadingZero = prop(
-        //     attributes.prependLeadingZero, this.prependLeadingZero
-        // );
+        if(this.minimumDigits !== false) {
+            this.minimumDigits = Math.max(
+                this.digits.length, attributes.minimumDigits || 0
+            );
+        }  
     }
 
     /**
@@ -55,11 +58,10 @@ export default class FaceValue {
      */
     copy(value: any): FaceValue {
         return new FaceValue(value, {
-            minimumDigits: Math.max(this.minimumDigits, this.digits.length),
-            // prependLeadingZero: this.prependLeadingZero
+            format: this.format,
+            minimumDigits: this.minimumDigits,
         });
     }
-
 
     /**
      * Instantiate a new FaceValue with the given value. If the give value

@@ -4,9 +4,10 @@ import Duration from '../Duration';
 import Face from '../Face';
 import FaceValue from '../FaceValue';
 import FlipClock from '../FlipClock';
-import { prop, h, digitize } from '../functions';
+import { prop, h, digitize, duration, formatDuration } from '../functions';
 import Group from '../Group';
 import Attributes from '../types/Attributes';
+import DurationFlags from '../types/DurationFlags';
 import VNode from '../VNode';
 
 /**
@@ -52,14 +53,14 @@ export default class ElapsedTime extends Face {
      * 
      * @var {string}
      */
-    format: string = 'mm:ss';    
+    format: string;    
 
     /**
      * Show the labels on the clock face.
      * 
      * @var {string[]|Function}
      */
-    labels: Attributes|Function = [];
+    labels: Attributes|((face: ElapsedTime) => Attributes);
 
     /**
      * The starting date used to calculate the elsapsed time.
@@ -79,8 +80,8 @@ export default class ElapsedTime extends Face {
     ) {
         super(attributes);
 
-        this.format = prop(attributes.format, this.format);
-        this.labels = prop(attributes.labels, this.labels);
+        this.format = prop(attributes.format, 'hh:mm:ss');
+        this.labels = prop(attributes.labels, []);
         this.start = prop(attributes.start, new Date);
     }
 
@@ -161,9 +162,12 @@ export default class ElapsedTime extends Face {
         if(!value) {
             return [];
         }
+        
+        const formatted: string = formatDuration(
+            duration(this.start, value?.value || new Date, this.format), this.format
+        );
 
-        return new Duration(this.start, value?.value)
-            .format(this.format)
+        return formatted
             .split(/\s+/)
             .map((subject: string, x: number) => new Group({
                 items: this.createGroup(subject, x, prevGroups)
@@ -211,11 +215,27 @@ export default class ElapsedTime extends Face {
 
             // Creat the group using the label glag and items.
             return new Group({
-                label: this.labels[flag],
+                label: this.label(flag),
                 items: part.map((digit, z) => {
                     return new Card(digit, (<Card>(<Group>prevGroups[x]?.items[y])?.items[z])?.digit)
                 })
             })
         });
+    }
+
+    /**
+     * Get the label using the given flag.
+     * 
+     * @param {string|undefined} flag 
+     * @returns {string}
+     */
+    protected label(flag?: string): string {
+        let labels: Attributes = this.labels;
+
+        if(this.labels instanceof Function) {
+            labels = this.labels(this);
+        }
+                
+        return flag && labels[flag];
     }
 }

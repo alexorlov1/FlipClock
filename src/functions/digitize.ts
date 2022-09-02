@@ -1,7 +1,9 @@
+import Attributes from '../types/Attributes';
 import deepFlatten from './deepFlatten';
 import flatten from './flatten';
 
-export type DigitizeOptions = {
+export type DigitizeAttributes = {
+    format?: (value: string) => string,
     minimumDigits?: number,
     prependLeadingZero?: boolean,
 }
@@ -13,20 +15,15 @@ export type DigitizeOptions = {
  *
  * @function digitize
  * @param  {*} value
- * @param  {DigitizeOptions} options
+ * @param  {DigitizeAttributes} options
  * @memberof functions
  */
-export default function digitize(value: any, options?: DigitizeOptions): string[] {
-   const opts = Object.assign({
-        minimumDigits: 0,
-        prependLeadingZero: true
-    }, options);
+export default function digitize(value: any, attributes: DigitizeAttributes = {}): string[] {
+    function prepend(digit) {
+        const shouldPrependZero = !!attributes?.prependLeadingZero
+            && digit.toString().split('').length === 1;
 
-    function prepend(number) {
-        const shouldPrependZero = !!opts.prependLeadingZero
-            && number.toString().split('').length === 1;
-
-        return (shouldPrependZero ? '0' : '').concat(number);
+        return (shouldPrependZero ? '0' : '').concat(digit);
     }
 
     function digits(arr: any[], min: number = 0): string[] {
@@ -41,9 +38,13 @@ export default function digitize(value: any, options?: DigitizeOptions): string[
         return flatten(arr);
     }
 
-    return digits(flatten([value]).map(number => {
-        return flatten(deepFlatten([number]).map(number => {
-            return prepend(number).split('');
+    if(attributes.format) {
+        value = attributes.format(value);
+    }
+
+    return digits(flatten([value]).map(digit => {
+        return flatten(deepFlatten([digit]).map(digit => {
+            return prepend(digit).split('');
         }));
-    }), opts.minimumDigits || 0);
+    }), attributes.minimumDigits);
 }

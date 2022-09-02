@@ -1,7 +1,10 @@
 import Face from "./Face";
-import { call, diff } from "./functions";
+import { call, diff, language, prop } from "./functions";
+import { aliases, dictionary } from "./languages/en-us";
 import Timer from "./Timer";
 import VNode from "./VNode";
+
+language(aliases, dictionary);
 
 export default class FlipClock {
     
@@ -37,10 +40,10 @@ export default class FlipClock {
         if(!attributes.face) {
             throw new Error('You must define a face property.');
         }
-
+        
         this.face = attributes.face;
         this.face.on('render', () => this.render());
-        this.timer = attributes.timer || new Timer(1000);
+        this.timer = prop(attributes.timer, new Timer(1000));
         
         if(attributes.el) {
             this.mount(attributes.el);
@@ -128,11 +131,15 @@ export default class FlipClock {
 
     /**
      * Unmount the clock instance from the DOM.
+     * 
+     * @return {this}
      */
-    unmount() {
+    unmount(): this {
         this.face.hook('beforeUnmount', this);
         this.el.parentElement?.removeChild(this.el);
         this.face.resetWatchers();
         this.face.hook('unmounted', this);
+
+        return this;
     }
 }

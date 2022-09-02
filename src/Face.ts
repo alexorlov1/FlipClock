@@ -1,40 +1,54 @@
+import Dictionary from "./Dictionary";
 import EventEmitter from "./EventEmitter";
 import FaceValue from "./FaceValue";
 import FlipClock from "./FlipClock";
-import { prop } from "./functions";
-import { ref } from "./functions";
+import { language, prop, ref } from "./functions";
 import Attributes from "./types/Attributes";
 import VNode from "./VNode";
 
 export default abstract class Face extends EventEmitter {
 
     /**
+     * The dictionary used to translate strings.
+     * 
+     * @var {Dictionary}
+     */
+    public dictionary: Dictionary;
+    
+    /**
+     *The language used to translate strings.
+     * 
+     * @var {string}
+     */
+    public language: string
+
+    /**
      * The number of milliseconds it takes to animate one turn of the face.
      * 
      * @var {number}
      */
-    animationRate: number = 500
+    public animationRate: number
 
     /**
      * Should the face automatically start on mount.
      * 
      * @var {number}
      */
-    autoStart: boolean = true
-
-    /**
-     * The reactive state.
-     * 
-     * @var {Attributes}
-     */
-    state: Attributes
+    public autoStart: boolean
 
     /**
      * The previous reactive state.
      * 
      * @var {Attributes}
      */
-    prevState?: Attributes
+    public prevState?: Attributes
+
+    /**
+     * The reactive state.
+     * 
+     * @var {Attributes}
+     */
+    public state: Attributes
 
     /**
      * An array of watcher callback functions.
@@ -53,8 +67,10 @@ export default abstract class Face extends EventEmitter {
     ) {
         super();
 
-        this.animationRate = prop(attributes.animationRate, this.animationRate);
-        this.autoStart = prop(attributes.autoStart, this.autoStart);
+        this.animationRate = prop(attributes.animationRate, 500) ;
+        this.autoStart = prop(attributes.autoStart, true);
+        this.language = attributes.language || 'en-us';
+        this.dictionary = language(this.language);
 
         this.state = ref({
             value: this.defaultValue(attributes.value)
@@ -182,35 +198,6 @@ export default abstract class Face extends EventEmitter {
     mounted(instance: FlipClock): void {
         //
     }
-
-    // /**
-    //  * The `buildLabels` hook.
-    //  * 
-    //  * This is the hook to build labels for the created VNode.
-    //  * 
-    //  * @param {FlipClock} instance
-    //  * @param {VNode} vnode
-    //  * @return {void}
-    //  */
-    // buildLabels(instance: FlipClock, vnode: VNode): void {
-    //     if(this.labels instanceof Function) {
-    //         this.labels(instance, vnode);
-
-    //         return;
-    //     }
-
-    //     for(let y in this.labels) {
-    //         for(let x in this.labels[y]) {
-    //             vnode.childNodes[y].childNodes[x]?.childNodes.splice(
-    //                 0, 0, h('div', [this.labels[y][x]])
-    //             );
-    //         }
-    //     }
-
-    //     // this.labels.forEach((label, i) => {
-    //     //     console.log(label,i);
-    //     // })
-    // }
 
     /**
      * The `beforeCreate` hook.
