@@ -1,9 +1,10 @@
 /**
  * Converts the given value to a reactive subject.
  * 
- * @param {any} value
- * @param {Function[]} events 
- * @returns 
+ * @public
+ * @param value - The subject that should be reactive.
+ * @param events - An array of event callback functions.
+ * @returns The reactive subject.
  */
 function subject(value: any, events: Function[]): any[]|Object {
     function watch(fn: Function): Function {
@@ -32,8 +33,9 @@ function subject(value: any, events: Function[]): any[]|Object {
 /**
  * Create a reactive variable reference.
  * 
- * @param {any} value 
- * @returns {ProxyConstructor}
+ * @public
+ * @param value - The value to make reactive.
+ * @returns The reactive value.
  */
 export default function ref(value: any): ProxyConstructor {
     const events: Function[] = [];

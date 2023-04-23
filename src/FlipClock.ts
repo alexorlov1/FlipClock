@@ -6,44 +6,42 @@ import VNode from "./VNode";
 
 language(aliases, dictionary);
 
+/**
+ * The FlipClock class starts, stops, resets, mounts, and unmounts the clock.
+ * The clock also tracks the time and renders the clock with each interval.
+ * 
+ * @public
+ */
 export default class FlipClock {
     
     /**
      * The element the count is mounted.
-     * 
-     * @var {Element}
      */
     public el: Element
     
     /**
      * The face used to display the clock.
-     * 
-     * @var {Face}
      */
     public face: Face
     
     /**
      * The face value displayed on the clock.
-     * 
-     * @var {Timer}
      */
     public timer: Timer
     
     /**
-     * Instantiate a new clock instance.
+     * Construct the FlipClock.
      * 
-     * @param attributes 
+     * @param attributes - The options passed to the instance.
      */
-    constructor(
-        attributes: Partial<FlipClock> = {}
-    ) { 
+    constructor(attributes: Partial<FlipClock> = {}) { 
         if(!attributes.face) {
             throw new Error('You must define a face property.');
         }
         
         this.face = attributes.face;
         this.face.on('render', () => this.render());
-        this.timer = prop(attributes.timer, new Timer(1000));
+        this.timer = Timer.make(prop(attributes.timer, 1000));
         
         if(attributes.el) {
             this.mount(attributes.el);
@@ -53,10 +51,15 @@ export default class FlipClock {
     /**
      * Mount the clock instance to the DOM.
      * 
-     * @param {Element} el
-     * @returns {this}
+     * @param el - The DOM element used to mount the clock.
+     * @returns The `FlipClock` instance.
      */
-    mount(el: Element): this {       
+    mount(el?: Element): this {
+        // If no element, then ignore this method call..     
+        if(!el) {
+            return this;   
+        }
+
         this.face.beforeMount(this);
         this.el = el;
         this.render();
@@ -72,7 +75,7 @@ export default class FlipClock {
     /**
      * Render the clock instance.
      * 
-     * @returns {VNode}
+     * @returns The rendered VNode.
      */
     render(): VNode {
         this.face.hook('beforeCreate', this);
@@ -101,16 +104,19 @@ export default class FlipClock {
     /**
      * Start the clock instance.
      *
-     * @param  {Function} fn
-     * @return {this}
+     * @param fn - A function that is called after the clock starts.
+     * @returns The `FlipClock` instance.
      */
     start(fn?: Function): this {
-        this.timer.start(() => {
+        const callback = () => {
             this.face.hook('interval', this, fn);
 
             call(fn);
-        });
 
+            return callback;
+        };
+
+        this.timer.start(callback());
         this.face.hook('started', this);
 
         return this;
@@ -119,8 +125,8 @@ export default class FlipClock {
     /**
      * Stop the clock instance.
      *
-     * @param  {Function} fn
-     * @return {this}
+     * @param fn - A function that is called after the clock stops.
+     * @returns The `FlipClock` instance.
      */
     stop(fn?: Function): this {
         this.timer.stop(fn);
@@ -130,9 +136,26 @@ export default class FlipClock {
     }
 
     /**
+     * Toggle starting/stopping the clock instance.
+     *
+     * @param fn - A function that is called after the clock stops.
+     * @returns The `FlipClock` instance.
+     */
+    toggle(fn?: Function): this {
+        if(this.timer.isStopped) {
+            this.start(fn);
+        }
+        else {
+            this.stop(fn);
+        }
+        
+        return this;
+    }
+
+    /**
      * Unmount the clock instance from the DOM.
      * 
-     * @return {this}
+     * @returns The `FlipClock` instance.
      */
     unmount(): this {
         this.face.hook('beforeUnmount', this);

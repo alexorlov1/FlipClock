@@ -6,6 +6,7 @@ import duration from './duration';
 import flatten from './flatten';
 import formatDate from './formatDate';
 import formatDuration from './formatDuration';
+import getTwelveHourFormat from './getTwelveHourFormat';
 import h from './h';
 import isNegative from './isNegative';
 import isNegativeZero from './isNegativeZero';
@@ -15,7 +16,7 @@ import pad from './pad';
 import prop from './prop';
 import ref from './ref';
 import round from './round';
-import { next, prev } from './values';
+// import { next, prev } from './values';
 
 export {
     call,
@@ -26,14 +27,15 @@ export {
     flatten,
     formatDate,
     formatDuration,
+    getTwelveHourFormat,
     h,
     isNegative,
     isNegativeZero,
     language,
-    next,
+    // next,
     noop,
     pad,
-    prev,
+    // prev,
     prop,
     ref,
     round,

@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Hungarian
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : 'Év',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Hungarian
+ * @public
  */
 export const aliases: string[] = ['hu', 'hu-hu', 'hungarian'];

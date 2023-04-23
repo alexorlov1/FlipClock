@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Japanese
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : '年',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Japanese
+ * @public
  */
 export const aliases: string[] = ['jp', 'ja-jp', 'japanese'];

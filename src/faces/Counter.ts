@@ -1,16 +1,15 @@
 import Card from '../Card';
-import Group from '../Group';
 import Face from '../Face';
-import FlipClock from '../FlipClock';
-import { h, prop } from '../functions';
+import FaceValue from '../FaceValue';
+import Group from '../Group';
 import VNode from '../VNode';
+import { h, prop } from '../functions';
 
 /**
  * This face is designed to increment and decrement values. Usually this face
  * is used as a counter for 0, 1, 2, 3, 4 (etc) for something like page views.
  * 
- * @extends Face
- * @memberof Faces
+ * @public
  * @example
  * ```html
  * <div id="clock"></div>
@@ -31,70 +30,48 @@ import VNode from '../VNode';
 export default class Counter extends Face {
 
     /**
-     * Should the face automatically start on mount.
-     * 
-     * @var {number}
-     */
-    autoStart: boolean;
-    
-    /**
      * Should the face count down instead of up.
-     * 
-     * @var {boolean}
      */
-    countdown: boolean;
+    countdown: boolean = false;
     
     /**
-     * The format callback function.
-     * 
-     * @var {Function}
+     * The number to increment/decrement in the interval.
      */
-    format: Function;
-
-    /**
-     * The number to increment/decrement in the interval..
-     * 
-     * @var {number}
-     */
-    step: number;
+    step: number|(() => number) = 1;
 
     /**
      * Instantiate a Clock face with a given value and attributes.
-     * 
-     * @param {FaceValue} value 
-     * @param {Attributes} attributes
      */
-    constructor(
-        attributes: Partial<Counter> = {}
-    ) {
+    constructor(attributes: Partial<Counter> = {}) {
         super(attributes);
+    }
 
-        this.autoStart = prop(attributes.autoStart, false);
-        this.countdown = prop(attributes.countdown, false);
-        this.step = prop(attributes.step, 1);
+    /**
+     * Get the default FaceValue using the instantiated value.
+     */
+    public defaultValue(value: any): FaceValue {
+        return FaceValue.make(value || 0);
     }
 
     /**
      * Decrement the face value by the given value.
-     * 
-     * @param {Number} value
-     * @return {void}
      */
-    decrement(value?: number): void {
+    public decrement(value?: number): void {
+        const step = prop(value, this.step);
+
         this.value = this.value.copy(
-            this.value.value - prop(value, this.step)
+            this.value.value - (typeof step === 'function' ? step() : step)
         );
     }
 
     /**
-     * Incremebt the face value by the given value.
-     * 
-     * @param {Number} value
-     * @return {void}
+     * Increment the face value by the given value.
      */
-    increment(value?: number): void {
-        this.value = this.value.copy(
-            this.value.value + prop(value, this.step)
+    public increment(value?: number): void {
+        const step = prop(value, this.step);
+
+        this.value = (<FaceValue>this.value).copy(
+            (<FaceValue>this.value).value + (typeof step === 'function' ? step() : step)
         );
     }
 
@@ -102,11 +79,8 @@ export default class Counter extends Face {
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
-     *
-     * @param  {FlipClock} instance
-     * @return {void}
      */
-    interval(instance: FlipClock): void {
+    public interval(): void {
         if(this.countdown) {
             this.decrement();
         }
@@ -117,12 +91,10 @@ export default class Counter extends Face {
 
     /**
      * Render the clock face.
-     * 
-     * @return {VNode} 
      */
-    render(): VNode {
-        const items = this.value.digits.map((digit, i) => new Card(
-            digit, this.lastValue && this.lastValue.digits[i]
+    public render(): VNode {
+        const items =( <string[]>(<FaceValue>this.value).digits).map((digit, i) => new Card(
+            digit, this.lastValue?.digits[i] || digit
         ));
         
         return h('div', {

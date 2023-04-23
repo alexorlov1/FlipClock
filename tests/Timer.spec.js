@@ -21,6 +21,5 @@ test('if can the timer be started and stopped.', () => {
 
     expect(instance.isStopped).toBe(true);
 
-    expect(called).toBe(true);
-    
+    expect(called).toBe(true);    
 });

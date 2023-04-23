@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Korean
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : '년',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Korean
+ * @public
  */
 export const aliases: string[] = ['ko', 'ko-kr', 'korean'];

@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Persian
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : 'سال',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Persian
+ * @public
  */
 export const aliases: string[] = ['fa', 'fa-ir', 'persian'];

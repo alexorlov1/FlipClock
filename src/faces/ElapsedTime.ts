@@ -1,29 +1,18 @@
-import Card from '../Card';
-import Divider from '../Divider';
-import Duration from '../Duration';
 import Face from '../Face';
 import FaceValue from '../FaceValue';
 import FlipClock from '../FlipClock';
-import { prop, h, digitize, duration, formatDuration } from '../functions';
+import { duration, formatDuration, h, prop } from '../functions';
 import Group from '../Group';
-import Attributes from '../types/Attributes';
-import DurationFlags from '../types/DurationFlags';
+import { Duration } from '../types';
 import VNode from '../VNode';
+import FormattableFace from './FormattableFace';
 
-/**
- * The flag regex pattern.
- * 
- * @var {RegExp}
- */
-const pattern: RegExp = /[^\w]+/;
-        
 /**
  * This face will show the amount of time elapsed since the given value and
  * display it a specific format. For example 'hh:mm:ss' will show the elapsed
  * time in hours, minutes, seconds.
  * 
- * @extends Face
- * @memberof Faces * 
+ * @public
  * @example
  * ```html
  * <div id="clock"></div>
@@ -39,203 +28,85 @@ const pattern: RegExp = /[^\w]+/;
  * instance.mount(document.querySelector('#clock'));
  * ```
  */
-export default class ElapsedTime extends Face {
+export default class ElapsedTime extends FormattableFace {
 
     /**
      * Should the face count down instead of up.
-     * 
-     * @var {boolean}
      */
     countdown: boolean = false;
     
     /**
-     * The date format to display.
-     * 
-     * @var {string}
+     * The ending date used to calculate the elsapsed time.
      */
-    format: string;    
+    end: Date;
 
     /**
-     * Show the labels on the clock face.
-     * 
-     * @var {string[]|Function}
+     * The string or callback function used to format the value.
      */
-    labels: Attributes|((face: ElapsedTime) => Attributes);
-
+    format: string|((value: FaceValue, face: Face) => string) = 'hh:mm:ss A';
+    
     /**
      * The starting date used to calculate the elsapsed time.
-     * 
-     * @var {Date}
      */
     start: Date;
 
     /**
      * Instantiate a Clock face with a given value and attributes.
-     * 
-     * @param {FaceValue} value 
-     * @param {Attributes} attributes
      */
-    constructor(
-        attributes: Partial<ElapsedTime> = {}
-    ) {
-        super(attributes);
+    constructor(attributes: Partial<ElapsedTime> = {}) {
+        super(Object.assign({
+            value: FaceValue.make(attributes.end || new Date)
+        }, attributes));
 
-        this.format = prop(attributes.format, 'hh:mm:ss');
-        this.labels = prop(attributes.labels, []);
         this.start = prop(attributes.start, new Date);
+        this.end = prop(attributes.end, this.value);
     }
 
     /**
      * Get the default value if no value is passed.
-     * 
-     * @param {any} value
-     * @returns {FaceValue}
      */
-    defaultValue(value: any): FaceValue {
+    public defaultValue(value: any): FaceValue {
         return super.defaultValue(value || new Date);
     }
 
     /**
-     * Decrement the face value by the given value.
-     * 
-     * @param {Number} value
-     * @return {this}
+     * Format the face value into a string.
      */
-    decrement(value: number = 1000): this {
-        this.value = this.value.copy(
-            new Date(this.value.value.getTime() - value)
-        );
+    public formatFaceValue(value: FaceValue): (format: string) => string {
+        return (format: string) => {
+            const instance: Duration = duration(
+                this.start, (<FaceValue>value)?.value, format
+            );
 
-        return this;
-    }
-
-    /**
-     * Increment the face value by the given value.
-     * 
-     * @param {Number} value
-     * @return {this}
-     */
-    increment(value: number = 1000): this {
-        this.value = this.value.copy(
-            new Date(this.value.value.getTime() + value)
-        );
-
-        return this;
+            return formatDuration(instance, format, this.dictionary);
+        };
     }
 
     /**
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
-     *
-     * @param  {FlipClock} instance
-     * @return {void}
      */
-    interval(instance: FlipClock): void {
-        if(this.countdown) {
-            this.decrement(new Date().getTime() - instance.timer.lastLoop);
-        }
-        else {
-            this.increment(new Date().getTime() - instance.timer.lastLoop);
-        }
+    public interval(instance: FlipClock): void {
+        const date: Date = new Date(
+            (<FaceValue>this.value)?.value.getTime() + instance.timer.elapsedSinceLastLoop
+        );
+
+        this.value = (<FaceValue>this.value).copy(date);
     }
 
     /**
      * Render the clock face.
-     * 
-     * @return {VNode} 
      */
-    render(): VNode {
-        return h('div', { class: 'flip-clock' }, this.createGroups(
-            this.state.value, this.createGroups(this.prevState?.value)
-        ));
-    }
-
-    /**
-     * Create the groups from the given FaceValue.
-     * 
-     * @param {FaceValue} value 
-     * @param {Group[]} prevGroups 
-     * @returns {Group[]}
-     */
-    protected createGroups(value?: FaceValue, prevGroups: Group[] = []): Group[] {
-        if(!value) {
-            return [];
-        }
-        
-        const formatted: string = formatDuration(
-            duration(this.start, value?.value || new Date, this.format), this.format
+    public render(): VNode {
+        const prevGroups: Group[] = this.createGroups(
+            this.prevState?.value || this.state.value
         );
 
-        return formatted
-            .split(/\s+/)
-            .map((subject: string, x: number) => new Group({
-                items: this.createGroup(subject, x, prevGroups)
-            }));
-    }
-
-    /**
-     * Create the groups from given string.
-     * 
-     * @param {string} subject
-     * @param {number} x
-     * @param {Group[]} prevGroups 
-     * @returns {(Group|Divider)[]}
-     */
-    protected createGroup(subject: string, x: number, prevGroups: Group[] = []): (Group|Divider)[] {
-        const digits: string[] = subject.match(pattern) || [];
-
-        const flagGroups: string[] = this.format.split(/\s+/);
-
-        const parts: any[] = subject.split(pattern).map(group => {
-            return digitize(group);
-        });
-        
-        for(let i = 0; i < parts.length - 1; i+=2) {
-            parts.splice(i + 1, 0, new Divider(digits[i]));
-        }
-        
-        let offset: number = 0;
-
-        return parts.map((part, y) => {
-            // If the part is a Divider, then add to the offset and return the
-            // divider. The offset counts the dividers so the index of the flag
-            // can be determined.
-            if(part instanceof Divider) {
-                offset++;
-
-                return part;
-            }
-
-            // Split the flag group using the pattern to match dividers.
-            const flagGroup: string[] = flagGroups[x]?.split(pattern);
-
-            // From the flag group, use the offset to get the current flag
-            const flag: string = flagGroup[y - offset];
-
-            // Creat the group using the label glag and items.
-            return new Group({
-                label: this.label(flag),
-                items: part.map((digit, z) => {
-                    return new Card(digit, (<Card>(<Group>prevGroups[x]?.items[y])?.items[z])?.digit)
-                })
-            })
-        });
-    }
-
-    /**
-     * Get the label using the given flag.
-     * 
-     * @param {string|undefined} flag 
-     * @returns {string}
-     */
-    protected label(flag?: string): string {
-        let labels: Attributes = this.labels;
-
-        if(this.labels instanceof Function) {
-            labels = this.labels(this);
-        }
-                
-        return flag && labels[flag];
+        return h('div', {
+            class: 'flip-clock'
+        }, this.createGroups(
+            this.state.value, prevGroups
+        ));
     }
 }

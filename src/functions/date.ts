@@ -1,12 +1,9 @@
 import { daysInWeek, millisecondsInDay, millisecondsInHour, millisecondsInMinute } from '../constants';
 import Duration from '../types/Duration';
+import round from './round';
 
 /**
  * Add x days to the given date.
- * 
- * @param {Date} date 
- * @param {number} amount 
- * @returns {Date}
  */
 function addDays(date: Date, amount: number): Date {
     // If amount is NaN, then just return the date.
@@ -26,10 +23,6 @@ function addDays(date: Date, amount: number): Date {
 
 /**
  * Add x months to the given date.
- * 
- * @param {Date} date 
- * @param {number} amount 
- * @returns {Date}
  */
 function addMonths(date: Date, amount: number): Date {
     // If amount is NaN, then just reutrn the date.
@@ -82,9 +75,10 @@ function addMonths(date: Date, amount: number): Date {
 /**
  * Add the duration to the given date.
  * 
- * @param {Date} dirtyDate 
- * @param duration 
- * @returns 
+ * @public
+ * @param dirtyDate - The starting date value.
+ * @param duration - The duration used to modify the starting date.
+ * @returns A new date instance.
  */
 export function add(dirtyDate: Date, duration: Duration): Date {
     const date: Date = new Date(dirtyDate);
@@ -116,9 +110,10 @@ export function add(dirtyDate: Date, duration: Duration): Date {
 /**
  * Compare two dates and return a number. This method is used with sort().
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
+ * @returns The values for an asc sort.
  */
 export function compareAsc(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
@@ -137,8 +132,8 @@ export function compareAsc(dirtyLeft: Date, dirtyRight: Date): number {
 /**
  * Set the date to the end of the relative day.
  * 
- * @param {Date} date 
- * @returns {Date}
+ * @param date - The date subject.
+ * @returns The modified date.
  */
 function endOfDay(date: Date): Date {
     date.setHours(23, 59, 59, 999)
@@ -148,8 +143,8 @@ function endOfDay(date: Date): Date {
 /**
  * Set the date to the end of the relative month.
  * 
- * @param {Date} date 
- * @returns {Date}
+ * @param date - The date subject.
+ * @returns The modified date.
  */
 function endOfMonth(date: Date): Date {
     const month = date.getMonth()
@@ -161,8 +156,9 @@ function endOfMonth(date: Date): Date {
 /**
  * Determines if the given date is the last day of the month.
  * 
- * @param {Date} date 
- * @returns {boolean}
+ * @public
+ * @param date - The date subject.
+ * @returns `true` if the date is the last day of the month.
  */
 export function isLastDayOfMonth(date: Date): boolean {
     return endOfDay(date).getTime() === endOfMonth(date).getTime()
@@ -171,8 +167,8 @@ export function isLastDayOfMonth(date: Date): boolean {
 /**
  * Calculates the difference between two given dates in calendar years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
  * @returns {number}
  */
 function differenceInCalendarYears(dirtyLeft: Date, dirtyRight: Date): number {
@@ -184,8 +180,8 @@ function differenceInCalendarYears(dirtyLeft: Date, dirtyRight: Date): number {
 /**
  * Calculates the difference between two given dates in calendar years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
  * @returns {number}
  */
 function differenceInCalendarMonths(dirtyLeft: Date, dirtyRight: Date): number {
@@ -199,9 +195,10 @@ function differenceInCalendarMonths(dirtyLeft: Date, dirtyRight: Date): number {
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator.
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of years between the two dates.
  */
 export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
@@ -226,9 +223,10 @@ export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
 /**
  * Calculates the difference between two given dates in months.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator.
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of months between the two dates.
  */
 export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
@@ -267,64 +265,70 @@ export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
 /**
  * Calculates the difference between two given dates in weeks.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator.
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of weeks between the two dates.
  */
 export function differenceInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
-    return Math.floor(differenceInDays(dirtyLeft, dirtyRight) / daysInWeek)
+    return round(differenceInDays(dirtyLeft, dirtyRight) / daysInWeek)
 }
 
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator.
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of days between the two dates.
  */
 export function differenceInDays(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInDay);
+    return round(differenceInMilliseconds(left, right) / millisecondsInDay);
 }
 
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of hours between the two dates.
  */
 export function differenceInHours(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInHour);
+    return round(differenceInMilliseconds(left, right) / millisecondsInHour);
 }
 
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of minutes between the two dates.
  */
 export function differenceInMinutes(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInMinute);
+    return round(differenceInMilliseconds(left, right) / millisecondsInMinute);
 }
 
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of seconds between the two dates.
  */
  export function differenceInSeconds(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / 1000);
+    return round(differenceInMilliseconds(left, right) / 1000);
 }
 
 /**
  * Calculates the difference between two given dates in years.
  * 
- * @param {Date} dirtyLeft 
- * @param {Date} dirtyRight 
- * @returns {number}
+ * @public
+ * @param dirtyLeft - The left side comparator 
+ * @param dirtyRight - The right side comparator.
+ * @returns The number of milliseconds between the two dates.
  */
 export function differenceInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number {
     return new Date(dirtyLeft).getTime() - new Date(dirtyRight).getTime();

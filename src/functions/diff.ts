@@ -65,9 +65,9 @@ function getNodeContent(node: Node|VNode): string|null|undefined {
 /**
  * Render the VNode as a DOM element.
  * 
- * @param {VNode} vnode
- * @returns {Element}
- * @memberof functions
+ * @public
+ * @param vnode - The VNode to render.
+ * @returns The rendered DOM element.
  */
 export function render(vnode: VNode): Element {
     // Create the DOM element
@@ -138,12 +138,11 @@ function shouldReplaceElement(vnode: VNode, el: Node): boolean {
 /**
  * Diff the VNode and Node and sync the changes with the DOM node.
  * 
- * @param {VNode} vnode 
- * @param {Element} el 
- * @return {VNode}
- * @memberof functions
+ * @public
+ * @param vnode - The VNode to render.
+ * @param el - The DOM element to compare the VNode against.
  */
-export function diff(vnode: VNode, el: Node) {
+export function diff(vnode: VNode, el: Node): void {
     // If the element is not the same type, replace with the new element.
     // Since the element is replaced, there is no need to do anything.        
     if(shouldReplaceElement(vnode, el)) {

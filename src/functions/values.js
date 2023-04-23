@@ -1,7 +1,7 @@
 /**
  * An array of objects with min/max ranges.
  *
- * @private
+ * @public
  * @type {array}
  */
  const RANGES = [{
@@ -22,7 +22,7 @@
  * Format a string into a new data type. Currently only supports string to
  * number conversion.
  *
- * @private
+ * @public
  * @function format
  * @param {string} string - The string to format.
  * @param {string} type - The data type (represented as a string) used to
@@ -43,7 +43,7 @@ function format(string, type) {
  * This is mainly an interval method, but can be used by faces to help
  * determine what the next value of a string should be.
  *
- * @private
+ * @public
  * @function format
  * @param {string} char - The char used to determine the range.
  * @param {string} type - The data type (represented as a string) used to
@@ -65,7 +65,7 @@ function findRange(char) {
 /**
  * Create a string from a character code, which is returned by the callback.
  *
- * @private
+ * @public
  * @callback stringFromCharCodeBy
  * @param {string} char - The char used to determine the range.
  * @param {function} fn - The callback function receives `range` and `code`

@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Italian
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : 'Anni',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Italian
+ * @public
  */
 export const aliases: string[] = ['da', 'da-dk', 'danish'];

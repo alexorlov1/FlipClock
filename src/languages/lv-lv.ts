@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Latvian
+ * @public
  */
 export const dictionary: Attributes = {
     'years'   : 'Gadi',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Latvian
+ * @public
  */
 export const aliases: string[] = ['lv', 'lv-lv', 'latvian'];

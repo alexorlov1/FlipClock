@@ -1,100 +1,114 @@
-
 import { call } from './functions';
 
+/**
+ * The Timer class uses a requestAnimationFrame loop to build a timer that can
+ * start and stop.
+ * 
+ * @public
+ */
 export default class Timer {
 
     /**
      * The count increments with each interval.
-     * 
-     * @var {number}
      */
-    count: number = 0;
+    protected count: number = 0;
 
     /**
      * The requestAnimationFrame handle number.
-     * 
-     * @var {number}
      */
-    handle: number;
+    protected handle: number;
 
     /**
      * The number of milliseconds that define an interval.
      * 
-     * @var {number}
+     * @readonly
      */
-    interval: number = 1000;
+    protected readonly interval: number|(() => number) = 1000;
 
     /**
      * The timestamp of the last loop.
-     * 
-     * @var {number}
      */
-    lastLoop: number;
+    protected lastLooped: number;
 
     /**
      * The date the timer starts.
-     * 
-     * @var {Date}
      */
-    started: Date;
+    protected startDate: Date;
 
     /**
      * The requestAnimationFrame handle number.
-     * 
-     * @var {boolean}
      */
-    running: boolean = false;
+    protected running: boolean = false;
 
     /**
      * Create a new `Timer` instance.
      *
-     * @param {number} interval
+     * @param interval - The number of milliseconds between intervals.
      */
-    constructor(interval: number = 1000) {
+    constructor(interval: number|(() => number) = 1000) {
         this.interval = interval;
     }
 
     /**
      * The `elapsed` attribute.
-     *
-     * @type {number}
      */
     get elapsed(): number {
-        if(!this.lastLoop) {
+        if(!this.startDate) {
             return 0;
         }
 
-        return this.lastLoop - (this.started || new Date()).getTime();
+        return Math.max(0, Date.now() - this.startDate.getTime());
     }
 
     /**
-     * The `isRunning` attribute.
-     *
-     * @type {boolean}
+     * The `elapsedSinceLastLoop` attribute.
+     */
+    get elapsedSinceLastLoop(): number {
+        if(!this.lastLoop) {
+            return this.lastLoop;
+        }
+
+        return Date.now() - this.lastLoop;
+    }
+
+    /**
+     * Determines if the Timer is currently running.
      */
     get isRunning(): boolean {
         return this.running === true;
     }
 
     /**
-     * The `isStopped` attribute.
-     *
-     * @type {boolean}
+     * Determines if the Timer is currently stopped.
      */
     get isStopped(): boolean {
         return this.running === false;
     }
 
     /**
-     * Resets the timer.
-     *
-     * @param  {Function} fn - The interval callback.
-     * @return {Timer} - The `Timer` instance.
+     * Get the last timestamp the timer looped.
      */
-    reset(fn: Function): Timer {
+    get lastLoop(): number {
+        return this.lastLooped || 0;
+    }
+
+    /**
+     * Get the date object when the timer started.
+     */
+    get started(): Date|undefined {
+        return this.startDate;
+    }
+
+    /**
+     * Resets the timer. If a callback is provided, re-start the clock.
+     */
+    reset(fn?: (timer: Timer) => void): Timer {
         this.stop(() => {
             this.count = 0;
-            this.start(() => call(fn));
+
+            if(fn) {
+                this.start(() => call(fn));
+            }
         });
 
         return this;
@@ -102,20 +116,20 @@ export default class Timer {
 
     /**
      * Starts the timer.
-     *
-     * @param  {Function} fn - The interval callback.
-     * @return {Timer} - The `Timer` instance.
      */
-    start(fn: Function): Timer {
-        this.started = new Date;
-        this.lastLoop = Date.now();
+    start(fn: (timer: Timer) => void): Timer {
+        this.startDate = new Date;
         this.running = true;
 
         const loop = () => {
-            if(Date.now() - this.lastLoop >= this.interval) {
-                call(fn);
+            const interval: number = typeof this.interval === 'function'
+                ? this.interval()
+                : this.interval;
+
+            if(Date.now() - this.lastLoop >= interval) {
+                call(fn, interval);
                 
-                this.lastLoop = Date.now();
+                this.lastLooped = Date.now();
                 this.count++;
             }
 
@@ -129,9 +143,6 @@ export default class Timer {
 
     /**
      * Stops the timer.
-     *
-     * @param  {Function} fn - The stop callback.
-     * @return {Timer} - The `Timer` instance.
      */
     stop(fn?: Function): Timer {
         if(this.isRunning) {
@@ -145,5 +156,12 @@ export default class Timer {
         }
 
         return this;
+    }
+
+    /**
+     * Create a new Timer instance.
+     */
+    static make(interval: number|Timer) {
+        return interval instanceof Timer ? interval : new Timer(interval);
     }
 }

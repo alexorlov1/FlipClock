@@ -1,35 +1,50 @@
 import { digitize, prop, ref } from "./functions";
 
+/**
+ * The FaceValue class digitizes the raw value and so it can be used by the
+ * clock face.
+ * 
+ * @public
+ */
 export default class FaceValue {
 
     /**
      * An array of digits.
      * 
-     * @var {ProxyConstructor}
+     * @readonly
      */
-    public readonly digits: ProxyConstructor
+    public readonly digits: string[]
 
     /**
      * The callback function used to format the value.
      * 
-     * @var {Function}
+     * @readonly
      */
     public readonly format: (value: any) => any
 
     /**
      * The minimum number of digits.
      * 
-     * @var {number|false}
+     * @readonly
      */
     public readonly minimumDigits: number|false = 0
 
     /**
-     * Instnatiate the face value.
+     * The raw value passed to the instance.
      * 
-     * @param {any} value 
-     * @param {Attributes} attributes 
+     * @readonly
      */
-    constructor(readonly value: any, attributes: Partial<FaceValue> = {}) {
+    public readonly value: any
+
+    /**
+     * Instantiate the face value.
+     * 
+     * @param value - The value to digitize.
+     * @param attributes - The options passed to the instance.
+     */
+    constructor(value: any, attributes: Partial<FaceValue> = {}) {
+        this.value = value;
+        
         const minimumDigits: number = prop(
             attributes.minimumDigits, this.minimumDigits
         );
@@ -50,11 +65,15 @@ export default class FaceValue {
         }  
     }
 
+    compare(subject: any) {
+        return this.value === FaceValue.make(subject).value;
+    }
+
     /**
      * Create a new instance with the given value.
      * 
-     * @param {any} value
-     * @return {FaceValue}
+     * @param value - The new value.
+     * @returns A new FaceValue instance.
      */
     copy(value: any): FaceValue {
         return new FaceValue(value, {
@@ -67,15 +86,15 @@ export default class FaceValue {
      * Instantiate a new FaceValue with the given value. If the give value
      * is already an instance of FaceValue, then return the instance.
      * 
-     * @param {any} value 
-     * @param {Partial<FaceValue>} attributes 
-     * @returns {FaceValue}
+     * @param value - The clock's face value.
+     * @param attributes - The options passed to the instance.
+     * @returns A new FaceValue instance.
      */
     static make(value: any, attributes: Partial<FaceValue> = {}): FaceValue {
         if(value instanceof FaceValue) {
             return value;
         }
-        
+
         return new this(value, attributes);
     }
 }

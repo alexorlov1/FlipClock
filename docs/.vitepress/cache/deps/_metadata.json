@@ -1,0 +1,19 @@
+{
+  "hash": "d478fdce",
+  "browserHash": "e9864e9d",
+  "optimized": {
+    "vue": {
+      "src": "../../../../node_modules/.pnpm/vue@3.2.47/node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "file": "vue.js",
+      "fileHash": "08c08acb",
+      "needsInterop": false
+    },
+    "flipclock": {
+      "src": "../../../../node_modules/.pnpm/file+/node_modules/flipclock/dist/flipclock.es.js",
+      "file": "flipclock.js",
+      "fileHash": "a5cd29a5",
+      "needsInterop": false
+    }
+  },
+  "chunks": {}
+}

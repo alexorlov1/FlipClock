@@ -13,10 +13,10 @@ export type DigitizeAttributes = {
  * use by the `Face`, which convert the digitized array into an array of `List`
  * instances.
  *
- * @function digitize
- * @param  {*} value
- * @param  {DigitizeAttributes} options
- * @memberof functions
+ * @public
+ * @param value - The value to digitize.
+ * @param attributes - The options for digitizing.
+ * @returns An array if digitized strings.
  */
 export default function digitize(value: any, attributes: DigitizeAttributes = {}): string[] {
     function prepend(digit) {

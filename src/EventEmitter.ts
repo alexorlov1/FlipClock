@@ -1,21 +1,25 @@
 import EmitterEvent from './types/EmitterEvent';
 
-export default class EventEmitter {
+/**
+ * The EventEmitter class gives event emitter method to classes that inherit it.
+ * 
+ * @public
+ */
+export default abstract class EventEmitter {
+    
     /**
      * The instance events.
-     * 
-     * @var {EmitterEvent[]}
      */
     protected events: EmitterEvent[] = [];
 
     /**
      * Emit an event.
-     *
-     * @param  {string} key
-     * @param  {...} key
-     * @return {this}
+     * 
+     * @param key - The name of the name of the event to emit.
+     * @param args - The arguments passed to the event.
+     * @returns The `EventEmitter` instance.
      */
-     emit(key: string, ...args) {
+    emit(key: string, ...args): this {
         const events: EmitterEvent[] = this.events.filter(
             (e: EmitterEvent) => e.key === key
         );
@@ -30,12 +34,9 @@ export default class EventEmitter {
     /**
      * Stop listening to for event to fire.
      *
-     * @param {string} key
-     * @param {(Function|undefined)} fn - The listener callback function. If no
-     *     function is defined, all events with the specified id/key will be
-     *     removed. Otherwise, only the event listeners matching the id/key AND
-     *     callback will be removed.
-     * @return {this}
+     * @param key - The name of the name of the event to emit.
+     * @param fn - The listener callback function.
+     * @returns The EventEmitter instance.
      */
     off(key: string, fn?: (event: EventEmitter) => void) {
         this.events = this.events.filter((e: EmitterEvent) => {
@@ -59,10 +60,9 @@ export default class EventEmitter {
     /**
      * Start listening for an event to fire.
      *
-     * @param  {string} key
-     * @param  {Function} fn
-     * @param  {boolean} [once=false]
-     * @return {this}
+     * @param key - The name of the name of the event to emit.
+     * @param fn - The listener callback function.
+     * @returns The EventEmitter instance.
      */
     on(key: string, fn: (event: EmitterEvent) => void) {
         this.events.push({ key, fn });
@@ -73,11 +73,11 @@ export default class EventEmitter {
     /**
      * Listen form an event to fire once.
      *
-     * @param  {string} key
-     * @param  {Function} fn - The listener callback function.
-     * @return {this}
+     * @param key - The name of the name of the event to emit.
+     * @param fn - The listener callback function.
+     * @returns The EventEmitter instance.
      */
-    once(key, fn) {
+    once(key: string, fn: (...args) => void) {
         return this.on(key, (...args) => {
             fn(...args);
 

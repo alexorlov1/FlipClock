@@ -3,7 +3,6 @@ import ChildNode from '../types/ChildNode';
 import DomElement from '../types/DomElement';
 import VNode from '../VNode';
 
-
 const pattern: RegExp = /<!--(.+?)-->/gim;
 
 function isComment(str:string): boolean {
@@ -11,25 +10,22 @@ function isComment(str:string): boolean {
 }
 
 function isDomElement(object: any): object is DomElement {
-    return typeof object === 'object' && 'render' in object;
+    return object && typeof object === 'object' && 'render' in object;
 }
 
 /**
  * Create a VNode.
  * 
- * @param {string} tagName 
- * @param {Attributes|ChildNode[]|ChildNode} attrs 
- * @param {ChildNode[]} children 
- * @returns {VNode}
+ * @public
+ * @param tagName - The tag of the VNode or the DOMElement.
+ * @param attrs - Attributes, an array of ChildNodes, a ChildNode or undefined.
+ * @param children - An array of ChildNodes
+ * @returns The VNode instance.
  */
-export default function h(tagName: string|DomElement, attrs?: Attributes|(ChildNode|undefined)[]|ChildNode, children?: (ChildNode|undefined)[]): VNode {
+export default function h(tagName: string|DomElement, attrs?: Attributes|(ChildNode|undefined)[]|ChildNode, children?: (ChildNode|undefined)[]|ChildNode): VNode {
     // If the tagName is a DomElement, then render and return it.
     if(isDomElement(tagName)) {
-        const vnode: VNode = tagName.render();
-        
-        // merge(vnode.attributes, attrs);
-
-        return vnode;
+        return <VNode> tagName.render();
     }
 
     // If attrs is an array, then assume it to be children
@@ -39,12 +35,17 @@ export default function h(tagName: string|DomElement, attrs?: Attributes|(ChildN
     }
 
     // If the attrs are not an object, assume it to be a text node.
-    if(attrs && !(attrs instanceof Object)) {
+    if(attrs && (!(attrs instanceof Object) || typeof attrs === 'string')) {
         children = [attrs]
     }
 
+    // If the children are passed as a string, convert them to an array.
+    if(typeof children === 'string') {
+        children = [children];
+    }
+
     // Create the new Vnode and recursively create its children.
-    return new VNode(tagName, <Attributes> attrs, children?.filter(child => child !== undefined).map(textContent => {
+    return new VNode(tagName, <Attributes> attrs, (<ChildNode[]>children)?.filter(child => child !== undefined).map(textContent => {
         if(textContent instanceof VNode) {
             return textContent;
         }

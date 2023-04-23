@@ -7,9 +7,7 @@
 import Attributes from "../types/Attributes";
 
 /**
- * @constant dictionary
- * @type {Attributes}
- * @memberof Languages.Turkish
+ * @public
  */
 export const dictionary: Attributes = {
 	'years'   : 'Yıl',
@@ -21,8 +19,6 @@ export const dictionary: Attributes = {
 };
 
 /**
- * @constant aliases
- * @type {string[]}
- * @memberof Languages.Turkish
+ * @public
  */
 export const aliases: string[] = ['tr', 'tr-tr', 'turkish'];

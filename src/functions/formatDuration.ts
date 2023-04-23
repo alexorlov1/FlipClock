@@ -1,41 +1,27 @@
-import { durationFlagPattern } from "../constants";
+import { durationFlagPattern, durationFlagFormats } from "../constants";
+import Dictionary from "../Dictionary";
 import Duration from "../types/Duration";
-import Flags from "../types/Flags";
-import pad from "./pad";
-
-/**
- * The available formatting flags.
- * 
- * @var {Flags}
- */
- const flags: Flags = {
-    Y: (duration: Duration, length: number): string => pad(duration?.years, length),
-    M: (duration: Duration, length: number): string => pad(duration?.months, length),
-    W: (duration: Duration, length: number): string => pad(duration?.weeks, length),
-    D: (duration: Duration, length: number): string => pad(duration.days, length),
-    h: (duration: Duration, length: number): string => pad(duration.hours, length),
-    m: (duration: Duration, length: number): string => pad(duration.minutes, length),
-    s: (duration: Duration, length: number): string => pad(duration.seconds, length),
-    v: (duration: Duration, length: number): string => pad(duration.milliseconds, length)
-}
 
 /**
  * Format the duration format flags and return an array of flag properties 
  * in the correct order.
  * 
- * @param {string} format 
- * @returns {DurationFlags}
+ * @public
+ * @param duration - The duration to format.
+ * @param format - The format string.
+ * @param dictionary - The language dictionary for translations.
+ * @returns The formatted duration.
  */
-export default function formatDuration(duration: Duration, pattern: string) {
-    pattern = pattern.replace(durationFlagPattern, i => {
+export default function formatDuration(duration: Duration, format: string, dictionary: Dictionary): string {
+    format = format.replace(durationFlagPattern, i => {
         const key = i.slice(0, 1);
 
-        if(!flags[key]) {
+        if(!durationFlagFormats[key]) {
             throw new Error(`Invalid duration format: ${i}`);
         }
 
-        return flags[key](duration, i.length)
+        return durationFlagFormats[key](duration, i.length)
     });
 
-    return pattern;
+    return format;
 }

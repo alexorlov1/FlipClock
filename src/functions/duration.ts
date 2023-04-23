@@ -33,10 +33,11 @@ function sort(a: string, b: string) {
 /**
  * Create a Duration instance using a start and end date with the given format.
  * 
- * @param {Date} dirtyStart 
- * @param {Date} dirtyEnd 
- * @param {string} format 
- * @returns {Duration}
+ * @public
+ * @param dirtyStart - The start of the date range.
+ * @param dirtyEnd - The end of the date range.
+ * @param format - The format string.
+ * @returns The duration instance.
  */
 export default function duration(dirtyStart: Date, dirtyEnd: Date, format: string): Duration {
     // Get the start and end date by comparing them by chronology.
@@ -63,5 +64,5 @@ export default function duration(dirtyStart: Date, dirtyEnd: Date, format: strin
     }
     
     // Reduce the keys into a Duration instance.
-    return flags.reduce((carry, key) => diff(key, carry), {});
+    return Object.freeze(flags.reduce((carry, key) => diff(key, carry), {}));
 }

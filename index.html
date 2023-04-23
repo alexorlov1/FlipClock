@@ -18,48 +18,45 @@
     <button id="decrement">-1</button>
     <button id="increment">+1</button>
 
-    <script lang="ts" type="module">
-        import { Clock, Counter, ElapsedTime, FaceValue, FlipClock } from './index'
+    <script type="module">
+        import { FlipClock, Counter, FaceValue } from './index';
 
-        const el = document.querySelector('#app');
+        const date = new Date();
 
-        new FlipClock({
-            el: el.appendChild(document.createElement('div')),
-            face: new ElapsedTime({
-                start: new Date('2022-05-29'),
-                labels: face => ({
-                    MM: face.dictionary.get('Months'),
-                    DD: face.dictionary.get('Days'),
-                    hh: face.dictionary.get('Hours'),
-                    mm: face.dictionary.get('Minutes'),
-                    ss: face.dictionary.get('Seconds')
-                })
-            })
-        })
-
-        new FlipClock({
-            el: el.appendChild(document.createElement('div')),
-            face: new Clock({
-                format: 'YYYY-MM-DD hh:mm:ss A'
-            })
+        date.setFullYear(1970);
+        date.setMonth(0);
+        date.setDate(1);
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+    
+        const face = new Counter({
+            countdown: true,
+            value: 10
         });
+
+        const el = document.querySelector('#app')?.appendChild(
+            document.createElement('div')
+        );
+
+        const clock = new FlipClock({ el, face });
+
+        /*
+        FaceValue.make(date);
+
+
+
+        import moment from 'moment';
 
         const clock = new FlipClock({
-            el: el.appendChild(document.createElement('div')),
-            face: new Counter({
-                value: new FaceValue(1, {
-                    format: value => value * 1000
-                }),
+            el,
+            face: new Clock({
+                format: (value, face) => {
+                    return moment(value.value).format('MMMM');
+                }
             })
         });
-
-        document.querySelector('#decrement')?.addEventListener('click', () => {
-            clock.face.decrement();
-        })
-
-        document.querySelector('#increment')?.addEventListener('click', () => {
-            clock.face.increment();
-        })
+        */
     </script>
 </body>
 </html>

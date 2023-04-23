@@ -1,8 +1,9 @@
+import './scss/flipclock.scss';
+
 import Card from './src/Card';
 import CardItem from './src/CardItem';
 import Dictionary from './src/Dictionary';
 import Divider from './src/Divider';
-import Duration from './src/Duration';
 import EventEmitter from './src/EventEmitter';
 import Face from './src/Face';
 import FaceValue from './src/FaceValue';
@@ -17,7 +18,6 @@ export {
     CardItem,
     Dictionary,
     Divider,
-    Duration,
     EventEmitter,
     Face,
     FaceValue,
@@ -28,6 +28,7 @@ export {
     VNode
 };
 
+export * from './src/types';
 export * from './src/faces';
 export * from './src/functions';
 export * from './src/languages';

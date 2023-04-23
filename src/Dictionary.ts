@@ -1,14 +1,27 @@
 import Attributes from "./types/Attributes";
 
+/**
+ * The Dictionary class translates strings using a definition file.
+ * 
+ * @public
+ */
 export default class Dictionary {
-    protected readonly definitions: Attributes;
+    /**
+     * A map of definitions used to translate strings.
+     * 
+     * @readonly
+     */
+    protected readonly definitions: Map<string,string>;
 
-    constructor(
-        definitions: Attributes = {}
-    ) {
+    /**
+     * Instnatiate a Dictionary.
+     * 
+     * @param definitions - An object of key/value pairs
+     */
+    constructor(definitions: Attributes = {}) {
         this.definitions = new Map(
             Object.entries(definitions).map(([key, value]) => [
-                key.toLowerCase(), value
+                key.toLowerCase(), String(value)
             ])
         );
     }
@@ -16,8 +29,8 @@ export default class Dictionary {
     /**
      * Get the definition
      * 
-     * @param {string} value 
-     * @returns {string|undefined}
+     * @param value - The string to translate.
+     * @returns The translated string.
      */
     get(value?: string): string|undefined {
         return this.definitions.get(value?.toLowerCase()) || value;

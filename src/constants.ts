@@ -1,32 +1,54 @@
-import Duration from "./types/Duration";
+import Dictionary from "./Dictionary";
+import { getTwelveHourFormat, pad } from "./functions";
+import { Flags } from "./types";
+import Duration from "./types/Duration"
 
 /**
  * The regex expression that matches the formatting flags for dates.
  *
- * @name dateFlagPattern
- * @constant
- * @type {RegExp}
- * @default
+ * @public
  */
- export const dateFlagPattern = /Y{2,4}|M{1,2}|D{1,2}|h{1,2}|m{1,2}|s{1,2}|v{1,4}|A|a/g;
+export const dateFlagPattern: RegExp = /Y{2,4}|M{1,2}|D{1,2}|h{1,2}|H{1,2}|m{1,2}|s{1,2}|v{1,4}|A|a/g
 
 /**
- * Days in a week
+ * The date formatting flags.
  *
- * @name daysInWeek
- * @constant
- * @type {number}
- * @default
+ * @public
  */
-export const daysInWeek = 7
+export const dateFlagFormats: {[key: string]: (date: Date, dictionary: Dictionary) => string} = {
+    a: (date: Date, dictionary: Dictionary): string => String(dictionary.get(date.getHours() < 12 ? 'am' : 'pm')).toLowerCase(),
+    A: (date: Date, dictionary: Dictionary): string => String(dictionary.get(date.getHours() < 12 ? 'am' : 'pm')).toUpperCase(),
+    YY: (date: Date): string => pad(date.getFullYear().toString().slice(2), 2),
+    YYYY: (date: Date): string => date.getFullYear().toString(),
+    M: (date: Date): string => String(date.getMonth()),
+    MM: (date: Date): string => pad(date.getMonth() + 1, 2),
+    D: (date: Date): string => String(date.getDate()),
+    DD: (date: Date): string => pad(date.getDate(), 2),
+    H: (date: Date): string => String(date.getHours()),
+    HH: (date: Date): string => pad(date.getHours(), 2),
+    h: (date: Date): string => getTwelveHourFormat(date),
+    hh: (date: Date): string => pad(getTwelveHourFormat(date)),
+    m: (date: Date): string => String(date.getMinutes()),
+    mm: (date: Date): string => pad(date.getMinutes(), 2),
+    s: (date: Date): string => String(date.getSeconds()),
+    ss: (date: Date): string => pad(date.getSeconds(), 2),
+    v: (date: Date): string => String(date.getMilliseconds()),
+    vv: (date: Date): string => pad(date.getMilliseconds(), 2),
+    vvv: (date: Date): string => pad(date.getMilliseconds(), 3),
+    vvvv: (date: Date): string => pad(date.getMilliseconds(), 4)
+};
+
+/**
+ * The number of days in a week.
+ *
+ * @public
+ */
+export const daysInWeek: number = 7
 
 /**
  * This defines the possible keys for a duration.
  * 
- * @name duration
- * @constant
- * @type {Duration}
- * @default
+ * @public
  */
 export const duration: Duration = {
     years: undefined,
@@ -37,43 +59,48 @@ export const duration: Duration = {
     minutes: undefined,
     seconds: undefined,
     milliseconds: undefined,
-};
+}
 
 /**
  * The regex expression that matches the formatting flags for durations.
  *
- * @name durationFlagPattern
- * @constant
- * @type {RegExp}
- * @default
+ * @public
  */
-export const durationFlagPattern = /(Y|M|W|D|h|m|s|v)+/g;
+export const durationFlagPattern: RegExp = /(Y|M|W|D|h|m|s|v)+/g
 
 /**
- * Milliseconds in 1 day.
+ * The duration formatting flags.
  *
- * @name millisecondsInDay
- * @constant
- * @type {number}
- * @default
+ * @public
  */
-export const millisecondsInDay = 86400000
+export const durationFlagFormats: Flags = {
+    Y: (duration: Duration, length: number): string => pad(duration?.years, length),
+    M: (duration: Duration, length: number): string => pad(duration?.months, length),
+    W: (duration: Duration, length: number): string => pad(duration?.weeks, length),
+    D: (duration: Duration, length: number): string => pad(duration.days, length),
+    h: (duration: Duration, length: number): string => pad(duration.hours, length),
+    m: (duration: Duration, length: number): string => pad(duration.minutes, length),
+    s: (duration: Duration, length: number): string => pad(duration.seconds, length),
+    v: (duration: Duration, length: number): string => pad(duration.milliseconds, length)
+}
 
 /**
- * Milliseconds in 1 hour
+ * The number of milliseconds in 1 day.
  *
- * @name millisecondsInHour
- * @constant
- * @type {number}
+ * @public
  */
-export const millisecondsInHour = 3600000
+export const millisecondsInDay: number = 86400000
 
 /**
- * Milliseconds in 1 minute
+ * The number of milliseconds in 1 hour
  *
- * @name millisecondsInMinute
- * @constant
- * @type {number}
- * @default
+ * @public
  */
- export const millisecondsInMinute = 60000
+export const millisecondsInHour: number = 3600000
+
+/**
+ * The number of milliseconds in 1 minute
+ *
+ * @public
+ */
+export const millisecondsInMinute: number = 60000

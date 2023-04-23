@@ -2,9 +2,7 @@ import Dictionary from "../Dictionary";
 import Attributes from "../types/Attributes";
 
 /**
- * The registered dictionary.
- * 
- * @var {Map<string,Language>}
+ * The registered language dictionaries.
  */
 const languages = new Map<string,Dictionary>();
 
@@ -12,9 +10,10 @@ const languages = new Map<string,Dictionary>();
  * Setter and getter for languages. If a dictionary is defined, it registers
  * the language. If no dictionary is defined, it gets the registered language.
  * 
- * @param {string[]} aliases
- * @param {Attributes} definitions
- * @return {Dictionary}
+ * @public
+ * @param aliases - The alias of the language
+ * @param definitions - The key/value pair of language definitions.
+ * @returns An instance of the Dictionary.
  */
 export default function language(alias: string|string[], definitions?: Attributes): Dictionary {
     if(Array.isArray(alias)) {
