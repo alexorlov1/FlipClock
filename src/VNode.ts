@@ -1,5 +1,30 @@
 import { diff, render } from './functions';
-import type Attributes from './types/Attributes';
+
+/** 
+ * The Attributes interface defines generic key/value pairs.
+ * 
+ * @public 
+ */
+export type Attributes = Record<string, string>;
+
+/** 
+ * The DOMElement interface provides a way to render objects in the DOM.
+ * 
+ * @public 
+ */
+export interface DomElement {
+    /**
+     * Render the element for the DOM.
+     */
+    render(): VNode
+}
+
+/** 
+ * The ChildNode type defines what is renderable DOM node.
+ * 
+ * @public 
+ */
+export type ChildNode = VNode | DomElement | string | number;
 
 /**
  * The VNode is a virtual representation of a DOM element. It is used to diff
@@ -16,45 +41,31 @@ export default class VNode {
 
     /**
      * The element's tagname.
-     * 
-     * @readonly
      */
     public readonly tagName: string
 
     /**
      * The element's attributes.
-     * 
-     * @readonly
      */
     public readonly attributes: Attributes = {}
 
     /**
      * The element's text content.
-     * 
-     * @readonly
      */
     public readonly textContent?: string
 
     /**
      * The element's children nodes.
-     * 
-     * @readonly
      */
     public readonly childNodes: VNode[]
 
     /**
      * The element's event bindings.
-     * 
-     * @readonly
      */
     public readonly on: Attributes = {}
 
     /**
      * Construct the VNode.
-     * 
-     * @param tagName - The tagName of the VNode element.
-     * @param attributes - The attributes used to create the VNode.
-     * @param childNodes - The children elements
      */
     constructor(tagName: string, attributes: Attributes = {}, childNodes: VNode[] = []) {
         // Set the tagname as always lowercase.

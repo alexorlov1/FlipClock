@@ -9,8 +9,6 @@ import CountdownManually from '../components/CountdownManually.vue';
 
 The `Counter` increments up and down.
 
-[[toc]]
-
 ## Basic Usage
 
 Create a counter that increments or decrements by a given number of steps. You may also specify the minimum number of digits. Notice `clock.start()`, this is required because `autoStart` is set to `false`.

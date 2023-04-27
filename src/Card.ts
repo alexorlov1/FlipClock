@@ -1,7 +1,6 @@
-import { prop, h } from "./functions";
 import CardItem from "./CardItem";
-import DomElement from "./types/DomElement";
-import VNode from "./VNode";
+import VNode, { DomElement } from "./VNode";
+import { h, prop } from "./functions";
 
 /**
  * The Card class renders a DOM element that has a flipping effect when the
@@ -12,40 +11,28 @@ import VNode from "./VNode";
 export default class Card implements DomElement {
     /**
      * The current digit displayed on the card.
-     * 
-     * @readonly
      */
-    protected readonly currentDigit: string;
+    public readonly currentDigit: string
 
     /**
      * The last digit, which is used to run the animated if different than the
      * current digit.
-     * 
-     * @readonly
      */
-    protected readonly lastDigit?: string;
+    public readonly lastDigit?: string
 
     /**
      * The number of milliseconds the animation should run.
-     * 
-     * @readonly
      */
-    protected readonly animationRate: number = 225;
+    public readonly animationRate: number = 225;
 
     /**
      * An array of items in the card. This array contains the top and bottom
      * halfs of the card element.
-     * 
-     * @readonly
      */
-    protected readonly items: [CardItem, CardItem];
+    public readonly items: [CardItem, CardItem];
 
     /**
      * Instantiate a new Card.
-     * 
-     * @param currentDigit - The card's current digit to display
-     * @param lastDigit - The card's previous digit
-     * @param animationRate - The number of milliseconds used to the animation rate
      */
     constructor(
         currentDigit: string,

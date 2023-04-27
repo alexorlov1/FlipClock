@@ -1,5 +1,5 @@
 import { h } from "./functions";
-import DomElement from "./types/DomElement";
+import { DomElement } from "./types";
 import VNode from "./VNode";
 
 /**

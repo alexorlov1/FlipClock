@@ -31,8 +31,6 @@ export default class FlipClock {
     
     /**
      * Construct the FlipClock.
-     * 
-     * @param attributes - The options passed to the instance.
      */
     constructor(attributes: Partial<FlipClock> = {}) { 
         if(!attributes.face) {
@@ -40,7 +38,8 @@ export default class FlipClock {
         }
         
         this.face = attributes.face;
-        this.face.on('render', () => this.render());
+        this.face.on('change', () => this.render());
+        
         this.timer = Timer.make(prop(attributes.timer, 1000));
         
         if(attributes.el) {
@@ -50,9 +49,6 @@ export default class FlipClock {
 
     /**
      * Mount the clock instance to the DOM.
-     * 
-     * @param el - The DOM element used to mount the clock.
-     * @returns The `FlipClock` instance.
      */
     mount(el?: Element): this {
         // If no element, then ignore this method call..     
@@ -60,10 +56,10 @@ export default class FlipClock {
             return this;   
         }
 
-        this.face.beforeMount(this);
+        this.face.hook('beforeMount', this);
         this.el = el;
         this.render();
-        this.face.mounted(this);
+        this.face.hook('afterMount', this);
 
         if(this.face.autoStart && this.timer.isStopped) {
             window.requestAnimationFrame(() => this.start());
@@ -74,8 +70,6 @@ export default class FlipClock {
 
     /**
      * Render the clock instance.
-     * 
-     * @returns The rendered VNode.
      */
     render(): VNode {
         this.face.hook('beforeCreate', this);
@@ -103,43 +97,36 @@ export default class FlipClock {
 
     /**
      * Start the clock instance.
-     *
-     * @param fn - A function that is called after the clock starts.
-     * @returns The `FlipClock` instance.
      */
     start(fn?: Function): this {
         const callback = () => {
-            this.face.hook('interval', this, fn);
-
+            this.face.hook('interval', this);
+            
             call(fn);
 
             return callback;
         };
 
+        this.face.hook('beforeStart', this);
         this.timer.start(callback());
-        this.face.hook('started', this);
+        this.face.hook('afterStarted', this);
 
         return this;
     }
 
     /**
      * Stop the clock instance.
-     *
-     * @param fn - A function that is called after the clock stops.
-     * @returns The `FlipClock` instance.
      */
     stop(fn?: Function): this {
+        this.face.hook('beforeStop', this);
         this.timer.stop(fn);
-        this.face.hook('stopped', this);
+        this.face.hook('afterStop', this);
 
         return this;
     }
 
     /**
      * Toggle starting/stopping the clock instance.
-     *
-     * @param fn - A function that is called after the clock stops.
-     * @returns The `FlipClock` instance.
      */
     toggle(fn?: Function): this {
         if(this.timer.isStopped) {
@@ -154,14 +141,12 @@ export default class FlipClock {
 
     /**
      * Unmount the clock instance from the DOM.
-     * 
-     * @returns The `FlipClock` instance.
      */
     unmount(): this {
         this.face.hook('beforeUnmount', this);
         this.el.parentElement?.removeChild(this.el);
         this.face.resetWatchers();
-        this.face.hook('unmounted', this);
+        this.face.hook('afterUnmount', this);
 
         return this;
     }

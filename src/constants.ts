@@ -1,7 +1,9 @@
-import Dictionary from "./Dictionary";
-import { getTwelveHourFormat, pad } from "./functions";
-import { Flags } from "./types";
-import Duration from "./types/Duration"
+import { pad } from "./functions";
+import Duration from "./types/Duration";
+
+export type Flags = {
+    [flag: string]: (duration: Duration, length: number) => string
+};
 
 /**
  * The regex expression that matches the formatting flags for dates.
@@ -9,34 +11,6 @@ import Duration from "./types/Duration"
  * @public
  */
 export const dateFlagPattern: RegExp = /Y{2,4}|M{1,2}|D{1,2}|h{1,2}|H{1,2}|m{1,2}|s{1,2}|v{1,4}|A|a/g
-
-/**
- * The date formatting flags.
- *
- * @public
- */
-export const dateFlagFormats: {[key: string]: (date: Date, dictionary: Dictionary) => string} = {
-    a: (date: Date, dictionary: Dictionary): string => String(dictionary.get(date.getHours() < 12 ? 'am' : 'pm')).toLowerCase(),
-    A: (date: Date, dictionary: Dictionary): string => String(dictionary.get(date.getHours() < 12 ? 'am' : 'pm')).toUpperCase(),
-    YY: (date: Date): string => pad(date.getFullYear().toString().slice(2), 2),
-    YYYY: (date: Date): string => date.getFullYear().toString(),
-    M: (date: Date): string => String(date.getMonth()),
-    MM: (date: Date): string => pad(date.getMonth() + 1, 2),
-    D: (date: Date): string => String(date.getDate()),
-    DD: (date: Date): string => pad(date.getDate(), 2),
-    H: (date: Date): string => String(date.getHours()),
-    HH: (date: Date): string => pad(date.getHours(), 2),
-    h: (date: Date): string => getTwelveHourFormat(date),
-    hh: (date: Date): string => pad(getTwelveHourFormat(date)),
-    m: (date: Date): string => String(date.getMinutes()),
-    mm: (date: Date): string => pad(date.getMinutes(), 2),
-    s: (date: Date): string => String(date.getSeconds()),
-    ss: (date: Date): string => pad(date.getSeconds(), 2),
-    v: (date: Date): string => String(date.getMilliseconds()),
-    vv: (date: Date): string => pad(date.getMilliseconds(), 2),
-    vvv: (date: Date): string => pad(date.getMilliseconds(), 3),
-    vvvv: (date: Date): string => pad(date.getMilliseconds(), 4)
-};
 
 /**
  * The number of days in a week.

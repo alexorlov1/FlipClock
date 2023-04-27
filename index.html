@@ -15,11 +15,23 @@
 <body>
     <div id="app"></div>
     
-    <button id="decrement">-1</button>
-    <button id="increment">+1</button>
-
     <script type="module">
-        import { FlipClock, Counter, FaceValue } from './index';
+        import { FlipClock, Alphanumeric, FaceValue, ref, Timer } from './index';
+        
+        import './src/test'
+        
+        /*
+
+        let transitionValue = FaceValue.make('!');
+
+        while (transitionValue.value !== value.value) {
+            transitionValue = spin(transitionValue, value);
+
+            console.log(transitionValue);
+        }
+
+
+
 
         const date = new Date();
 
@@ -30,18 +42,24 @@
         date.setMinutes(0);
         date.setSeconds(0);
     
-        const face = new Counter({
-            countdown: true,
-            value: 10
-        });
 
-        const el = document.querySelector('#app')?.appendChild(
-            document.createElement('div')
-        );
 
-        const clock = new FlipClock({ el, face });
+        const clock = new FlipClock({ face });
 
-        /*
+        clock.face.transitionValue = FaceValue.make('!');
+        clock.mount(el);
+
+        clock.face.on('mount');
+
+        clock.face.interval();
+        clock.render();
+
+
+
+        clock.render();
+
+
+
         FaceValue.make(date);
 
 

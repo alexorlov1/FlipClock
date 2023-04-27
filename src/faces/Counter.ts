@@ -70,8 +70,8 @@ export default class Counter extends Face {
     public increment(value?: number): void {
         const step = prop(value, this.step);
 
-        this.value = (<FaceValue>this.value).copy(
-            (<FaceValue>this.value).value + (typeof step === 'function' ? step() : step)
+        this.value = this.value.copy(
+            this.value.value + (typeof step === 'function' ? step() : step)
         );
     }
 
@@ -93,7 +93,7 @@ export default class Counter extends Face {
      * Render the clock face.
      */
     public render(): VNode {
-        const items =( <string[]>(<FaceValue>this.value).digits).map((digit, i) => new Card(
+        const items = this.value.digits.map((digit, i) => new Card(
             digit, this.lastValue?.digits[i] || digit
         ));
         

@@ -8,9 +8,7 @@ import TwelveHourClockCustomDate from '../components/TwelveHourClockCustomDate.v
 
 # Clock
 
-The `Clock` tracks the time.
-
-[[toc]]
+The `Clock` displays a Date object in a given format. Clocks will automatically start once the are mounted to the DOM.
 
 ## Basic Usage
 

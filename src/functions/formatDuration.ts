@@ -1,5 +1,4 @@
-import { durationFlagPattern, durationFlagFormats } from "../constants";
-import Dictionary from "../Dictionary";
+import { durationFlagFormats, durationFlagPattern } from "../constants";
 import Duration from "../types/Duration";
 
 /**
@@ -7,12 +6,8 @@ import Duration from "../types/Duration";
  * in the correct order.
  * 
  * @public
- * @param duration - The duration to format.
- * @param format - The format string.
- * @param dictionary - The language dictionary for translations.
- * @returns The formatted duration.
  */
-export default function formatDuration(duration: Duration, format: string, dictionary: Dictionary): string {
+export default function formatDuration(duration: Duration, format: string): string {
     format = format.replace(durationFlagPattern, i => {
         const key = i.slice(0, 1);
 

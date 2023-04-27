@@ -4,7 +4,8 @@ layout: home
 
 hero:
   name: "FlipClock.js"
-  tagline: A TypeScript library for building fun animated clocks, timers, tickers, and countdowns with zero dependencies.
+  tagline: "A TypeScript library for building fun animated clocks, timers, tickers, and countdowns with zero dependencies."
+  image: false
   actions:
     - theme: brand
       text: Getting Started
@@ -14,12 +15,12 @@ hero:
       link: /api-examples
 
 features:
+  - title: Themeable
+    details: Easily create new Faces with any HTML structure.
   - title: Robust Features
-    details: Ships with robust API's to create clocks, counters, countdowns, and tickers.
+    details: Create clocks, counters, countdowns, tickers, and more.
   - title: Flexible API
     details: Easily extend the API. Everything is extensible and customizable.
-  - title: React, Vue, and Svelte.
-    details: Works with any modern framework, including React, Vue, and Svelte.
   - title: TypeScript 🧪
     details: Written and strongly typed with TypeScript.
   - title: Unit Tested 📘
@@ -27,3 +28,10 @@ features:
   - title: Zero Dependencies 🔗
     details: Keep your bundle as small as possible.
 ---
+<script setup lang="ts">
+import Clock from './components/Clock.vue'
+</script>
+
+<div class="flex justify-center mt-16 mb-16">
+    <Clock />
+</div>

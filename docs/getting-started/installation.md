@@ -15,7 +15,7 @@ npm i flipclock
 ### PNPM
 
 ```bash
-PNPM i flipclock
+pnpm i flipclock
 ```
 
 ### Yarn
@@ -24,7 +24,7 @@ PNPM i flipclock
 yarn add flipclock
 ```
 
-## CDN
+### CDN
 
 You may use any CDN with access to Github or NPM. The following is using JSDeliver.
 

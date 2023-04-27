@@ -1,34 +1,24 @@
 import { h } from "./functions";
 import Label from "./Label";
-import ChildNode from "./types/ChildNode";
-import DomElement from "./types/DomElement";
-import VNode from "./VNode";
+import VNode, { DomElement } from "./VNode";
 
 /**
  * The Group class groups DOM elements together.
- * 
- * @public
  */
 export default class Group implements DomElement {
 
     /**
      * The children in the group.
-     * 
-     * @readonly
      */
-    public readonly items: ChildNode[];
+    public readonly items: DomElement[];
     
     /**
      * The group's label.
-     * 
-     * @readonly
      */
     public readonly label?: string;
     
     /**
      * Construct the Group.
-     * 
-     * @param attributes - The options passed to the instance.
      */
     constructor(attributes: Partial<Group>) {
         this.items = attributes.items || [];
@@ -37,8 +27,6 @@ export default class Group implements DomElement {
     
     /**
      * Render the VNode.
-     * 
-     * @returns The rendered VNode.
      */
     render(): VNode {
         return h('div', {

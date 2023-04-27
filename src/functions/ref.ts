@@ -1,12 +1,27 @@
+export type Watcher = {
+    watch: (fn: Function) => void
+    toRaw: () => any
+}
+
+export type Ref<T> = {
+    [K in keyof T]: T[K]
+} & Watcher;
+
 /**
  * Converts the given value to a reactive subject.
- * 
- * @public
- * @param value - The subject that should be reactive.
- * @param events - An array of event callback functions.
- * @returns The reactive subject.
  */
-function subject(value: any, events: Function[]): any[]|Object {
+export function subject<T>(value: T, events: Function[]): Ref<T> {
+    /**
+     * Returns the raw value.
+     */
+    function toRaw(): T {
+        return value;
+    }
+    
+    /**
+     * Watches the given function.
+     */
+    
     function watch(fn: Function): Function {
         events.push(fn);
     
@@ -17,6 +32,9 @@ function subject(value: any, events: Function[]): any[]|Object {
     
     if(Array.isArray(value)) {
         class ProxyArray extends Array {
+            toRaw(): T {
+                return toRaw();
+            }
             watch(fn: Function): Function {
                 return watch(fn);
             }
@@ -26,36 +44,38 @@ function subject(value: any, events: Function[]): any[]|Object {
     }
 
     return Object.assign(
-        Object.create({ watch }), value instanceof Object ? value : { value }
+        Object.create({
+            watch,
+            toRaw
+        }), value instanceof Object ? value : { value }
     );
 }
 
 /**
  * Create a reactive variable reference.
- * 
- * @public
- * @param value - The value to make reactive.
- * @returns The reactive value.
  */
-export default function ref(value: any): ProxyConstructor {
+export default function ref<T>(value: T): Ref<T> {
     const events: Function[] = [];
 
-    return new Proxy(subject(value, events), {
+    return new Proxy<Ref<T>>(subject(value, events), {
         set(target: any, prop: string|symbol, newValue: any) {
-            const oldValue = JSON.stringify(target);
+            const oldValueString = JSON.stringify(target);
+            const oldValue = JSON.parse(oldValueString);
 
             target[prop] = newValue;
 
-            if(JSON.stringify(target) !== oldValue) {
+            // console.log(JSON.stringify(target), oldValueString)
+
+            // if(JSON.stringify(target) !== oldValueString) {
                 for(const event of events) {
                     if(Array.isArray(value) || value instanceof Object) {
-                        event(target, JSON.parse(oldValue))
+                        event(target, oldValue)
                     }
                     else {
-                        event(target.value, JSON.parse(oldValue).value)
+                        event(target.value, oldValue.value)
                     }
                 }
-            }
+            // }
             
             return true;
         }

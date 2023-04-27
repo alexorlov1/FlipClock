@@ -28,7 +28,7 @@ onMounted(() => el.value && run(el.value));
 </script>
 
 <template>
-    <div class="my-4">
+    <div class="example my-4">
         <div ref="el" style="margin: 1rem"></div>
 
         <div class="flex gap-2 my-4">

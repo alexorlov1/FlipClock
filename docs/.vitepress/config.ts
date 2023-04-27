@@ -31,9 +31,9 @@ export default defineConfig({
       },
       {
         text: 'Advanced', items: [
-          { text: 'Virtual DOM', link: '/advanced/virtual-dom' },
           { text: 'Date & Time Formatting', link: '/advanced/date-time-formatting' },
           { text: 'Timer', link: '/advanced/Timer' },
+          { text: 'Virtual DOM', link: '/advanced/virtual-dom' },
         ]
       }
     ],

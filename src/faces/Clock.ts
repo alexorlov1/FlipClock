@@ -77,8 +77,8 @@ export default class Clock extends FormattableFace {
             ? new Date().getTime() - instance.timer.lastLoop
             : 0;
 
-        this.value = (<FaceValue>this.value).copy(
-            new Date((<FaceValue>this.value).value.getTime() + interval)
+        this.value = this.value.copy(
+            new Date(this.value.value.getTime() + interval)
         );
     }
 

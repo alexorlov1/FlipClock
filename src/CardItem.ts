@@ -1,6 +1,5 @@
 import { h } from "./functions";
-import DomElement from "./types/DomElement";
-import VNode from "./VNode";
+import VNode, { DomElement } from "./VNode";
 
 /** 
  * The CardItem generates the top and bottom elements for the parent Card class.

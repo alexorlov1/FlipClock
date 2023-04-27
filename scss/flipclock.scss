@@ -75,8 +75,8 @@
             }
 
             &.animate {
-                animation-delay: 500ms;
-                animation-duration: 500ms;
+                animation-delay: inherit;
+                animation-duration: inherit;
 
                 .flip-clock-card-item-inner {
                     perspective: 15em;

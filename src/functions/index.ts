@@ -6,18 +6,18 @@ import duration from './duration';
 import flatten from './flatten';
 import formatDate from './formatDate';
 import formatDuration from './formatDuration';
-import getTwelveHourFormat from './getTwelveHourFormat';
 import h from './h';
 import isNegative from './isNegative';
 import isNegativeZero from './isNegativeZero';
 import language from './language';
-import noop from './noop';
 import pad from './pad';
 import prop from './prop';
 import ref from './ref';
 import round from './round';
 // import { next, prev } from './values';
 
+export * from './date';
+export * from './diff';
 export {
     call,
     concatMap,
@@ -41,5 +41,3 @@ export {
     round,
 };
 
-export * from './date';
-export * from './diff';

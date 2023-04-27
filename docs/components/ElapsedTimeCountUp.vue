@@ -9,10 +9,7 @@ const el = ref<Element>();
 
 function run(el: Element) {
     // #region example
-    const start = new Date();
-
     const face = new ElapsedTime({
-        start,
         format: 'hh:mm:ss',
         labels: {
             hh: 'Hours',

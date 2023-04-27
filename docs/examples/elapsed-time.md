@@ -7,8 +7,6 @@ import ElapsedTimeCountUp from '../components/ElapsedTimeCountUp.vue';
 
 The `ElapsedTime` displays the time between two dates.
 
-[[toc]]
-
 ## 24-hour countdown
 
 Create a clock using `ElapsedTime` to show a 24-hour countdown.

@@ -2,9 +2,6 @@ import VNode from '../VNode';
 
 /**
  * Bind the events from the vnode to the element.
- * 
- * @param {VNode} vnode 
- * @param {Element} el 
  */
 function bindEvents(vnode: VNode, el: Element) {
     for(const [key, value] of Object.entries(vnode.on)) {     
@@ -14,9 +11,6 @@ function bindEvents(vnode: VNode, el: Element) {
 
 /**
  * Creates the DOM element from the VNode.
- * 
- * @param {VNode} vnode 
- * @returns {Element}
  */
 function createElement(vnode: VNode): Element {
     // Functions to create different types of tags. `element` is the
@@ -34,9 +28,6 @@ function createElement(vnode: VNode): Element {
 
 /**
  * Get the type for a node.
- * 
- * @param {Node} node 
- * @return {string|null}
  */
 function getNodeType(node: Node): string|null {
 	if (node.nodeType === 3) return 'text';
@@ -50,9 +41,6 @@ function getNodeType(node: Node): string|null {
 
 /**
  * Get the contents of a node.
- * 
- * @param {Node} node
- * @return {string|undefined}
  */
 function getNodeContent(node: Node|VNode): string|null|undefined {
 	if (node.childNodes.length > 0) {
@@ -64,10 +52,6 @@ function getNodeContent(node: Node|VNode): string|null|undefined {
 
 /**
  * Render the VNode as a DOM element.
- * 
- * @public
- * @param vnode - The VNode to render.
- * @returns The rendered DOM element.
  */
 export function render(vnode: VNode): Element {
     // Create the DOM element
@@ -90,9 +74,6 @@ export function render(vnode: VNode): Element {
 
 /**
  * Set the attributes from the vnode on the element.
- * 
- * @param {VNode} vnode 
- * @param {Element} el 
  */
 function setAttributes(vnode: VNode, el: Element) {
     for(const [key, value] of Object.entries(vnode.attributes)) {
@@ -104,9 +85,6 @@ function setAttributes(vnode: VNode, el: Element) {
 
 /**
  * Sync the attributes from the vnode on the element.
- * 
- * @param {VNode} vnode 
- * @param {Element} el 
  */
 function diffAttributes(vnode: VNode, el: Element): void {
     // Set the attributes from the vnode.
@@ -125,10 +103,6 @@ function diffAttributes(vnode: VNode, el: Element): void {
 /**
  * Determines if the element should be replaced by checking if the tag names
  * do not match, or if the tag names are text.
- * 
- * @param {VNode} vnode 
- * @param {Element} el 
- * @returns {boolean}
  */
 function shouldReplaceElement(vnode: VNode, el: Node): boolean {
     return vnode.tagName !== getNodeType(el)
@@ -137,10 +111,6 @@ function shouldReplaceElement(vnode: VNode, el: Node): boolean {
 
 /**
  * Diff the VNode and Node and sync the changes with the DOM node.
- * 
- * @public
- * @param vnode - The VNode to render.
- * @param el - The DOM element to compare the VNode against.
  */
 export function diff(vnode: VNode, el: Node): void {
     // If the element is not the same type, replace with the new element.

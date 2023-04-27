@@ -1,10 +1,13 @@
 import Dictionary from "./Dictionary";
 import EventEmitter from "./EventEmitter";
-import FaceValue from "./FaceValue";
+import FaceValue, { RawFaceValue } from "./FaceValue";
 import FlipClock from "./FlipClock";
 import { language, prop, ref } from "./functions";
-import Attributes from "./types/Attributes";
 import VNode from "./VNode";
+
+export interface FaceDefaultState {
+    value: FaceValue|string|number|undefined
+}
 
 /**
  * The Face is an abstract class that is base class for all other faces. The
@@ -54,7 +57,7 @@ export default abstract class Face extends EventEmitter {
      * A value used to compare against the current value that is used to
      * determine if the clock should stop.
      */
-    public stopAt: FaceValue|string|number|((instance: FlipClock) => boolean)
+    public stopAt: FaceValue|RawFaceValue|((instance: FlipClock) => boolean)
 
     /**
      * An array of watcher callback functions.
@@ -63,8 +66,6 @@ export default abstract class Face extends EventEmitter {
 
     /**
      * Instantiate a Clock face with a given value and attributes.
-     * 
-     * @param attributes - The options passed to the instance.
      */
     constructor(attributes: Partial<Face> = {}) {
         super();
@@ -77,27 +78,38 @@ export default abstract class Face extends EventEmitter {
             this.language = attributes.language || 'en-us'
         );
 
-        this.state = ref({
-            value: this.defaultValue(attributes.value)
+        this.state = ref(this.defineState());
+
+        this.value = attributes.value
+
+        this.prevState = ref(Object.assign(this.defineState(), {
+            value: this.state?.value
+        }))
+
+        this.watch(() => {    
+            this.emit('change')
         });
-        
-        this.watch(() => this.emit('render'));
+    }
+
+    /**
+     * Define the initial state of the clock. This allows us to watch for
+     * reactivity changes.
+     */
+    defineState(): FaceDefaultState {
+        return {
+            value: undefined
+        }
     }
 
     /**
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
-     *
-     * @param instance - The FlipClock instance.
-     * @param fn - A callback that runs with each interval.
      */
     abstract interval(instance: FlipClock, fn?: Function): void;
 
     /**
      * Render the clock face.
-     * 
-     * @returns The face's VNode.
      */
     abstract render(): VNode;
 
@@ -107,21 +119,16 @@ export default abstract class Face extends EventEmitter {
     get value(): FaceValue {
         return this.state.value;
     }
+
     /**
      * Set the face value.
      */
-    set value(value: any) {
-        this.prevState = {
-            value: this.state.value
-        }
-
-        this.state.value = FaceValue.make(value);
+    set value(value: FaceValue) {
+        this.state.value = value;
     }
 
     /**
      * Get the last face value.
-     * 
-     * @returns A FaceValue instance.
      */
     get lastValue(): FaceValue|undefined {
         return this.prevState?.value;
@@ -129,30 +136,24 @@ export default abstract class Face extends EventEmitter {
 
     /**
      * Get the default FaceValue using the instantiated value.
-     * 
-     * @param value - The value passed from instantiation.
-     * @returns A FaceValue instance.
      */
-    defaultValue(value: any): FaceValue {
-        return FaceValue.make(value);
+    defaultValue(value: RawFaceValue, attributes: Partial<FaceValue> = {}): FaceValue {
+        return FaceValue.make(value, attributes);
     }
 
     /**
      * Dispatch the event and call the method that correspond to given hook.
-     * 
-     * @param key - The name of the hook being dispatched.
-     * @param args - The arguments passed to the callbacks. 
      */
     hook(key: string, ...args): void {
-        this[key](...args);
+        if(key in this) {
+            this[key](...args);
+        }
+        
         this.emit(key, ...args);
     }
 
     /**
      * Bind a watcher function to the state.
-     * 
-     * @param fn - The watcher callback function.
-     * @returns A function to unwatch the callback.
      */
     watch(fn: Function): Function {
         const unwatch = this.state.watch(fn);
@@ -164,8 +165,6 @@ export default abstract class Face extends EventEmitter {
     
     /**
      * Reset the watchers.
-     * 
-     * @returns The `Face` instance.
      */
     resetWatchers(): this {
         for(const unwatch of this.watchers) {
@@ -177,6 +176,9 @@ export default abstract class Face extends EventEmitter {
         return this;
     }
 
+    /**
+     * Determines if the clock should stop or not.
+     */
     shouldStop(instance: FlipClock): boolean {
         if(this.stopAt === undefined) {
             return false;
@@ -186,24 +188,24 @@ export default abstract class Face extends EventEmitter {
             return this.stopAt(instance)
         }
 
-        return FaceValue.make(this.stopAt).compare(this.value);
+        if (!(this.stopAt instanceof FaceValue)) {
+            this.stopAt = FaceValue.make(this.stopAt);
+        }
+
+        return this.stopAt.compare(this.value);
     }
 
     /**
-     * Run before the animation.
-     * 
-     * @param instance - The FlipClock instance.
+     * The `beforeMount` hook.
      */
     beforeMount(instance: FlipClock): void {
         //
     }
 
     /**
-     * The `mounted` hook.
-     * 
-     * @param instance - The FlipClock instance.
+     * The `afterMount` hook.
      */
-    mounted(instance: FlipClock): void {
+    afterMount(instance: FlipClock): void {
         //
     }
 
@@ -211,8 +213,6 @@ export default abstract class Face extends EventEmitter {
      * The `beforeCreate` hook.
      * 
      * This is the hook to change the VNode before it hits the DOM.
-     * 
-     * @param instance - The FlipClock instance.
      */
     beforeCreate(instance: FlipClock): void {
         //
@@ -222,9 +222,6 @@ export default abstract class Face extends EventEmitter {
      * The `beforeCreate` hook.
      * 
      * This is the hook to change the VNode before it hits the DOM.
-     * 
-     * @param instance - The FlipClock instance.
-     * @param vnode - The VNode instance.
      */
     afterCreate(instance: FlipClock, vnode: VNode): void {
         //
@@ -232,28 +229,20 @@ export default abstract class Face extends EventEmitter {
 
     /**
      * The `beforeUnmount` hook.
-     * 
-     * @param instance - The FlipClock instance.
-     * @param vnode - The VNode instance.
      */
     beforeUnmount(instance: FlipClock): void {
         //
     }
 
     /**
-     * The `unmounted` hook.
-     * 
-     * @param instance - The FlipClock instance.
+     * The `afterUnmount` hook.
      */
-    unmounted(instance: FlipClock): void {
+    afterUnmount(instance: FlipClock): void {
         //
     }
 
     /**
      * The `afterRender` hook.
-     * 
-     * @param instance - The FlipClock instance.
-     * @param vnode - The VNode instance.
      */
     afterRender(instance: FlipClock, vnode: VNode): void {
         //
@@ -261,21 +250,15 @@ export default abstract class Face extends EventEmitter {
 
     /**
      * The `beforeAnimation` hook.
-     * 
-     * @param instance - The FlipClock instance.
-     * @param vnode - The VNode instance.
      */
     beforeAnimation(instance: FlipClock, vnode: VNode): void {
-        instance.el.querySelectorAll('.animate').forEach(
+        instance.el?.querySelectorAll('.animate').forEach(
             el => el.classList.remove('animate')
         );
     }
 
     /**
      * The `afterAnimation` hook.
-     * 
-     * @param instance - The FlipClock instance.
-     * @param vnode - The VNode instance.
      */
     afterAnimation(instance: FlipClock, vnode: VNode): void {
         if(this.shouldStop(instance)) {
@@ -284,20 +267,30 @@ export default abstract class Face extends EventEmitter {
     }
 
     /**
-     * The `started` hook.
-     * 
-     * @param instance - The FlipClock instance.
+     * The `beforeStart` hook.
      */
-    started(instance: FlipClock): void {
+    beforeStart(instance: FlipClock): void {
         //
     }
 
     /**
-     * The `stopped` hook.
-     * 
-     * @param instance - The FlipClock instance.
+     * The `afterStart` hook.
      */
-    stopped(instance: FlipClock): void {
+    afterStart(instance: FlipClock): void {
+        //
+    }
+
+    /**
+     * The `beforeStop` hook.
+     */
+    beforeStop(instance: FlipClock): void {
+        //
+    }
+
+    /**
+     * The `afterStop` hook.
+     */
+    afterStop(instance: FlipClock): void {
         //
     }
 }
