@@ -1,31 +1,22 @@
-import { Card } from "flipclock";
-import FaceValue, { RawFaceValue } from "../FaceValue";
-import Group from "../Group";
-import VNode, { DomElement } from "../VNode";
-import h from "./h";
+import { RawFaceValue } from "../FaceValue";
 
-export type DigitizerParameters = {
-    format?: (value: string) => string
-    prepend?: (value: string[]) => string[]
-    prependDigit?: string,
+export type DigitizerProps = {
     minimumDigits?: number
 }
 
 export type CountFunction = (value: DigitizedValues) => number
 export type DigitizedValue = string
 export type DigitizedValues = DigitizedValue[] | DigitizedValues[]
-export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerParameters) => DigitizedValues
-export type UndigitizeFunction = (value: DigitizedValues) => string
+export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerProps) => DigitizedValues
+export type UndigitizeFunction = (value: RawFaceValue) => string
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
-export type RenderFunction = (value: FaceValue, lastValue?: FaceValue) => VNode
 
 export type DigitizerContext = {
     count: CountFunction
     digitize: DigitizeFunction
     undigitize: UndigitizeFunction
     pad: PadFunction
-    render: RenderFunction
-}
+} & DigitizerProps
 
 /**
  * Create a digiter that can be used to convert a string into arrays of
@@ -33,14 +24,14 @@ export type DigitizerContext = {
  *
  * @public
  */
-export function useDigitizer(defaults: DigitizerParameters = {}): DigitizerContext {
+export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
     
     /**
      * Pad a value with spaces until it has the minimum number of digits.
      * 
      * @public
      */
-    function pad(value: DigitizedValues, minimumDigits: number|undefined = defaults.minimumDigits): DigitizedValues {
+    function pad(value: DigitizedValues, minimumDigits: number|undefined = props.minimumDigits): DigitizedValues {
         const digits = [].concat(value).flat(Infinity);
 
         if (digits.length < minimumDigits) {
@@ -66,8 +57,8 @@ export function useDigitizer(defaults: DigitizerParameters = {}): DigitizerConte
      * 
      * @public
      */
-    function digitize(value: RawFaceValue | RawFaceValue[], overrideDefaults?: DigitizerParameters): DigitizedValues {
-        const { minimumDigits } = Object.assign({}, defaults, overrideDefaults);
+    function digitize(value: RawFaceValue | RawFaceValue[], overrideprops?: DigitizerProps): DigitizedValues {
+        const { minimumDigits } = Object.assign({}, props, overrideprops);
 
         function split(value: RawFaceValue | RawFaceValue[], char: string = ''): RawFaceValue[] {
             return Array.isArray(value)
@@ -79,8 +70,6 @@ export function useDigitizer(defaults: DigitizerParameters = {}): DigitizerConte
             if(Array.isArray(value)) {
                 return value.map(recurse, depth + 1);
             }
-
-            console.log(123);
 
             return split(value, ' ').map(group => {
                 return split(group);
@@ -125,45 +114,11 @@ export function useDigitizer(defaults: DigitizerParameters = {}): DigitizerConte
 
         return recurse(value);
     }
-    
-    /**
-     * The recursive render function.
-     * 
-     * @public
-     */
-    function render(value: FaceValue, lastValue?: FaceValue): VNode {
-        function recurse(digit: DigitizedValues, prevDigits?: DigitizedValue|DigitizedValues, index: number = 0): DomElement {
-            if (Array.isArray(digit)) {
-                return new Group({
-                    items: digit.map((digit, i) => {
-                        return recurse(digit, prevDigits?.[i], i)
-                    })
-                })
-            }
-    
-            const lastDigit = Array.isArray(prevDigits)
-                ? prevDigits[index] as string
-                : prevDigits;
 
-            if(Array.isArray(prevDigits)) {
-                console.log(digit, prevDigits[index])
-            }
-
-            return new Card(digit)
-        }
-
-        return h('div', {
-            class: 'flip-clock',
-        }, [
-            recurse(value.digits, lastValue?.digits)
-        ]);
-    }
-
-    return {
+    return Object.assign({
         count,
         digitize,
         pad,
-        render,
         undigitize
-    }
+    }, props)
 }

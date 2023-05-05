@@ -3,7 +3,7 @@
  * 
  * @public 
  */
-export default interface EmitterEvent {
+export interface EmitterEvent {
     /**
      * The event's key.
      */
@@ -12,7 +12,12 @@ export default interface EmitterEvent {
     /**
      * The event's callback.
      */
-    fn: Function
+    fn: Function,
+
+    /**
+     * Unwatch the event.
+     */
+    unwatch: Function
 }
 
 /**
@@ -20,7 +25,7 @@ export default interface EmitterEvent {
  * 
  * @public
  */
-export default abstract class EventEmitter {
+export default class EventEmitter {
     
     /**
      * The instance events.
@@ -29,75 +34,65 @@ export default abstract class EventEmitter {
 
     /**
      * Emit an event.
-     * 
-     * @param key - The name of the name of the event to emit.
-     * @param args - The arguments passed to the event.
-     * @returns The `EventEmitter` instance.
      */
-    emit(key: string, ...args): this {
+    emit(key: string, ...args) {
         const events: EmitterEvent[] = this.events.filter(
             (e: EmitterEvent) => e.key === key
         );
 
-        for(const event of events) {
-            event.fn.apply(this, ...args);
+        for (const event of events) {
+            event.fn.apply(this, args);
         }
-
-        return this;
     }
 
     /**
-     * Stop listening to for event to fire.
-     *
-     * @param key - The name of the name of the event to emit.
-     * @param fn - The listener callback function.
-     * @returns The EventEmitter instance.
+     * Stop listening for an event to fire.
      */
-    off(key: string, fn?: (event: EventEmitter) => void) {
-        this.events = this.events.filter((e: EmitterEvent) => {
-            if(e.key === key && (!fn || fn === e.fn)) {
-                
+    off(key?: string, fn?: Function) {
+        if(this.events[key]) {
+            for(const event of this.events[key]) {
+                if(!fn || fn === event.fn) {
+                    event.unwatch();
+                }
             }
-        });
-        
-        if(this.events[key] && fn) {
-            this.events[key] = this.events[key].filter(event => {
-                return event !== fn;
-            });
         }
         else {
-            this.events[key] = [];
+            this.resetEvents();
         }
-
-        return this;
     }
 
     /**
      * Start listening for an event to fire.
-     *
-     * @param key - The name of the name of the event to emit.
-     * @param fn - The listener callback function.
-     * @returns The EventEmitter instance.
      */
-    on(key: string, fn: (event: EmitterEvent) => void) {
-        this.events.push({ key, fn });
+    on(key: string, fn: Function) {
+        const unwatch = () => {
+            this.events.splice(this.events.findIndex(event => {
+                return event.key === key && event.fn === fn;
+            }), 1);   
+        }
 
-        return this;
+        this.events.push({ key, fn, unwatch });
+
+        return unwatch;
     }
 
     /**
      * Listen form an event to fire once.
-     *
-     * @param key - The name of the name of the event to emit.
-     * @param fn - The listener callback function.
-     * @returns The EventEmitter instance.
      */
     once(key: string, fn: (...args) => void) {
-        return this.on(key, (...args) => {
-            fn(...args);
+        return this.on(key, (event: EmitterEvent, ...args) => {
+            fn(event, ...args);
 
-            this.off(key, fn);
+            event.unwatch();
         });
     }
 
+    /**
+     * Unwatch and remove all the events.
+     */
+    resetEvents() {
+        for (const event of this.events) {
+            event.unwatch();
+        }
+    }
 }

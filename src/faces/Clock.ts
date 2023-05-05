@@ -1,9 +1,9 @@
 
 import Face from '../Face';
-import FaceValue from '../FaceValue';
+import { FaceValue } from '../FaceValue';
 import FlipClock from '../FlipClock';
 import VNode from '../VNode';
-import { formatDate, h, prop } from '../functions';
+import { prop } from '../functions';
 import FormattableFace from './FormattableFace';
 
 /**
@@ -35,12 +35,12 @@ export default class Clock extends FormattableFace {
     format: string|((value: FaceValue, face: Face) => string) = 'hh:mm:ss A';
 
     /**
-     * Instantiate a Clock face with a given value and attributes.
+     * Instantiate the clock face.
      */
-    constructor(attributes: Partial<Clock> = {}) {
-        super(attributes)
+    constructor(attrs: Partial<Clock> = {}) {
+        super()
 
-        this.format = prop(attributes.format, this.format);
+        this.format = prop(attrs.format, this.format);
     }
 
     /**
@@ -86,8 +86,8 @@ export default class Clock extends FormattableFace {
      * Render the clock face.
      */
     public render(): VNode {
-        return h('div', { class: 'flip-clock' }, this.createGroups(
-            this.state.value, this.createGroups(this.prevState?.value || this.state.value)
-        ));
+        // return h('div', { class: 'flip-clock' }, this.createGroups(
+        //     this.state.value, this.createGroups(this.prevState?.value || this.state.value)
+        // ));
     }
 }

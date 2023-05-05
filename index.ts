@@ -1,25 +1,26 @@
 import './scss/flipclock.scss';
 
-import Card from './src/Card';
-import CardItem from './src/CardItem';
-import Dictionary from './src/Dictionary';
-import Divider from './src/Divider';
 import EventEmitter from './src/EventEmitter';
-import Face from './src/Face';
+// import { Face } from './src/Face';
 import FaceValue from './src/FaceValue';
 import FlipClock from './src/FlipClock';
-import Group from './src/Group';
-import Label from './src/Label';
 import Timer from './src/Timer';
 import VNode from './src/VNode';
+import Card from './src/themes/flipclock/Card';
+import CardItem from './src/themes/flipclock/CardItem';
+import Divider from './src/themes/flipclock/Divider';
+import Group from './src/themes/flipclock/Group';
+import Label from './src/themes/flipclock/Label';
 
+export * from './src/faces';
+export * from './src/functions';
+export * from './src/types';
 export {
     Card,
     CardItem,
-    Dictionary,
     Divider,
     EventEmitter,
-    Face,
+    // Face,
     FaceValue,
     FlipClock,
     Group,
@@ -28,7 +29,3 @@ export {
     VNode
 };
 
-export * from './src/types';
-export * from './src/faces';
-export * from './src/functions';
-export * from './src/languages';

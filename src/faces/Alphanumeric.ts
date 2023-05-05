@@ -1,10 +1,22 @@
-import Face from '../Face';
-import FaceValue, { RawFaceValue } from '../FaceValue';
+import { Face } from '../Face';
+import { FaceValue } from '../FaceValue';
 import FlipClock from '../FlipClock';
 import VNode from '../VNode';
-import { prop } from '../functions';
-import { RandomizerFunction, useRandomizer } from '../functions/randomizer';
-import { Attributes } from '../types';
+import { RandomizerFunction, useRandomizer } from '../helpers/randomizer';
+import { Reactive, useState } from './../helpers/state';
+
+export type AlphanumericState = {
+    initialValue: FaceValue,
+    currentValue: FaceValue,
+    lastValue?: FaceValue,
+    targetValue: FaceValue,
+};
+
+export type AlphanumericParams = Partial<Pick<Alphanumeric, 'randomizer' | 'chunkSize'>> & {
+    initialValue?: FaceValue,
+    value: FaceValue,
+    targetValue?: FaceValue
+}
 
 /**
  * This face is designed to increment and decrement values. Usually this face
@@ -28,12 +40,7 @@ import { Attributes } from '../types';
  * instance.mount(document.querySelector('#clock'));
  * ```
  */
-export default class Alphanumeric extends Face {
-
-    /**
-     * A callback to override how digits are randomly selected.
-     */
-    public randomizer?: RandomizerFunction
+export default class Alphanumeric implements Face {
 
     /**
      * The chunkSize for generating random characters. Incease this value to
@@ -42,63 +49,88 @@ export default class Alphanumeric extends Face {
     public chunkSize: number = 3;
 
     /**
-     * Instantiate a Clock face with a given value and attributes.
+     * A callback to override how digits are randomly selected.
      */
-    constructor(attributes: Partial<Alphanumeric> = {}) {
-        super(attributes);
-
-        this.chunkSize = prop(attributes.chunkSize, this.chunkSize);
-
-        this.randomizer = prop(attributes.randomizer, useRandomizer({
-            chunkSize: this.chunkSize
-        }));
-    }
+    public randomizer?: RandomizerFunction
 
     /**
-     * Get the face value.
+     * The reactive state.
      */
-    get value(): FaceValue | undefined {
-        return super.value;
-    }
+    protected $state: Reactive<AlphanumericState>
 
     /**
-     * Set the face value.
+     * Instantiate the clock face.
      */
-    set value(value: FaceValue) {
-        this.state.value = value;
-    }
-
-    /**
-     * Get the face value.
-     */
-    get targetValue(): FaceValue|undefined {
-        return this.state.targetValue;
-    }
-
-    /**
-     * Set the face value.
-     */
-    set targetValue(value: FaceValue) {
-        this.state.targetValue = value
-    }
-
-    /**
-     * Define the initial state of the clock. This allows us to watch for
-     * reactivity changes.
-     */
-    defineState(): Attributes {
-        return {
-            value: undefined,
-            targetValue: undefined
+    constructor(params: AlphanumericParams) {
+        if (params.chunkSize) {
+            this.chunkSize = params.chunkSize;
         }
+
+        this.randomizer = params.randomizer || useRandomizer({
+            chunkSize: this.chunkSize
+        });
+
+        const initialValue = params.initialValue || new FaceValue('')
+
+        const currentValue = this.randomizer(initialValue, params.value);
+
+        this.$state = useState({
+            initialValue,
+            currentValue,
+            lastValue: undefined,
+            targetValue: params.value,
+        });
     }
 
-    /**
-     * Get the default FaceValue using the instantiated value.
-     */
-    public defaultValue(value: RawFaceValue, attributes: Partial<FaceValue> = {}): FaceValue {
-        return FaceValue.make(value, attributes);
+    get state() {
+        return this.$state
     }
+
+    // /**
+    //  * Get the face value.
+    //  */
+    // get value(): FaceValue | undefined {
+    //     return super.value;
+    // }
+
+    // /**
+    //  * Set the face value.
+    //  */
+    // set value(value: FaceValue) {
+    //     this.state.value = value;
+    // }
+
+    // /**
+    //  * Get the face value.
+    //  */
+    // get targetValue(): FaceValue|undefined {
+    //     return this.state.targetValue;
+    // }
+
+    // /**
+    //  * Set the face value.
+    //  */
+    // set targetValue(value: FaceValue) {
+    //     this.state.targetValue = value
+    // }
+
+    // /**
+    //  * Define the initial state of the clock. This allows us to watch for
+    //  * reactivity changes.
+    //  */
+    // defineState(): attrs {
+    //     return {
+    //         value: undefined,
+    //         targetValue: undefined
+    //     }
+    // }
+
+    // /**
+    //  * Get the default FaceValue using the instantiated value.
+    //  */
+    // public defaultValue(value: RawFaceValue, attrs: Partial<FaceValue> = {}): FaceValue {
+    //     return FaceValue.make(value, attrs);
+    // }
 
     /**
      * This method is called with every interval, or every time the clock
@@ -106,29 +138,39 @@ export default class Alphanumeric extends Face {
      * clock's `FaceValue`.
      */
     public interval(instance: FlipClock): void {
-        if(!this.value.compare(this.lastValue)) {
-            // return;
-        
-        }
+        // if (this.state.currentValue.compare(this.state.targetValue)) {
+        //     return;
+        // }
 
-        this.value = this.randomizer(this.value, this.targetValue);
+        // const lastValue = this.state.currentValue;
+
+        // const currentValue = this.randomizer(
+        //     this.state.currentValue, this.state.targetValue
+        // );
+
+        // console.log(currentValue)
+
+        // this.state.update({
+        //     lastValue,
+        //     currentValue
+        // });
     }
 
     /**
      * Render the clock face.
      */
-    public render(): VNode {
-        return this.value.digitizer.render(this.value, this.lastValue);
+    public render(instance: FlipClock): VNode {
+        return instance.theme(this.state.currentValue, this.state.lastValue);
     }
 
-    /**
-     * Bind a watcher function to the state.
-     */
-    watch(fn: Function): Function {
-        const unwatch = this.state.watch(fn);
+    // /**
+    //  * Bind a watcher function to the state.
+    //  */
+    // watch(fn: Function): Function {
+    //     const unwatch = this.state.watch(fn);
 
-        this.watchers.push(unwatch);
+    //     this.watchers.push(unwatch);
 
-        return unwatch;
-    }
+    //     return unwatch;
+    // }
 }

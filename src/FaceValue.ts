@@ -1,17 +1,8 @@
-import { prop } from "./functions";
-import { DigitizedValues, DigitizerContext, DigitizerParameters, useDigitizer } from "./functions/digitizer";
-import ref from "./functions/ref";
+import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
 
 export type RawFaceValue = undefined | string | number | RawFaceValue[];
 
-/**
- * Create a new `FaceValue` instance.
- * 
- * @public
- */
-export function createFaceValue(value: RawFaceValue, params: Partial<FaceValue> = {}) {
-    return new this(value, params);
-}
+export type FaceValueProps = Pick<FaceValue, 'carryLength' | 'digitizer'>
 
 /**
  * The FaceValue class digitizes the raw value and so it can be used by the
@@ -19,7 +10,7 @@ export function createFaceValue(value: RawFaceValue, params: Partial<FaceValue> 
  * 
  * @public
  */
-export default class FaceValue {
+export class FaceValue {
 
     /**
      * The carry length is carry over when the instance it copied. The minimum
@@ -32,17 +23,12 @@ export default class FaceValue {
     /**
      * An array of digits.
      */
-    public readonly digits: DigitizedValues
+    public readonly digits?: DigitizedValues
 
     /**
      * Parameters that are passed to the digiter.
      */
     public readonly digitizer?: DigitizerContext
-
-    /**
-     * Parameters that are passed to the digiter.
-     */
-    public readonly digitizerParameters?: DigitizerParameters
 
     /**
      * The raw value that was given.
@@ -52,29 +38,29 @@ export default class FaceValue {
     /**
      * Instantiate the face value.
      */
-    constructor(params: Partial<FaceValue> = {}) {
-        this.value = params.value;
-        
-        this.carryLength = prop(params.carryLength, this.carryLength);
-        
-        this.digitizer = prop(params.digitizer, useDigitizer(
-            this.digitizerParameters
-        ));
-        
-        const { digitize, undigitize } = this.digitizer;
+    constructor(value: RawFaceValue, props: FaceValueProps = {}) {
+        if(this.carryLength) {
+            this.carryLength = props.carryLength;
+        }
 
-        const digits = params.digits || digitize(this.value || [], {
-            minimumDigits: this.minimumLength
+        this.digitizer = props.digitizer || useDigitizer({
+            minimumDigits: props.carryLength,
         });
 
-        this.digits = ref(digits);
+        const { digitize, undigitize } = this.digitizer;
+
+        this.value = Array.isArray(value) ? undigitize(value) : value;
+
+        this.digits = digitize(this.value, {
+            minimumDigits: this.minimumLength
+        });
     }
 
     get minimumLength() {
         return Math.max(
             this.carryLength || 0,
             this.digits?.flat().length || 0,
-            this.digitizerParameters?.minimumDigits || 0
+            this.digitizer.minimumDigits || 0
         )
     }
 
@@ -88,29 +74,10 @@ export default class FaceValue {
     /**
      * Create a new instance with the given value.
      */
-    copy(value?: RawFaceValue): FaceValue {
-        // If the value is undefined, then use the current value.
-        if(value === undefined) {
-            value = this.value;
-        }
-
-        return new FaceValue({
-            value,
+    copy(value?: RawFaceValue, props: FaceValueProps = {}): FaceValue {
+        return new FaceValue(value === undefined ? this.value : value, Object.assign({
             carryLength: this.minimumLength,
-            digitizer: this.digitizer,
-            digitizerParameters: this.digitizerParameters,
-        });
-    }
-
-    /**
-     * Instantiate a new FaceValue with the given value. If the give value
-     * is already an instance of FaceValue, then return the instance.
-     */
-    static make(value?: RawFaceValue, params: Partial<FaceValue> = {}): FaceValue {
-        if (value instanceof FaceValue) {
-            return value;
-        }
-
-        return new this(Object.assign({ value }, params));;
+            digitizer: this.digitizer
+        }, props));
     }
 }

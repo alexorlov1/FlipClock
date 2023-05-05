@@ -157,11 +157,4 @@ export default class Timer {
 
         return this;
     }
-
-    /**
-     * Create a new Timer instance.
-     */
-    static make(interval: number|Timer) {
-        return interval instanceof Timer ? interval : new Timer(interval);
-    }
 }

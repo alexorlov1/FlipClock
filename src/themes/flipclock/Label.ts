@@ -1,6 +1,5 @@
-import { h } from "./functions";
-import { DomElement } from "./types";
-import VNode from "./VNode";
+import VNode from "../../VNode";
+import { DomElement, h } from "../../helpers/dom";
 
 /**
  * The Label class builds a textual label for the UI. The Label doesn't do
@@ -9,18 +8,14 @@ import VNode from "./VNode";
  * 
  * @public
  */
-export default class Label implements DomElement {
+export class Label implements DomElement {
     /**
      * The label's value.
-     * 
-     * @readonly
      */
     protected readonly value: string;
 
     /**
      * Construct the Label.
-     * 
-     * @param value - The label's value.
      */
     constructor(value: string) {
         this.value = value;
@@ -28,8 +23,6 @@ export default class Label implements DomElement {
     
     /**
      * Render the VNode.
-     * 
-     * @returns The rendered VNode.
      */
     render(): VNode {
         return h('div', {

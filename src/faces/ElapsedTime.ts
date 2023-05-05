@@ -1,11 +1,10 @@
 import Face from '../Face';
-import FaceValue from '../FaceValue';
+import { FaceValue } from '../FaceValue';
 import FlipClock from '../FlipClock';
-import { duration, formatDuration, h, prop } from '../functions';
-import Group from '../Group';
+// import { duration, formatDuration } from '../functions';
+import { prop } from '../functions';
 import { Duration } from '../types';
 import VNode from '../VNode';
-import FormattableFace from './FormattableFace';
 
 /**
  * This face will show the amount of time elapsed since the given value and
@@ -28,7 +27,7 @@ import FormattableFace from './FormattableFace';
  * instance.mount(document.querySelector('#clock'));
  * ```
  */
-export default class ElapsedTime extends FormattableFace {
+export default class ElapsedTime extends Face {
 
     /**
      * Should the face count down instead of up.
@@ -99,14 +98,14 @@ export default class ElapsedTime extends FormattableFace {
      * Render the clock face.
      */
     public render(): VNode {
-        const prevGroups: Group[] = this.createGroups(
-            this.prevState?.value || this.state.value
-        );
+        // const prevGroups: Group[] = this.createGroups(
+        //     this.prevState?.value || this.state.value
+        // );
 
-        return h('div', {
-            class: 'flip-clock'
-        }, this.createGroups(
-            this.state.value, prevGroups
-        ));
+        // return h('div', {
+        //     class: 'flip-clock'
+        // }, this.createGroups(
+        //     this.state.value, prevGroups
+        // ));
     }
 }

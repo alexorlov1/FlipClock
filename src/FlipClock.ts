@@ -1,10 +1,15 @@
-import Face from "./Face";
-import { call, diff, language, prop } from "./functions";
-import { aliases, dictionary } from "./languages/en-us";
+import { Face } from "./Face";
 import Timer from "./Timer";
-import VNode from "./VNode";
+import { call } from "./functions";
+import { diff } from "./helpers/dom";
+import { Reactive, useState } from "./helpers/state";
+import { FlipClockThemeOptions, useTheme } from "./themes/flipclock";
+import { ThemeTemplateFunction } from "./types";
 
-language(aliases, dictionary);
+export type FlipClockProps = {
+    face: Face,
+    theme?: ThemeTemplateFunction | FlipClockThemeOptions
+} & Pick<FlipClock, 'el' | 'timer'>;
 
 /**
  * The FlipClock class starts, stops, resets, mounts, and unmounts the clock.
@@ -15,53 +20,79 @@ language(aliases, dictionary);
 export default class FlipClock {
     
     /**
+     * Determines if the clock should automatically start when it is mounted.
+     */
+    public autoStart: boolean = false
+
+    /**
      * The element the count is mounted.
      */
-    public el: Element
-    
+    public el?: Element
+
     /**
      * The face used to display the clock.
      */
-    public face: Face
+    public state: Reactive<{face: Face}>
+
+    /**
+     * The face used to display the clock.
+     */
+    public theme: ThemeTemplateFunction
     
     /**
      * The face value displayed on the clock.
      */
-    public timer: Timer
+    public timer?: Timer
     
     /**
      * Construct the FlipClock.
      */
-    constructor(attributes: Partial<FlipClock> = {}) { 
-        if(!attributes.face) {
-            throw new Error('You must define a face property.');
+    constructor(props: FlipClockProps) {
+        this.state = useState({
+            face: props.face
+        })
+
+        this.el = props.el
+        
+        this.theme = typeof props.theme === 'function'
+            ? props.theme
+            : useTheme(props.theme);
+            
+        this.timer = props.timer || new Timer(1000);
+        
+        if(this.el) {
+            this.mount(this.el);
         }
-        
-        this.face = attributes.face;
-        this.face.on('change', () => this.render());
-        
-        this.timer = Timer.make(prop(attributes.timer, 1000));
-        
-        if(attributes.el) {
-            this.mount(attributes.el);
-        }
+    }
+
+    get face() {
+        return this.state.face;
+    }
+
+    set face(face: Face) {
+        face.state.watch(() => this.render());
+
+        this.state.face = face;
+        this.render();
     }
 
     /**
      * Mount the clock instance to the DOM.
      */
-    mount(el?: Element): this {
-        // If no element, then ignore this method call..     
-        if(!el) {
-            return this;   
-        }
+    mount(el: Element) {
+        // // If no element, then ignore this method call..     
+        // if(!el) {
+        //     return this;   
+        // }
 
-        this.face.hook('beforeMount', this);
+        // // this.face.hook('beforeMount', this);
+
         this.el = el;
         this.render();
-        this.face.hook('afterMount', this);
+        
+        // this.face.hook('afterMount', this);
 
-        if(this.face.autoStart && this.timer.isStopped) {
+        if(this.autoStart && this.timer.isStopped) {
             window.requestAnimationFrame(() => this.start());
         }
 
@@ -71,45 +102,57 @@ export default class FlipClock {
     /**
      * Render the clock instance.
      */
-    render(): VNode {
-        this.face.hook('beforeCreate', this);
+    render() {
+        // this.face.hook('beforeCreate', this);
 
-        const vnode: VNode = this.face.render();
-
-        this.face.hook('afterCreate', this, vnode);
+        const vnode = this.face.render(this);
         
-        this.face.hook('beforeAnimation', this, vnode);
+        diff(this.el, vnode);
+        
 
-        setTimeout(() => {
-            diff(vnode, this.el);
+        // this.face.hook('afterCreate', this, vnode);
+        
+        // this.face.hook('beforeAnimation', this, vnode);
 
-            setTimeout(() => {
-                this.face.hook('afterRender', this, vnode);
-            });
+        // setTimeout(() => {
+        //     diff(vnode, this.el);
+
+        //     setTimeout(() => {
+        //         this.face.hook('afterRender', this, vnode);
+        //     });
             
-            setTimeout(() => {
-                this.face.hook('afterAnimation', this, vnode);
-            }, this.face.animationRate);
-        });
+        //     setTimeout(() => {
+        //         this.face.hook('afterAnimation', this, vnode);
+        //     }, this.face.animationRate);
+        // });
 
-        return vnode;
+        // return vnode;
     }
 
     /**
      * Start the clock instance.
      */
     start(fn?: Function): this {
-        const callback = () => {
-            this.face.hook('interval', this);
+        // const callback = () => {
+        //     this.face.hook('interval', this);
             
-            call(fn);
+        //     call(fn);
 
-            return callback;
-        };
+        //     return callback;
+        // };
 
-        this.face.hook('beforeStart', this);
-        this.timer.start(callback());
-        this.face.hook('afterStarted', this);
+        // this.face.hook('beforeStart', this);
+
+
+
+        this.timer.start(() => {
+            this.hook('interval', this);
+            this.render();
+            
+            call(fn);            
+        });
+
+        // this.face.hook('afterStarted', this);
 
         return this;
     }
@@ -118,9 +161,9 @@ export default class FlipClock {
      * Stop the clock instance.
      */
     stop(fn?: Function): this {
-        this.face.hook('beforeStop', this);
-        this.timer.stop(fn);
-        this.face.hook('afterStop', this);
+        // this.face.hook('beforeStop', this);
+        // this.timer.stop(fn);
+        // this.face.hook('afterStop', this);
 
         return this;
     }
@@ -143,11 +186,22 @@ export default class FlipClock {
      * Unmount the clock instance from the DOM.
      */
     unmount(): this {
-        this.face.hook('beforeUnmount', this);
-        this.el.parentElement?.removeChild(this.el);
-        this.face.resetWatchers();
-        this.face.hook('afterUnmount', this);
+        // this.face.hook('beforeUnmount', this);
+        // this.el.parentElement?.removeChild(this.el);
+        // this.face.resetWatchers();
+        // this.face.hook('afterUnmount', this);
 
         return this;
+    }
+
+    /**
+     * Dispatch the event and call the method that corresponds to given hook.
+     */
+    protected hook(key: string, ...args): void {
+        if(key in this.face) {
+            this.face[key](...args);
+        }
+        
+        // this.emit(key, ...args);
     }
 }

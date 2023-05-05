@@ -3,9 +3,7 @@ export type Watcher = {
     toRaw: () => any
 }
 
-export type Ref<T> = {
-    [K in keyof T]: T[K]
-} & Watcher;
+export type Ref<T> = { [K in keyof T]: T[K] } & Watcher;
 
 /**
  * Converts the given value to a reactive subject.

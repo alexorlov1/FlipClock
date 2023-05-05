@@ -1,6 +1,6 @@
-import { h } from "./functions";
-import Label from "./Label";
-import VNode, { DomElement } from "./VNode";
+import VNode from "../../VNode";
+import { DomElement, h } from "../../helpers/dom";
+import { Label } from "./Label";
 
 /**
  * The Group class groups DOM elements together.
@@ -20,9 +20,9 @@ export default class Group implements DomElement {
     /**
      * Construct the Group.
      */
-    constructor(attributes: Partial<Group>) {
-        this.items = attributes.items || [];
-        this.label = attributes.label;
+    constructor(attrs: Partial<Group>) {
+        this.items = attrs.items || [];
+        this.label = attrs.label;
     }
     
     /**
@@ -32,7 +32,7 @@ export default class Group implements DomElement {
         return h('div', {
             class: 'flip-clock-group'
         }, [
-            this.label && new Label(this.label),
+            this.label && h(new Label(this.label)),
             h('div', {
                 class: 'flip-clock-group-items'
             }, this.items)

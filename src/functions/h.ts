@@ -1,4 +1,7 @@
-import VNode, { Attributes, ChildNode, DomElement } from '../VNode';
+import { Attributes } from '../types/Attributes';
+import ChildNode from '../types/ChildNode';
+import DomElement from '../types/DomElement';
+import VNode from '../VNode';
 
 const pattern: RegExp = /<!--(.+?)-->/gim;
 
@@ -43,6 +46,8 @@ export default function h(tagName: string|DomElement, attrs?: Attributes|(ChildN
             return textContent;
         }
 
+        console.log(textContent);
+
         if(isDomElement(textContent)) {
             return textContent.render();
         }
@@ -53,8 +58,6 @@ export default function h(tagName: string|DomElement, attrs?: Attributes|(ChildN
             });
         }
 
-        return h('text', {
-            textContent: textContent.toString()
-        });
+        return h('text', {textContent});
     }));
 }

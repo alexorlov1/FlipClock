@@ -1,10 +1,8 @@
-import Card from "../Card";
-import Divider from "../Divider";
 import Face from "../Face";
-import FaceValue from "../FaceValue";
-import { digitize } from "../functions";
-import Group from "../Group";
-import { Attributes } from "../types";
+import { FaceValue } from "../FaceValue";
+import Card from "../themes/flipclock/Card";
+import Divider from "../themes/flipclock/Divider";
+import Group from "../themes/flipclock/Group";
 
 /**
  * The flag regex pattern.

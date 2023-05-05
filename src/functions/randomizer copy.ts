@@ -1,4 +1,4 @@
-import FaceValue from "../FaceValue";
+import { FaceValue } from "../FaceValue";
 import digitize from "./digitize";
 
 export const SPACE = 32;

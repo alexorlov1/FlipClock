@@ -1,4 +1,4 @@
-import FaceValue from "../FaceValue";
+import { FaceValue } from "../FaceValue";
 import { CharsetParams, useCharset } from "./charset";
 import { DigitizedValue, DigitizedValues } from "./digitizer";
 
@@ -14,7 +14,7 @@ export type RandomizerFunction = (value: FaceValue, targetValue?: FaceValue) => 
  * characters may be generated for each digit without repeats. When the random
  */
 export function useRandomizer(params: RandomizerParams = {}): RandomizerFunction {
-    return function run(value: FaceValue, targetValue?: FaceValue): FaceValue {
+    return function run(value: FaceValue, targetValue: FaceValue): FaceValue {
         const { get, chars, isWhitelisted } = useCharset(params.charset);
 
         function castArray(value?: DigitizedValues|DigitizedValue): DigitizedValues {
@@ -71,6 +71,8 @@ export function useRandomizer(params: RandomizerParams = {}): RandomizerFunction
                 after === undefined ? value : after
             );
 
+            console.log(possibleChars);
+
             if (possibleChars.includes(targetValue)) {
                 return targetValue;
             }
@@ -126,14 +128,14 @@ export function useRandomizer(params: RandomizerParams = {}): RandomizerFunction
             return next(key, value, targetValue);     
         }
 
-        const digits = recurse(
+        // The problem is we need to clone the digits. the only real easy way
+        // to do this is undigitize in the face so we always have the actual
+        // value. This avoids the cloning...
+        
+        const test = recurse(
             value.digits, targetValue.digits
         ) as DigitizedValue[];
 
-        return FaceValue.make(digits, {
-            digits
-        });
+        return new FaceValue(test);
     }
-    
-    return run
 }

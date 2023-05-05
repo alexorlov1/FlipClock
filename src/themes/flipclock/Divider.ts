@@ -1,5 +1,5 @@
-import { h } from "./functions";
-import VNode, { DomElement } from "./VNode";
+import VNode from "../../VNode";
+import { DomElement, h } from "../../helpers/dom";
 
 /**
  * The Divider class displays dividers between cards in a clock face. For

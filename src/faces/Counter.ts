@@ -1,9 +1,10 @@
-import Card from '../Card';
 import Face from '../Face';
-import FaceValue from '../FaceValue';
-import Group from '../Group';
+import { FaceValue } from '../FaceValue';
 import VNode from '../VNode';
-import { h, prop } from '../functions';
+import { prop } from '../functions';
+import { h } from '../helpers/dom';
+import Card from '../themes/flipclock/Card';
+import Group from '../themes/flipclock/Group';
 
 /**
  * This face is designed to increment and decrement values. Usually this face
@@ -40,10 +41,10 @@ export default class Counter extends Face {
     step: number|(() => number) = 1;
 
     /**
-     * Instantiate a Clock face with a given value and attributes.
+     * Instantiate the clock face.
      */
-    constructor(attributes: Partial<Counter> = {}) {
-        super(attributes);
+    constructor(attrs: Partial<Counter> = {}) {
+        super(attrs);
     }
 
     /**
@@ -100,7 +101,7 @@ export default class Counter extends Face {
         return h('div', {
             class: 'flip-clock',
         }, [
-            h(new Group({ items }))
+            new Group({ items })
         ]);
     }
 }

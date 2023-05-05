@@ -8,23 +8,21 @@
             "internalConsoleOptions": "neverOpen",
             "cwd": "${workspaceFolder}"
         },
+
         {
             "type": "node",
-            "name": "vscode-jest-tests.v2",
+            "name": "vscode-jest-tests",
             "request": "launch",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "program": "${workspaceFolder}/npx",
+            "disableOptimisticBPs": true,
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+            // ^^ modified line ^^
             "cwd": "${workspaceFolder}",
             "args": [
-                "jest",
                 "--runInBand",
-                "--watchAll=false",
-                "--testNamePattern",
-                "${jest.testNamePattern}",
-                "--runTestsByPath",
-                "${jest.testFile}"
+                "--watchAll=false"
             ]
-        }
+        },
     ]
 }
