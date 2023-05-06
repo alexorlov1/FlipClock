@@ -43,6 +43,7 @@ export function defaultCharset(): string[] {
         ...characterRange('a', 'z'),
         ...characterRange('A', 'Z'),
         ...characterRange('0', '9'),
+        ...['.', ',', '!', '?', ' ']
     ];
 }
 
@@ -68,7 +69,6 @@ export type CharsetCache = Map<string, string[]>;
 export function useCharset(options: CharsetOptions = {}) {
     const blacklist = options.blacklist || [];
     const whitelist = options.whitelist || [];
-    const cache: CharsetCache = new Map<string, string[]>();
 
     const shuffle: ShuffleFunction = options.shuffle && (
         typeof options.shuffle === 'function' ? options.shuffle : fisherYatesShuffle
@@ -88,17 +88,21 @@ export function useCharset(options: CharsetOptions = {}) {
      */
     const charset = createCharset();
 
-    /**
-     * Gets the charset for the given key. If no key is given, just generate a
-     * new charset each time.
-     */
-    function get(key: string): string[] {
-        if(!cache.has(key)) {
-            cache.set(key, shuffle(charset.slice(0)));
-        }
+    // @TODO - Re-evaluate this code to see if it is needed and if not, remove.
+    //
+    // const cache: CharsetCache = new Map<string, string[]>();
+    //
+    // /**
+    //  * Gets the charset for the given key. If no key is given, just generate a
+    //  * new charset each time.
+    //  */
+    // function get(key: string): string[] {
+    //     if(!cache.has(key)) {
+    //         cache.set(key, shuffle(charset.slice(0)));
+    //     }
 
-        return cache.get(key);
-    }
+    //     return cache.get(key);
+    // }
 
     // /**
     //  * Generates a random array of character from the given key.
@@ -166,7 +170,11 @@ export function useCharset(options: CharsetOptions = {}) {
      * Get the next character in the charset relative to the given value.
      */
     function next(value: DigitizedValue, targetValue: DigitizedValue, count: number = 1) {
-        if(isWhitelisted(value) || targetValue === value) {
+        if (!charset.includes(targetValue)) {
+            return targetValue;
+        }
+
+        if (isWhitelisted(value) || targetValue === value) {
             return value;
         }
 
@@ -187,6 +195,10 @@ export function useCharset(options: CharsetOptions = {}) {
      * Get the prev character in the charset relative to the given value.
      */
     function prev(value: DigitizedValue, targetValue: DigitizedValue, count: number = 1) {
+        if (!charset.includes(targetValue)) {
+            return targetValue;
+        }
+
         if (isWhitelisted(value) || targetValue === value) {
             return value;
         }
@@ -200,7 +212,7 @@ export function useCharset(options: CharsetOptions = {}) {
         if (matches.includes(targetValue)) {
             return targetValue;
         }
-
+        
         return matches[0];
     }
 

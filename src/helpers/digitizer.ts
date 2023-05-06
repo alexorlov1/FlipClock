@@ -6,17 +6,28 @@ export type DigitizerProps = {
 
 export type CountFunction = (value: DigitizedValues) => number
 export type DigitizedValue = string
-export type DigitizedValues = DigitizedValue[] | DigitizedValues[]
+export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
 export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerProps) => DigitizedValues
-export type UndigitizeFunction = (value: RawFaceValue) => string
+export type UndigitizeFunction = (value: DigitizedValues) => string
+export type IsDigitizedFunction = (value: RawFaceValue|DigitizedValues) => boolean
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
 
 export type DigitizerContext = {
     count: CountFunction
     digitize: DigitizeFunction
     undigitize: UndigitizeFunction
+    isDigitized: IsDigitizedFunction
     pad: PadFunction
 } & DigitizerProps
+
+/**
+* Recursively count the number of digits in a value.
+* 
+* @public
+*/
+export function count(values: DigitizedValues) {
+    return [].concat(values).flat(Infinity).length;
+}
 
 /**
  * Create a digiter that can be used to convert a string into arrays of
@@ -44,15 +55,6 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
     }
 
     /**
-    * Recursively count the number of digits in a value.
-    * 
-    * @public
-    */
-    function count(values: DigitizedValues) {
-        return [].concat(values).flat(Infinity).length;
-    }
-    
-    /**
      * Recursively digitize a value into groups of characters.
      * 
      * @public
@@ -60,10 +62,8 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
     function digitize(value: RawFaceValue | RawFaceValue[], overrideprops?: DigitizerProps): DigitizedValues {
         const { minimumDigits } = Object.assign({}, props, overrideprops);
 
-        function split(value: RawFaceValue | RawFaceValue[], char: string = ''): RawFaceValue[] {
-            return Array.isArray(value)
-                ? value
-                : value.toString().split(char);
+        function split(value: RawFaceValue, char: string = ''): RawFaceValue[] {
+            return value.toString().split(char);
         }
 
         function recurse(value: RawFaceValue|RawFaceValue[], depth: number = 0) {
@@ -115,9 +115,39 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
         return recurse(value);
     }
 
+    function isDigitized(value: RawFaceValue|DigitizedValues): boolean {
+        function recurse(value: RawFaceValue): boolean {
+            if (!Array.isArray(value)) {
+                return false;
+            }
+
+            for (const i in value) {
+                if (typeof value[i]  === 'string' && (value[i] as string).length === 1) {
+                    continue
+                }
+
+                if (!Array.isArray(value[i])) {
+                    return false;
+                }
+                else if(!(value[i] as DigitizedValues).length) {
+                    continue;
+                }
+
+                if (!recurse(value[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return recurse(value);
+    }   
+
     return Object.assign({
         count,
         digitize,
+        isDigitized,
         pad,
         undigitize
     }, props)

@@ -1,15 +1,19 @@
 export type Translator = (value: string) => string;
 
-export type Dictionary = Record<string, string | Translator>;
+export type DictionaryRecord = Record<string, string | Translator>
+export type DictionaryMap = Map<string, string | Translator>
+export type DefinitionTerms = Record<string, string | Translator>;
 
 var KEBAB_REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
 
 /**
  * Create a new date string formatter.
  */
-export function useDictionary(dictionary: Dictionary = {}) {
+export function useDictionary(definitions: DefinitionTerms = {}) {
+    const dictionary: DictionaryMap = new Map(Object.entries(definitions));
+
     function translate(key: string): string {
-        const term = dictionary[key];
+        const term = dictionary.get(key);
 
         if (typeof term === 'function') {
             return term(key);
@@ -22,27 +26,32 @@ export function useDictionary(dictionary: Dictionary = {}) {
         return term;
     }
 
-    function define(key: string | Record<string, string>)
-    function define(key: string | Record<string, string>, value?: string): void {
+    function define(key: string, value: string)
+    function define(key: DictionaryRecord)
+    function define(key: string | DictionaryRecord, value?: string): void {
         if(typeof key === 'string') {
-            dictionary[key] = value;
+            dictionary.set(key, value);
         }
         else {
-            Object.assign(dictionary, key)
-        }
+            for (const entry of Object.entries(key)) {
+                dictionary.set(entry[0], entry[1]);
+            }
+        }        
     }
 
     function undefine(keys: string|string[]): void {
-        if (!Array.isArray(keys)) {
-            keys = [keys];
+        if (Array.isArray(keys)) {
+            for(const key of keys) {
+                dictionary.delete(key);
+            }
         }
-
-        for (const i of keys) {
-            delete dictionary[i];
+        else {
+            dictionary.delete(keys);
         }
     }
 
     return {
+        dictionary,
         translate,
         define,
         undefine,

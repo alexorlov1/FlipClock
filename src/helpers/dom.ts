@@ -31,15 +31,6 @@ export function isDomElement(value: number | string | DomElement): value is DomE
 var KEBAB_REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
 
 /**
- * Convert a string to kebab case.
- */
-export function kebabCase(str: string) {
-    return str.replace(KEBAB_REGEX, function (match) {
-        return '-' + match.toLowerCase();
-    }).slice(1);
-}
-
-/**
  * Bind the events from the vnode to the element.
  */
 export function bindEvents(el: Element, vnode: VNode) {
@@ -151,8 +142,6 @@ export function createElement(vnode: VNode): Element {
  * Get the type for a node.
  */
 export function getNodeType(node: Node): string | null {
-    console.log(node);
-    
     if (node.nodeType === 3) return 'text';
     if (node.nodeType === 8) return 'comment';
     if (node.nodeType === 11) return 'fragment';
@@ -280,7 +269,7 @@ export function diff(el: Node, vnode: VNode, prevNode?: VNode): void {
 /**
  * Render the VNode as a DOM element.
  */
-export function render(vnode: VNode): Element | Text | Comment {
+export function render<T = Element | Text | Comment>(vnode: VNode): T {
     // Create the DOM element
     const el = createElement(vnode);
 

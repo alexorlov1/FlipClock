@@ -1,4 +1,4 @@
-import { call } from './functions';
+import call from "./helpers/functions";
 
 /**
  * The Timer class uses a requestAnimationFrame loop to build a timer that can
@@ -23,7 +23,7 @@ export default class Timer {
      * 
      * @readonly
      */
-    protected readonly interval: number|(() => number) = 1000;
+    protected readonly interval: number;
 
     /**
      * The timestamp of the last loop.
@@ -42,10 +42,8 @@ export default class Timer {
 
     /**
      * Create a new `Timer` instance.
-     *
-     * @param interval - The number of milliseconds between intervals.
      */
-    constructor(interval: number|(() => number) = 1000) {
+    constructor(interval: number = 1000) {
         this.interval = interval;
     }
 
@@ -105,10 +103,8 @@ export default class Timer {
     reset(fn?: (timer: Timer) => void): Timer {
         this.stop(() => {
             this.count = 0;
-
-            if(fn) {
-                this.start(() => call(fn));
-            }
+            this.lastLooped = 0
+            this.start(fn);
         });
 
         return this;
@@ -122,12 +118,8 @@ export default class Timer {
         this.running = true;
 
         const loop = () => {
-            const interval: number = typeof this.interval === 'function'
-                ? this.interval()
-                : this.interval;
-
-            if(Date.now() - this.lastLoop >= interval) {
-                call(fn, interval);
+            if (Date.now() - this.lastLoop >= this.interval) {
+                call(fn, this.interval);
                 
                 this.lastLooped = Date.now();
                 this.count++;
@@ -146,13 +138,13 @@ export default class Timer {
      */
     stop(fn?: Function): Timer {
         if(this.isRunning) {
-            setTimeout(() => {
+            // setTimeout(() => {
                 window.cancelAnimationFrame(this.handle);
 
                 this.running = false;
 
                 call(fn);
-            });
+            // });
         }
 
         return this;

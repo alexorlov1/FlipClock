@@ -1,4 +1,3 @@
-import { next, prev } from '../../src/js/Helpers/Value';
 import FaceValue from '../../src/js/Components/FaceValue';
 
 
@@ -34,3 +33,9 @@ test('face values without leading zeros', () => {
 
     expect(faceValue.digits[0]).toHaveLength(1);
 });
+
+test('the carry length', () => {
+    const value = new FaceValue('test');
+
+    expect(value.carryLength).toBe(1);
+})

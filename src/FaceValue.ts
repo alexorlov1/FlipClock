@@ -1,6 +1,7 @@
 import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
 
-export type RawFaceValue = undefined | string | number | RawFaceValue[];
+export type RawFaceLiterals = undefined | string | number
+export type RawFaceValue = RawFaceLiterals | (RawFaceValue)[] | DigitizedValues;
 
 export type FaceValueProps = Pick<FaceValue, 'carryLength' | 'digitizer'>
 
@@ -38,22 +39,25 @@ export class FaceValue {
     /**
      * Instantiate the face value.
      */
-    constructor(value: RawFaceValue, props: FaceValueProps = {}) {
-        if(this.carryLength) {
-            this.carryLength = props.carryLength;
-        }
+    constructor(value: RawFaceValue|DigitizedValues, props: FaceValueProps = {}) {
+        this.carryLength = props.carryLength;
 
         this.digitizer = props.digitizer || useDigitizer({
             minimumDigits: props.carryLength,
         });
 
-        const { digitize, undigitize } = this.digitizer;
+        const { digitize, undigitize, isDigitized } = this.digitizer;
 
-        this.value = Array.isArray(value) ? undigitize(value) : value;
-
-        this.digits = digitize(this.value, {
-            minimumDigits: this.minimumLength
-        });
+        if(isDigitized(value)) {
+            this.value = undigitize(value as DigitizedValues);
+            this.digits = value as DigitizedValues;
+        }
+        else {
+            this.value = value;
+            this.digits = digitize(this.value, {
+                minimumDigits: this.minimumLength
+            });
+        }
     }
 
     get minimumLength() {

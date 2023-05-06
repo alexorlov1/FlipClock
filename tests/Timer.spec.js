@@ -5,21 +5,42 @@ jest.useFakeTimers();
 test('if can the timer be started and stopped.', () => {
     const instance = new Timer(500);
 
+    expect(instance.elapsed).toBe(0);
+    expect(instance.elapsedSinceLastLoop).toBe(0);
     expect(instance.interval === 500).toBe(true);
+    expect(instance.isRunning).toBe(false);
     expect(instance.isStopped).toBe(true);
+    expect(instance.started).toBe(undefined);
 
-    instance.start();
+    const startCallback = jest.fn();
 
+    instance.start(startCallback);
+
+    expect(instance.count).toBe(1);
+    expect(instance.elapsed).toBe(0);
+    expect(instance.elapsedSinceLastLoop).toBe(0);
     expect(instance.isRunning).toBe(true);
     expect(instance.isStopped).toBe(false);
+    expect(instance.started).toBeInstanceOf(Date);
 
-    let called = false;
+    const resetCallback = jest.fn();
 
-    instance.stop(() => called = true);
+    instance.reset(resetCallback);
+
+    expect(instance.count).toBe(1);
+
+    const stopCallback = jest.fn();
+
+    instance.stop(stopCallback);
+
+    expect(instance.isRunning).toBe(false);
+    expect(instance.isStopped).toBe(true);
 
     jest.runAllTimers();
 
-    expect(instance.isStopped).toBe(true);
+    expect(startCallback).toHaveBeenCalledTimes(1);
+    expect(resetCallback).toHaveBeenCalledTimes(1);
+    expect(stopCallback).toHaveBeenCalledTimes(1);
 
-    expect(called).toBe(true);    
+    expect(instance.isStopped).toBe(true);   
 });

@@ -55,7 +55,7 @@ test('creating a dom tree that represents a bulleted list', () => {
     expect(ul.childNodes[2].tagName).toBe('li');
     expect(ul.childNodes[2].childNodes[0].textContent).toBe('item 3');
 
-    const el = render(ul);
+    const el = render<Element>(ul);
 
     expect(el.outerHTML).toBe('<ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>');
 });
@@ -63,7 +63,7 @@ test('creating a dom tree that represents a bulleted list', () => {
 test('adding and removing attributes', () => {
     let vnode = h('div', { ['data-id']: 'some-id' }, 'some text');
 
-    const el = render(vnode);
+    const el = render<Element>(vnode);
 
     expect(el.outerHTML).toBe('<div data-id="some-id">some text</div>');
 
@@ -81,7 +81,7 @@ test('creating 2 vnode and diff\'ing them between making changes', () => {
         h('li', { ['data-id']: '3' }, 'item 3')
     ]);
 
-    const el = render(ul);
+    const el = render<Element>(ul);
 
     expect(el.outerHTML).toBe('<ul><li data-id="1">item 1</li><li data-id="2">item 2</li><li data-id="3">item 3</li></ul>');
 
@@ -138,7 +138,7 @@ test('creating 2 vnode and diff\'ing them between making changes', () => {
 test('interecting a vnode with a dom element', () => {
     const vnode = h('div', { class: 'test' }, 'test');
 
-    const el = render(vnode);
+    const el = render<Element>(vnode);
 
     el.setAttribute('id', 'added');
     el.setAttribute('class', 'changed');

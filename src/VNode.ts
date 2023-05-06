@@ -1,4 +1,4 @@
-import { Attributes, ChildNode, DomElement, h } from './helpers/dom';
+import { Attributes } from './helpers/dom';
 
 /**
  * The VNode is a virtual representation of a DOM element. It is used to diff
@@ -36,22 +36,12 @@ export default class VNode {
     /**
      * Construct the VNode.
      */
-    constructor(tagName: string, attributes: Attributes = {}, childNodes: ChildNode[] = []) {
+    constructor(tagName: string, attributes: Attributes = {}, childNodes: VNode[] = []) {
         // Set the tagname as always lowercase.
         this.tagName = tagName.toLowerCase();
 
         // Set the child nodes.
-        this.childNodes = childNodes.map(child => {
-            if(child instanceof VNode) {
-                return child;
-            }
-            else if (!(typeof child === 'object')) {
-                return h('text', { textContent: child });
-            }
-            else if('render' in child) {
-                return (child as DomElement).render()
-            }
-        }).filter(child => child !== undefined);        
+        this.childNodes = childNodes;        
 
         // Set the propetires and attributes.
         for(const key in attributes) {

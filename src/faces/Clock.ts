@@ -1,5 +1,5 @@
 
-import Face from '../Face';
+import { Face } from '../Face';
 import { FaceValue } from '../FaceValue';
 import FlipClock from '../FlipClock';
 import VNode from '../VNode';

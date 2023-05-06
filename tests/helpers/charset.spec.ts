@@ -1,9 +1,9 @@
-import { characterRange, defaultCharset, range, useCharset } from "../../src/helpers/charset";
+import { characterRange, defaultCharset, fisherYatesShuffle, range, useCharset } from "../../src/helpers/charset";
 
 test('using a charset', () => {
-    const { chunk, isBlacklisted, isWhitelisted, next, prev } = useCharset({
-        whitelist: '!',
-        blacklist: '#'
+    const { charset, chunk, isBlacklisted, isWhitelisted, next, prev } = useCharset({
+        whitelist: ['!'],
+        blacklist: ['#']
     });
 
     expect(chunk('a', 1)).toStrictEqual(['b']);
@@ -15,28 +15,45 @@ test('using a charset', () => {
     expect(isWhitelisted('!')).toEqual(true)
     expect(isBlacklisted('#')).toEqual(true)
 
-    expect(next('.', '.')).toBe('.');
+    expect(next('9', '!')).toBe('.');
+    expect(next('9', '!', 2)).toBe('!');
+    expect(next('a', '!', 100)).toBe('!');
     expect(next('!', '!')).toBe('!');
-    expect(next('#', '!')).toBe('0');
+    expect(next('#', '!')).toBe('!');
+    expect(next('#', ':')).toBe(':');
     expect(next('a', 'z', 1)).toBe('b');
     expect(next('a', 'z', 5)).toBe('f');
     expect(next('a', 'z', 100)).toBe('z');
 
-    expect(prev('.', '.')).toBe('.');
+    expect(prev('?', '.')).toBe('!');
+    expect(prev('?', '.', 2)).toBe(',');
+    expect(prev('?', '.', 100)).toBe('.');
     expect(prev('!', '!')).toBe('!');
-    expect(prev('#', '!')).toBe('0');
+    expect(prev('#', '!')).toBe('!');
+    expect(prev('#', ':')).toBe(':');
     expect(prev('z', 'a', 1)).toBe('y');
     expect(prev('z', 'a', 5)).toBe('u');
     expect(prev('z', 'a', 100)).toBe('a');
 })
 
 test('using a randomize charset', () => {
+    const { charset } = useCharset();
+
     const { chunk } = useCharset({
         shuffle: true
     });
 
-    expect(chunk('a', 1)).not.toStrictEqual(['b']);
-    expect(chunk('a', 5)).not.toStrictEqual(['b', 'c', 'd', 'e', 'f']);
+    expect(chunk('a', 5)).not.toStrictEqual(defaultCharset);
+})
+
+test('using a custom shuffle function', () => {
+    const { charset } = useCharset();
+
+    const { chunk } = useCharset({
+        shuffle: fisherYatesShuffle
+    });
+
+    expect(chunk('a', 100)).not.toStrictEqual(charset);
 })
 
 test('using a custom charset', () => {
@@ -50,7 +67,9 @@ test('using a custom charset', () => {
 })
 
 test('the default charset', () => {
-    expect(defaultCharset()).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    const { charset } = useCharset();
+    
+    expect(charset).toEqual(defaultCharset());
 })
 
 test('creating character ranges', () => {
