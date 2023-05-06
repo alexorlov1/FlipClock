@@ -72,7 +72,7 @@ export class FaceValue {
      * Compare the face value with the given subject.
      */
     compare(subject: FaceValue) {
-        return JSON.stringify(this.digits) === JSON.stringify(subject.digits);
+        return this.value === subject.value;
     }
 
     /**

@@ -1,9 +1,6 @@
-
-// options: changeTotalDigits chunkSize
-
 import { FaceValue } from "../FaceValue";
 import { CharsetOptions, useCharset } from "./charset";
-import { DigitizedValue, DigitizedValues } from "./digitizer";
+import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from "./digitizer";
 
 type SequencerOptions = {
     charset?: CharsetOptions,
@@ -14,6 +11,9 @@ type SequencerOptions = {
 
 type SequenceValue = DigitizedValue | DigitizedValues | undefined;
 
+/**
+ * Cast a value to a string.
+ */
 export function castDigitizedString(value: SequenceValue): DigitizedValue {
     if (Array.isArray(value)) {
         return castDigitizedString(value[0]);
@@ -22,6 +22,9 @@ export function castDigitizedString(value: SequenceValue): DigitizedValue {
     return value;
 }
 
+/**
+ * Cast a value to an array of strings.
+ */
 export function castDigitizedValues(value: SequenceValue): DigitizedValue[] {
     if (isDigitizedGroup(value)) {
         return value[0] as DigitizedValue[];
@@ -34,6 +37,9 @@ export function castDigitizedValues(value: SequenceValue): DigitizedValue[] {
     return [value];
 }
 
+/**
+ * Cast a value to a array of digitized arrays.
+ */
 export function castDigitizedGroup(value: SequenceValue): DigitizedValues {
     if (isDigitizedGroup(value)) {
         return value as DigitizedValues;
@@ -50,11 +56,18 @@ export function castDigitizedGroup(value: SequenceValue): DigitizedValues {
     return [[value]];
 }
 
+/**
+ * Determines if the values is an array of digitized strings.
+ */
 export function isDigitizedValues(value: SequenceValue) {
     return Array.isArray(value) && !isDigitizedGroup(value);
 }   
 
-export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undefined) {
+/**
+ * Determines if the value is a digitized group, which is an array of digitized
+ * values.
+ */
+export function isDigitizedGroup(value: DigitizedValues | DigitizedValue) {
     if (!Array.isArray(value) || !value.length) {
         return false;
     }
@@ -68,6 +81,10 @@ export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undef
     return false
 }
 
+/**
+ * Pad an array to the left with the specified character. This function is not
+ * recursive.
+ */
 export function padLeft(value: DigitizedValues, length: number, char: string): DigitizedValues {
     value.unshift(
         ...Array(Math.max(0, length - value.length)).fill(char)
@@ -76,6 +93,10 @@ export function padLeft(value: DigitizedValues, length: number, char: string): D
     return value;
 }
 
+/**
+ * Pad an array to the right with the specified character. This function is not
+ * recursive.
+ */
 export function padRight(value: DigitizedValues, length: number, char: string): DigitizedValues {
     value.push(
         ...Array(Math.max(0, length - value.length)).fill(char)
@@ -84,6 +105,9 @@ export function padRight(value: DigitizedValues, length: number, char: string): 
     return value;
 }
 
+/**
+ * Force the value to have the same data type as the target.
+ */
 export function matchDataType(value: SequenceValue, target: SequenceValue): DigitizedValues | DigitizedValue {
     if(isDigitizedGroup(target)) {
         return castDigitizedGroup(value);
@@ -167,6 +191,10 @@ export function matchStructureLength(current: DigitizedValues, target: Digitized
     return recurse(current, target) as DigitizedValues;
 }
 
+/**
+ * Recursively walk the current array and call the function for each string.
+ * The returned value of the function will replace the current string.
+ */
 export function walk(current: DigitizedValues, target: DigitizedValues, fn: Function) {
     function recurse(current: DigitizedValues | DigitizedValue, target: DigitizedValues | DigitizedValue) {
         if (!Array.isArray(current)) {
@@ -183,6 +211,10 @@ export function walk(current: DigitizedValues, target: DigitizedValues, fn: Func
     return recurse(current, target);
 }
 
+/**
+ * Use the sequencer to increment and decrement values until it reaches its
+ * target value.
+ */
 export function useSequencer(options: SequencerOptions = {}) {
     const { charset, next, prev } = useCharset(options.charset);
 
@@ -190,7 +222,7 @@ export function useSequencer(options: SequencerOptions = {}) {
         const current = matchStructureLength(
             matchArrayStructure(
                 value.digits, targetValue.digits
-            ), targetValue.digits, options.emptyChar || ' '
+            ), targetValue.digits, options.emptyChar || EMPTY_CHAR
         );
 
         const digits = walk(current, targetValue.digits, (current, target) => {

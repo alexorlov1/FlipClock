@@ -1,16 +1,18 @@
 import { RawFaceValue } from "../FaceValue";
 
-export type DigitizerProps = {
+export type DigitizerOptions = {
+    emptyChar?: string,
     minimumDigits?: number
 }
 
 export type CountFunction = (value: DigitizedValues) => number
 export type DigitizedValue = string
 export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
-export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerProps) => DigitizedValues
+export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerOptions) => DigitizedValues
 export type UndigitizeFunction = (value: DigitizedValues) => string
 export type IsDigitizedFunction = (value: RawFaceValue|DigitizedValues) => boolean
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
+
 
 export type DigitizerContext = {
     count: CountFunction
@@ -18,7 +20,9 @@ export type DigitizerContext = {
     undigitize: UndigitizeFunction
     isDigitized: IsDigitizedFunction
     pad: PadFunction
-} & DigitizerProps
+} & DigitizerOptions
+
+export const EMPTY_CHAR = ' ';
 
 /**
 * Recursively count the number of digits in a value.
@@ -35,20 +39,37 @@ export function count(values: DigitizedValues) {
  *
  * @public
  */
-export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
+export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
     
     /**
-     * Pad a value with spaces until it has the minimum number of digits.
+     * Pad a value with spaces until it has the minimum number of digits. The
+     * digits are applied to the first array with a string value.
      * 
      * @public
      */
-    function pad(value: DigitizedValues, minimumDigits: number|undefined = props.minimumDigits): DigitizedValues {
+    function pad(value: DigitizedValues, minimumDigits: number|undefined = options.minimumDigits): DigitizedValues {
         const digits = [].concat(value).flat(Infinity);
 
         if (digits.length < minimumDigits) {
-            const pad = Array(minimumDigits - digits.length).fill(String.fromCharCode(0));
+            const pad = Array(minimumDigits - digits.length).fill(
+                options.emptyChar || EMPTY_CHAR
+            );
 
-            value.unshift(...pad);
+            function unshift(value: DigitizedValues[], parent?: DigitizedValues) {
+                for(let i = 0; i < value.length; i++) {
+                    if(Array.isArray(value[i])) {
+                        if(unshift(value[i] as DigitizedValues[], value)) {
+                            return true;
+                        }
+                    }
+
+                    value.unshift(...pad);
+
+                    return true;
+                }
+            }
+                
+            unshift(value as DigitizedValues[], value);
         } 
         
         return value;
@@ -59,8 +80,8 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
      * 
      * @public
      */
-    function digitize(value: RawFaceValue | RawFaceValue[], overrideprops?: DigitizerProps): DigitizedValues {
-        const { minimumDigits } = Object.assign({}, props, overrideprops);
+    function digitize(value: RawFaceValue | RawFaceValue[], overrideoptions?: DigitizerOptions): DigitizedValues {
+        const { minimumDigits } = Object.assign({}, options, overrideoptions);
 
         function split(value: RawFaceValue, char: string = ''): RawFaceValue[] {
             return value.toString().split(char);
@@ -74,6 +95,11 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
             return split(value, ' ').map(group => {
                 return split(group);
             });
+        }
+
+        // If the value is already digitized, pad if necessary and return.
+        if(isDigitized(value)) {
+            return pad(value as DigitizedValues, minimumDigits);
         }
 
         let response = recurse(value);
@@ -91,28 +117,17 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
      * @public
      */
     function undigitize(value: DigitizedValues): string {
-        function recurse(current: DigitizedValue|DigitizedValues, parent?: DigitizedValues): string {
-            if (Array.isArray(current)) {
-                let carry = Array.isArray(parent) ? ' ' : '';
-
-                if (Array.isArray(parent)) {
-                    const index = parent.findIndex(child => current === child);
-                    const isLastChild = parent.length === index + 1;
-
-                    if (isLastChild) {
-                        carry = '';
-                    }
+        function recurse(value: DigitizedValues): string {
+            return (value as DigitizedValues[]).reduce((carry, value) => {
+                if(typeof value === 'string') {
+                    return carry + value;
                 }
 
-                return (current as DigitizedValue[]).reduce((carry: string, child: DigitizedValue) => {
-                    return carry + recurse(child, current);
-                }, '') as string + carry;
-            }
-
-            return current.toString();
+                return carry + ' ' + recurse(value);
+            }, String());
         }
 
-        return recurse(value);
+        return recurse(value).trim();
     }
 
     function isDigitized(value: RawFaceValue|DigitizedValues): boolean {
@@ -150,5 +165,5 @@ export function useDigitizer(props: DigitizerProps = {}): DigitizerContext {
         isDigitized,
         pad,
         undigitize
-    }, props)
+    }, options)
 }
