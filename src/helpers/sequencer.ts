@@ -4,8 +4,7 @@ import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from "./digitizer";
 
 type SequencerOptions = {
     charset?: CharsetOptions,
-    changeTotalDigits?: number,
-    chunkSize?: number,
+    maxDigitChanges?: number,
     emptyChar?: string,
 }
 
@@ -193,22 +192,64 @@ export function matchStructureLength(current: DigitizedValues, target: Digitized
 
 /**
  * Recursively walk the current array and call the function for each string.
- * The returned value of the function will replace the current string.
+ * The returned value of the function will replace the current value in the
+ * array. If `true` is returned, the current value is used (similar to 
+ * `continue` in a for loop). If `false` or `undefined` is returned, the current
+ * value will be used and resursion is stopped (similar to `break` in a for
+ * loop).
  */
-export function walk(current: DigitizedValues, target: DigitizedValues, fn: Function) {
-    function recurse(current: DigitizedValues | DigitizedValue, target: DigitizedValues | DigitizedValue) {
-        if (!Array.isArray(current)) {
-            return fn(current, target);
+type WalkerFunction = (current: DigitizedValue, target: DigitizedValues | DigitizedValue | undefined) => DigitizedValues |DigitizedValue | boolean;
+
+
+/**
+ * Recursively walk the current array and call the function for each string.
+ * The returned value of the function will replace the current value in the
+ * array. If `true` is returned, the current value is used (similar to 
+ * `continue` in a for loop). If `false` or `undefined` is returned, the current
+ * value will be used and resursion is stopped (similar to `break` in a for
+ * loop).
+ */
+export function walk(current: DigitizedValues, fn: WalkerFunction)
+export function walk(current: DigitizedValues, target: DigitizedValues, fn: WalkerFunction)
+export function walk(current: DigitizedValues, target: DigitizedValues | WalkerFunction | undefined, fn?: WalkerFunction) {
+    let stop = false;
+
+    if (typeof target === 'function') {
+        fn = target as WalkerFunction;
+
+        target = undefined;
+    }
+
+    function recurse(current: DigitizedValues | DigitizedValue, target?: DigitizedValues | DigitizedValue) {
+        // If the recursion has been stopped, return the current value.
+        if(stop) {
+            return current;
         }
 
+        // If the current value is not an array, then call the function.
+        if (!Array.isArray(current)) {
+            const response = fn(current, target);
+
+            if (response === false || response === undefined) {
+                stop = true;
+            }
+            
+            if (typeof response !== 'boolean' && !stop) {
+                return response;
+            }
+
+            return current;
+        }
+
+        // Resurse through the array.
         for (let x = current.length - 1; x >= 0; x--) {
-            current[x] = recurse(current[x], target[x]);
+            current[x] = recurse(current[x], target?.[x]);
         }
 
         return current;
     }
 
-    return recurse(current, target);
+    return recurse(current, (target as DigitizedValues|undefined));
 }
 
 /**
@@ -226,7 +267,7 @@ export function useSequencer(options: SequencerOptions = {}) {
         );
 
         const digits = walk(current, targetValue.digits, (current, target) => {
-            return prev(current, target, count);
+            return prev(current, castDigitizedString(target), count);
         });
 
         return value.copy(digits);
@@ -242,7 +283,7 @@ export function useSequencer(options: SequencerOptions = {}) {
         );
 
         const digits = walk(current, targetValue.digits, (current, target) => {
-            return next(current, target, count);
+            return next(current, castDigitizedString(target), count);
         });
 
         return value.copy(digits);

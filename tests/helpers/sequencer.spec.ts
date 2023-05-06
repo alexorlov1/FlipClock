@@ -1,5 +1,5 @@
 import { FaceValue } from '../../src/FaceValue';
-import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, matchDataType, matchStructureLength, useSequencer } from '../../src/helpers/sequencer';
+import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, matchDataType, matchStructureLength, useSequencer, walk } from '../../src/helpers/sequencer';
 
 test('incrementing a face value', () => {
     let value = new FaceValue(['a', ['b', ['c']]]),
@@ -108,4 +108,67 @@ test('matching structure', () => {
     expect(matchStructureLength(['1', '2'], ['1', '2'], ' ', 'left')).toStrictEqual(['1', '2']);
     expect(matchStructureLength(['1', ['2']], ['1', ['2', '3']], ' ', 'left')).toStrictEqual(['1', [' ', '2']]);
     expect(matchStructureLength(['1', ['2', '4']], ['1', ['2', '3']], ' ', 'left')).toStrictEqual(['1', ['2', '4']]);
+})
+
+test('walking through arrays', () => {
+    let stopped = false;
+
+    function tick(value: string) {
+        return stopped ? value : String(parseInt(value) + 1)
+    }
+
+    function createWalker(fn?: Function) {
+        return jest.fn((value, target) => {
+            if(typeof fn === 'function') {
+                return fn(value, target);
+            }
+
+            return tick(value)
+        });
+    };
+
+    function stopAfter(times: number) {
+        let count = 0;
+
+        return (value, target) => {
+            count++;
+
+            if (count >= times) {
+                return false;
+            }
+            
+            return value;
+        }
+    }
+
+    const subject = ['1', ['2', ['3']]];
+
+    const walker = createWalker();
+
+    walk(subject, walker);
+
+    expect(walker).toHaveBeenCalledTimes(3);
+    expect(subject).toStrictEqual(['2', ['3', ['4']]]);
+
+    const walker2 = createWalker(() => {
+        return true;
+    });
+
+    walk(subject, walker2);
+
+    expect(walker2).toHaveBeenCalledTimes(3);
+    expect(subject).toStrictEqual(['2', ['3', ['4']]]);
+
+    const walker3 = createWalker(stopAfter(2));
+
+    walk(subject, walker3);
+
+    expect(walker3).toHaveBeenCalledTimes(2);
+    expect(subject).toStrictEqual(['2', ['3', ['4']]]);
+
+    const walker4 = createWalker((value) => [value].concat('1'));
+
+    walk(subject, walker4);
+
+    expect(subject).toStrictEqual([['2', '1'], [['3', '1'], [['4', '1']]]]);
 })

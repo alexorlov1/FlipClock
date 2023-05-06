@@ -15,7 +15,7 @@ test('digitizing and undigitizing values', () => {
 });
 
 test('digitizing and undigitize "hello" with 8 minimum digits', () => {
-    const { digitize, undigitize } = useDigitizer({
+    const { digitize } = useDigitizer({
         minimumDigits: 8,
     });
 
@@ -24,6 +24,12 @@ test('digitizing and undigitize "hello" with 8 minimum digits', () => {
 
     expect(digitize(['a', ['b']]))
         .toEqual([' ', ' ', ' ', ' ', ' ', ' ', 'a', ['b']]);
+
+    expect(digitize([[[], ['a'], 'b'], 'c']))
+        .toEqual([[[], [' ', ' ', ' ', ' ', ' ', 'a'], 'b'], 'c']);
+        
+    expect(digitize([[[]], ['c']]))
+        .toEqual([[[]], [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'c']]);
 
     expect(digitize([['a', 'b', ['c']]]))
         .toEqual([[' ', ' ', ' ', ' ', ' ', 'a', 'b', ['c']]]);

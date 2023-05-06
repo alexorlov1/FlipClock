@@ -13,15 +13,9 @@ export type UndigitizeFunction = (value: DigitizedValues) => string
 export type IsDigitizedFunction = (value: RawFaceValue|DigitizedValues) => boolean
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
 
-
-export type DigitizerContext = {
-    count: CountFunction
-    digitize: DigitizeFunction
-    undigitize: UndigitizeFunction
-    isDigitized: IsDigitizedFunction
-    pad: PadFunction
-} & DigitizerOptions
-
+/**
+ * The default empty character for digitization.
+ */
 export const EMPTY_CHAR = ' ';
 
 /**
@@ -33,6 +27,14 @@ export function count(values: DigitizedValues) {
     return [].concat(values).flat(Infinity).length;
 }
 
+export type DigitizerContext = {
+    count: CountFunction
+    digitize: DigitizeFunction
+    undigitize: UndigitizeFunction
+    isDigitized: IsDigitizedFunction
+    pad: PadFunction
+} & DigitizerOptions
+
 /**
  * Create a digiter that can be used to convert a string into arrays of
  * individual characters.
@@ -40,7 +42,6 @@ export function count(values: DigitizedValues) {
  * @public
  */
 export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
-    
     /**
      * Pad a value with spaces until it has the minimum number of digits. The
      * digits are applied to the first array with a string value.
@@ -55,18 +56,26 @@ export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
                 options.emptyChar || EMPTY_CHAR
             );
 
-            function unshift(value: DigitizedValues[], parent?: DigitizedValues) {
+            function unshift(value: DigitizedValues[], parent?: DigitizedValues): boolean {
                 for(let i = 0; i < value.length; i++) {
+                    if(value[i] === undefined) {
+                        continue;
+                    }
+
                     if(Array.isArray(value[i])) {
                         if(unshift(value[i] as DigitizedValues[], value)) {
                             return true;
                         }
+
+                        continue;
                     }
 
                     value.unshift(...pad);
 
                     return true;
                 }
+
+                return false;
             }
                 
             unshift(value as DigitizedValues[], value);
