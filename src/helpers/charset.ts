@@ -1,4 +1,4 @@
-import { DigitizedValue } from './digitizer';
+import { DigitizedValue, EMPTY_CHAR } from './digitizer';
 
 /**
  * Get a range of numbers using the given size and starting point.
@@ -43,7 +43,7 @@ export function defaultCharset(): string[] {
         ...characterRange('a', 'z'),
         ...characterRange('A', 'Z'),
         ...characterRange('0', '9'),
-        ...['.', ',', '!', '?', ' ']
+        ':', '-', '.', ',', '!', '?'
     ];
 }
 
@@ -55,10 +55,27 @@ export type CharsetOptions = {
     whitelist?: string[]
     blacklist?: string[],
     charset?: CreateCharset,
+    emptyChar?: string,
     shuffle?: boolean|ShuffleFunction
 }
 
 export type CharsetCache = Map<string, string[]>;
+
+
+export type ChunkFunction = (value: DigitizedValue, size: number) => string[];
+export type IsBlacklistFunction = (value: DigitizedValue) => boolean;
+export type IsWhitelistFunction = (value: DigitizedValue) => boolean;
+export type NextFunction = (value: DigitizedValue, target: DigitizedValue, count?: number) => DigitizedValue;
+export type PrevFunction = (value: DigitizedValue, target: DigitizedValue, count?: number) => DigitizedValue;
+
+export type CharsetContext = {
+    charset: string[],
+    chunk: ChunkFunction,
+    isBlacklisted: IsBlacklistFunction,
+    isWhitelisted: IsWhitelistFunction,
+    next: NextFunction,
+    prev: PrevFunction
+}
 
 /**
  * A use function to capture the state of the spin cycle so that random
@@ -66,9 +83,10 @@ export type CharsetCache = Map<string, string[]>;
  * 
  * @public
  */
-export function useCharset(options: CharsetOptions = {}) {
+export function useCharset(options: CharsetOptions = {}): CharsetContext {
     const blacklist = options.blacklist || [];
     const whitelist = options.whitelist || [];
+    const emptyChar = options.emptyChar || EMPTY_CHAR;
 
     const shuffle: ShuffleFunction = options.shuffle && (
         typeof options.shuffle === 'function' ? options.shuffle : fisherYatesShuffle
@@ -88,44 +106,6 @@ export function useCharset(options: CharsetOptions = {}) {
      */
     const charset = createCharset();
 
-    // @TODO - Re-evaluate this code to see if it is needed and if not, remove.
-    //
-    // const cache: CharsetCache = new Map<string, string[]>();
-    //
-    // /**
-    //  * Gets the charset for the given key. If no key is given, just generate a
-    //  * new charset each time.
-    //  */
-    // function get(key: string): string[] {
-    //     if(!cache.has(key)) {
-    //         cache.set(key, shuffle(charset.slice(0)));
-    //     }
-
-    //     return cache.get(key);
-    // }
-
-    // /**
-    //  * Generates a random array of character from the given key.
-    //  */
-    // function chars(key?: string, count: number = 1, after?: DigitizedValue): string[] {
-    //     const cache = get(key).filter(value => !isBlacklisted(value));
-    //     const index = cache.indexOf(after);
-        
-    //     let start = Math.max(0, after && index + 1);
-        
-    //     if(index >= cache.length - 1) {
-    //         start = 0;
-    //     }
-
-    //     const trailing = cache.slice(start, start + count);
-
-    //     if(trailing.length < count) {
-    //         trailing.push(...cache.slice(0, count - trailing.length));
-    //     }
-
-    //     return trailing.slice(0, count);
-    // }
-
     /**
      * Find the nearest character in the charset to the given value.
      */
@@ -143,77 +123,92 @@ export function useCharset(options: CharsetOptions = {}) {
     /**
      * Get the next chunks of characters relative to another character.
      */
-    function chunk(value: DigitizedValue, size: number): string[] {
-        const index = charset.indexOf(value);
-        
-        const start = size > 0 ? index + 1 : size;
+    function chunk(value: DigitizedValue, size: number = 1): string[] {
+        let chunked = [emptyChar, ...charset, emptyChar, ...charset];
 
-        const matches = size > 0
-            ? charset.slice(start, start + size)
-            : charset.slice(Math.max(0, index + size), index);
-
-        if (matches.length === Math.abs(size)) {
-            return matches;
+        if(size < 0) {
+            chunked = chunked.reverse();
         }
 
-        if(size > 0) {
-            matches.push(...charset.slice(0, size - matches.length));
-        }
-        else {
-            matches.unshift(...charset.slice(size + matches.length));
+        let offset = 1;
+
+        if (!chunked.includes(value)) {
+            value = emptyChar;
+            offset = 0;
         }
 
-        return matches.slice(0, charset.length);
+        const index = chunked.indexOf(value);
+
+        const sequence = chunked.slice(
+            index + offset, chunked.indexOf(value, index + 1) + offset
+        );
+
+        return sequence.splice(0, Math.abs(size));
     }   
 
     /**
      * Get the next character in the charset relative to the given value.
      */
-    function next(value: DigitizedValue, targetValue: DigitizedValue, count: number = 1) {
-        if (!charset.includes(targetValue)) {
-            return targetValue;
+    function next(current: DigitizedValue, target: DigitizedValue, count: number = 1): DigitizedValue {
+        if (target === undefined && current === emptyChar) {
+            return undefined
+        }
+        else if (target && !charset.includes(target)) {
+            return target;
         }
 
-        if (isWhitelisted(value) || targetValue === value) {
-            return value;
+        if (isWhitelisted(current) || target === current) {
+            return current;
         }
 
-        if (isBlacklisted(value)) {
-            return nearest(value);
+        if (isBlacklisted(current)) {
+            return nearest(current);
         }
 
-        const matches = chunk(value, count + 1);
+        const matches = chunk(current, count);
 
-        if (matches.includes(targetValue)) {
-            return targetValue;
+        if (matches.includes(target)) {
+            return target;
         }
 
+        if (target === undefined && charset.indexOf(matches[count - 1]) < charset.indexOf(current)) {
+            return undefined;
+        }
+        
         return matches[count - 1];
     }
 
     /**
      * Get the prev character in the charset relative to the given value.
      */
-    function prev(value: DigitizedValue, targetValue: DigitizedValue, count: number = 1) {
-        if (!charset.includes(targetValue)) {
-            return targetValue;
-        }
-
-        if (isWhitelisted(value) || targetValue === value) {
-            return value;
-        }
-
-        if (isBlacklisted(value)) {
-            return nearest(value);
-        }
-
-        const matches = chunk(value, Math.abs(count) * -1);
-
-        if (matches.includes(targetValue)) {
-            return targetValue;
-        }
+    function prev(current: DigitizedValue, target: DigitizedValue, count: number = 1): DigitizedValue {
         
-        return matches[0];
+        if (target === undefined && current === emptyChar) {
+            return undefined
+        }
+        else if (target && !charset.includes(target)) {
+            return target;
+        }
+
+        if (isWhitelisted(current) || target === current) {
+            return current;
+        }
+
+        if (isBlacklisted(current)) {
+            return nearest(current);
+        }
+
+        const matches = chunk(current, -count);
+
+        if (matches.includes(target)) {
+            return target;
+        }
+
+        if (target === undefined && charset.indexOf(matches[count - 1]) > charset.indexOf(current)) {
+            return undefined;
+        }
+
+        return matches[count - 1];
     }
 
     /**
@@ -231,7 +226,6 @@ export function useCharset(options: CharsetOptions = {}) {
     }
 
     return {
-        // chars,
         charset,
         chunk,
         isBlacklisted,

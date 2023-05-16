@@ -1,40 +1,74 @@
 import { characterRange, defaultCharset, fisherYatesShuffle, range, useCharset } from "../../src/helpers/charset";
 
-test('using a charset', () => {
-    const { charset, chunk, isBlacklisted, isWhitelisted, next, prev } = useCharset({
-        whitelist: ['!'],
+test('validating whitelisted and blacklisted characters', () => {
+    const { isBlacklisted, isWhitelisted } = useCharset({
+        whitelist: ['@'],
         blacklist: ['#']
     });
 
-    expect(chunk('a', 1)).toStrictEqual(['b']);
-    expect(chunk('a', 5)).toStrictEqual(['b', 'c', 'd', 'e', 'f']);
-
-    expect(chunk('z', -1)).toStrictEqual(['y']);
-    expect(chunk('z', -5)).toStrictEqual(['u', 'v', 'w', 'x', 'y']);
-
-    expect(isWhitelisted('!')).toEqual(true)
+    expect(isWhitelisted('@')).toEqual(true)
     expect(isBlacklisted('#')).toEqual(true)
+});
 
-    expect(next('9', '!')).toBe('.');
-    expect(next('9', '!', 2)).toBe('!');
+test('retrieving chunks of the charset going forwards and backwards', () => {
+    const { charset, chunk } = useCharset();
+
+    expect(chunk('@', 1)).toStrictEqual([' ']);
+    expect(chunk('A', 1000)).toHaveLength(charset.length + 1);
+    expect(chunk(':', 7)).toStrictEqual(['-', '.', ',', '!', '?', ' ', 'a']);
+    expect(chunk(' ', 1)).toStrictEqual(['a']);
+    expect(chunk(undefined, 1)).toStrictEqual([' ']);
+    expect(chunk(undefined, 5)).toStrictEqual([' ', 'a', 'b', 'c', 'd']);
+    expect(chunk(undefined, 1000)).toHaveLength(charset.length + 1);
+
+    expect(chunk('@', -1)).toStrictEqual([' ']);
+    expect(chunk('A', -1000)).toHaveLength(charset.length + 1);
+    expect(chunk(':', -7)).toStrictEqual(['9', '8', '7', '6', '5', '4', '3']);
+    expect(chunk(' ', -1)).toStrictEqual(['?']);
+    expect(chunk(undefined, -1)).toStrictEqual([' ']);
+    expect(chunk(undefined, -5)).toStrictEqual([' ', '?', '!', ',', '.']);
+    expect(chunk(undefined, -1000)).toHaveLength(charset.length + 1);
+});
+
+test('retrieving the next value towards the target', () => {
+    const { next, prev } = useCharset({
+        blacklist: ['#'],
+        whitelist: ['@']
+    });
+
+    expect(next('a', undefined)).toBe('b');
+    expect(next(' ', undefined)).toBe(undefined);
+    expect(next(undefined, 'a')).toBe(' ');
+    expect(next(undefined, 'a', 2)).toBe('a');
+    expect(next('9', '!')).toBe(':');
+    expect(next('9', '!', 2)).toBe('-');
     expect(next('a', '!', 100)).toBe('!');
-    expect(next('!', '!')).toBe('!');
+    expect(next('@', '@')).toBe('@');
     expect(next('#', '!')).toBe('!');
-    expect(next('#', ':')).toBe(':');
-    expect(next('a', 'z', 1)).toBe('b');
+    expect(next('a', 'z')).toBe('b');
     expect(next('a', 'z', 5)).toBe('f');
     expect(next('a', 'z', 100)).toBe('z');
+    expect(next('!', 'a', 2)).toBe(' ');
+    expect(next('!', '?', 2)).toBe('?');
+    expect(next('!', '?')).toBe('?');
+    expect(next('?', undefined)).toBe(undefined);
 
+    expect(prev('b', undefined)).toBe('a');
+    expect(prev('a', undefined)).toBe(' ');
+    expect(prev(' ', undefined)).toBe(undefined);
+    expect(prev(undefined, 'a')).toBe(' ');
+    expect(prev(undefined, 'a', 2)).toBe('?');
     expect(prev('?', '.')).toBe('!');
     expect(prev('?', '.', 2)).toBe(',');
     expect(prev('?', '.', 100)).toBe('.');
     expect(prev('!', '!')).toBe('!');
     expect(prev('#', '!')).toBe('!');
-    expect(prev('#', ':')).toBe(':');
-    expect(prev('z', 'a', 1)).toBe('y');
+    expect(prev('z', 'a')).toBe('y');
     expect(prev('z', 'a', 5)).toBe('u');
     expect(prev('z', 'a', 100)).toBe('a');
-})
+});
+
+
 
 test('using a randomize charset', () => {
     const { charset } = useCharset();
@@ -58,12 +92,13 @@ test('using a custom shuffle function', () => {
 
 test('using a custom charset', () => {
     const { chunk } = useCharset({
+        emptyChar: '$',
         charset: () => ['a', 'b', 'c', 'd', 'e', 'f']
     });
 
     expect(chunk('a', 1)).toStrictEqual(['b']);
     expect(chunk('a', 5)).toStrictEqual(['b', 'c', 'd', 'e', 'f']);
-    expect(chunk('a', 100)).toStrictEqual(['b', 'c', 'd', 'e', 'f', 'a']);
+    expect(chunk('a', 100)).toStrictEqual(['b', 'c', 'd', 'e', 'f', '$', 'a']);
 })
 
 test('the default charset', () => {

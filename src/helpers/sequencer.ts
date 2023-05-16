@@ -1,14 +1,7 @@
 import { FaceValue } from "../FaceValue";
-import { CharsetOptions, useCharset } from "./charset";
-import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from "./digitizer";
-
-type SequencerOptions = {
-    charset?: CharsetOptions,
-    maxDigitChanges?: number,
-    emptyChar?: string,
-}
-
-type SequenceValue = DigitizedValue | DigitizedValues | undefined;
+import { CharsetContext, useCharset } from "./charset";
+import { DigitizedValue, DigitizedValues } from "./digitizer";
+import { StopWalkerCallbackFunction, WalkerDirection, WalkerFunction, WalkerOptions, stopAfterChanges, useWalker } from "./walker";
 
 /**
  * Cast a value to a string.
@@ -24,13 +17,17 @@ export function castDigitizedString(value: SequenceValue): DigitizedValue {
 /**
  * Cast a value to an array of strings.
  */
-export function castDigitizedValues(value: SequenceValue): DigitizedValue[] {
+export function castDigitizedValues(value: SequenceValue, direction: WalkerDirection = 'forwards'): DigitizedValue[] {
     if (isDigitizedGroup(value)) {
-        return value[0] as DigitizedValue[];
+        return (value as DigitizedValue[]).flat(Infinity);
     }
 
     if (Array.isArray(value)) {
         return value as DigitizedValue[];
+    }
+    
+    if (value === undefined) {
+        return [];
     }
 
     return [value];
@@ -49,14 +46,14 @@ export function castDigitizedGroup(value: SequenceValue): DigitizedValues {
     }
 
     if (value === undefined) {
-        return [[]];
+        return [[]]
     }
-    
+
     return [[value]];
 }
 
 /**
- * Determines if the values is an array of digitized strings.
+ * Determines if the value is an array of digitized strings.
  */
 export function isDigitizedValues(value: SequenceValue) {
     return Array.isArray(value) && !isDigitizedGroup(value);
@@ -80,53 +77,43 @@ export function isDigitizedGroup(value: DigitizedValues | DigitizedValue) {
     return false
 }
 
-/**
- * Pad an array to the left with the specified character. This function is not
- * recursive.
- */
-export function padLeft(value: DigitizedValues, length: number, char: string): DigitizedValues {
-    value.unshift(
-        ...Array(Math.max(0, length - value.length)).fill(char)
-    );
-    
-    return value;
-}
+// /**
+//  * Force the value to have the same data type as the target.
+//  */
+// export function matchDataType(value: SequenceValue, target: SequenceValue): DigitizedValues | DigitizedValue {
+//     if(isDigitizedGroup(target)) {
+//         return castDigitizedGroup(value);
+//     }
 
-/**
- * Pad an array to the right with the specified character. This function is not
- * recursive.
- */
-export function padRight(value: DigitizedValues, length: number, char: string): DigitizedValues {
-    value.push(
-        ...Array(Math.max(0, length - value.length)).fill(char)
-    );
+//     if (isDigitizedValues(target)) {
+//         return castDigitizedValues(value);
+//     }
 
-    return value;
-}
-
-/**
- * Force the value to have the same data type as the target.
- */
-export function matchDataType(value: SequenceValue, target: SequenceValue): DigitizedValues | DigitizedValue {
-    if(isDigitizedGroup(target)) {
-        return castDigitizedGroup(value);
-    }
-
-    if (isDigitizedValues(target)) {
-        return castDigitizedValues(value);
-    }
-
-    return castDigitizedString(value);   
-}
+//     return castDigitizedString(value);   
+// }
 
 /**
  * This method will match the structure of the current array against the target.
  * This method will not match the length of the DigitizedValue[] arrays, but
  * match lengths for groups. To ensure all structures have the same length, 
  * run matchStructureLength() after this method.
- *  
+ *
  */
-export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues): DigitizedValues {
+export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, fn?: WalkerFunction): DigitizedValues
+export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options: WalkerOptions, fn?: WalkerFunction): DigitizedValues
+export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options: WalkerOptions | WalkerFunction, fn?: WalkerFunction): DigitizedValues {
+    // Allow for the method overloading. If options is a function, assign it.
+    if(typeof options === 'function') {
+        fn = options;
+        options = {};
+    }
+    else if(!options) {
+        options = {};
+    }
+    
+    const direction = options.direction || 'forwards';
+    const forwards = direction === 'forwards';
+        
     function recurse(current: DigitizedValues | DigitizedValue, target: DigitizedValues | DigitizedValue): DigitizedValues | DigitizedValue{
         // If target is a digit group, then loop through them and recursively
         // iterate over the groups.
@@ -135,8 +122,8 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
             current = castDigitizedGroup(current);
             
             // Loop through the target array. We could implement this backwards
-            // if it becomes necessary. No reason it has to go forwards...
-            for(let i = 0; i < target.length; i++) {
+            // if it becomes necessary. No reason it has to go forwards...            
+            for (let i = forwards ? 0 : target.length - 1; forwards ? i < target.length : i >= 0; forwards ? i++ : i--) {
                 // If the current value doesn't exist, recurively match the
                 // target array against an empty array to match the structure.
                 // If the current value exists recursively match against target.
@@ -144,149 +131,243 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
                     ? recurse([], target[i])
                     : recurse(current[i], target[i]);
             }
-
-            return current
+            
+            // Remove the undefined items in the array. Use this instead of
+            // filter to avoid copy the array.
+            for(let i = 0; i < current.length; i++) {
+                if(current[i] === undefined) {
+                    current.splice(i, 1);
+                }
+            }
+    
+            return current;
         }
 
-        // If the target is an array, ensure current is an array. Slice the
-        // length of current to match target.
+        // If the target is an array of digitized values, then recursively
+        // force the current value to be an array of digitized values.
         if(isDigitizedValues(target)) {
-            return castDigitizedValues(current).slice(0, target.length)
-        }
+            current = castDigitizedValues(current, direction);
 
-        // If the target is a digit, then cast the current value to a digit.
-        return castDigitizedString(current);
+            // Loop over the existing digitized value to ensure the digits are
+            // valid and gives the walker a chance to touch it.
+
+            if(forwards) {
+                let i = 0;
+
+                while(i < current.length) {
+                    current[i] = recurse(current[i], target[i]);
+
+                    if(current[i] === undefined) {
+                        current.splice(i, 1);
+                    }
+                    else {
+                        i++;
+                    }
+                }
+            }
+            else {
+                let i = 0;
+
+                while (i < current.length) {
+                    current[current.length - 1 - i] = recurse(
+                        current[current.length - 1 - i],
+                        target[target.length - 1 - i]
+                    );
+
+                    if (current[current.length - 1 - i] === undefined) {
+                        current.splice(current.length - 1 - i, 1);
+                    }
+                    else {
+                        i++;
+                    }
+                }
+            }
+
+            // let i = 0;
+
+            // while(i < current.length) {
+            //     current[forwards ? i : current.length - 1 - i] = forwards
+            //         ? recurse(current[i], target[i])
+            //         : recurse(current[current.length - 1 - i], target[target.length - 1 - i]);
+
+            //     if(current[i] === undefined) {
+            //         current.splice(i, 1);
+            //     }
+            //     else {
+            //         i++;
+            //     }
+            // }
+
+
+            // for(let i = forwards ? 0 : current.length - 1; forwards ? i < current.length : i >= 0; forwards ? i++ : i--) {
+            //     current[i] = recurse(current[i], target[i]);
+
+            //     const response = recurse(current[i], target[i]);
+
+            //     // If response is undefined, then remove it. Otherwise assign
+            //     // the response back to the current value.
+            //     if (response === undefined) {
+            //         current.splice(i, 1);
+            //     }
+            //     else {
+            //         current[i] = response;
+            //     }
+            // }
+            
+
+            // If the current length is less than the target length, recursively
+            // loop through it an add the digits. If a walker is used, it can
+            // incrementall add the values.
+            for (let i = forwards ? current.length : target.length; forwards ? i < target.length : i >= current.length; forwards ? i++ : i--) {
+                const response = recurse(undefined, target[i]);
+
+                // If the response gets undefined, just break the array and
+                // assume the manipulation has finished.
+                if (response === undefined) {
+                    break;
+                }
+
+                // If we are still here, the push the response 
+                current.push(response);
+            }
+            
+            return current;
+        }
+        
+        // If the callback is defined, use it to walk through the digits. The
+        // walker can modify the digits. If used with `useWalker()` you can
+        // limit the total changes that can be made to the structure. This
+        // is useful for incrementing/decrementing the sequence X changes at a
+        // time.
+        return fn
+            ? fn(castDigitizedString(current), target)
+            : (target === undefined ? undefined : castDigitizedString(current)); 
     }
 
     // Recursively match the current and target array structures.
     return recurse(current, target) as DigitizedValues;
 }
 
-/**
- * This method will match the structure of the current array against the target.
- * This method assumes that each array has the same structure has been sanitized
- * with matchArrayStructure();
- */
-export function matchStructureLength(current: DigitizedValues, target: DigitizedValues, char: DigitizedValue, direction: 'left'|'right' = 'right'): DigitizedValues {
-    function recurse(current: DigitizedValues, target: DigitizedValues) {
-        current = direction === 'right'
-            ? padRight(current, target.length, char)
-            : padLeft(current, target.length, char);
+// export function matchArrayStructureReverse(current: DigitizedValues, target: DigitizedValues, fn?: WalkerFunction): DigitizedValues {
+//     function recurse(current: DigitizedValues | DigitizedValue, target: DigitizedValues | DigitizedValue): DigitizedValues | DigitizedValue {
+//         // If target is a digit group, then loop through them and recursively
+//         // iterate over the groups.
+//         if (isDigitizedGroup(target)) {
+//             // Cast the current value to a digitized group.
+//             current = castDigitizedGroup(current);
 
-        for(let i = 0; i < current.length; i++) {
-            if(Array.isArray(current[i])) {
-                current[i] = matchStructureLength(
-                    current[i] as DigitizedValues,
-                    target[i] as DigitizedValues,
-                    char,
-                    direction
-                );
-            }
-        }
+//             // Loop through the target array. We could implement this backwards
+//             // if it becomes necessary. No reason it has to go forwards...
+//             for (let i = target.length - 1; i >= 0; i--) {
+//                 // If the current value doesn't exist, recursively match the
+//                 // target array against an empty array to match the structure.
+//                 // If the current value exists recursively match against target.
+//                 current[i] = !current[i]
+//                     ? recurse([], target[i])
+//                     : recurse(current[i], target[i]);
+//             }
 
-        return current;
-    }
+//             // Remove the undefined items in the array. Use this instead of
+//             // filter to avoid copy the array.
+//             for (let i = 0; i < current.length; i++) {
+//                 if (current[i] === undefined) {
+//                     current.splice(i, 1);
+//                 }
+//             }
 
-    return recurse(current, target) as DigitizedValues;
+//             return current;
+//         }
+
+//         // If the target is an array, ensure current is an array. Splice the
+//         // length of current to match target.
+//         if (isDigitizedValues(target)) {
+//             current = castDigitizedValues(current);
+
+//             // Loop over the existing digitized value to ensure the digits are
+//             // valid and gives the walker a chance to touch it.
+//             for (let i = current.length - 1; i >= 0; i--) {
+//                 const response = recurse(current[i], target[i]);
+
+//                 // If response is undefined, then remove it. Otherwise assign
+//                 // the response back to the current value.
+//                 if (response === undefined) {
+//                     current.splice(i, 1);
+//                 }
+//                 else {
+//                     current[i] = response;
+//                 }
+//             }
+
+//             // If the current length is less than the target length, recursively
+//             // loop through it an add the digits. If a walker is used, it can
+//             // incrementally add the values.
+//             for (let i = target.length; i >= current.length; i--) {
+//                 const response = recurse(undefined, target[i]);
+
+//                 // If the response gets undefined, just break the array and
+//                 // assume the manipulation has finished.
+//                 if (response === undefined) {
+//                     break;
+//                 }
+
+//                 // If we are still here, the push the response 
+//                 current.push(response);
+//             }
+
+//             return current;
+//         }
+
+//         // If the callback is defined, use it to walk through the digits. The
+//         // walker can modify the digits. If used with `useWalker()` you can
+//         // limit the total changes that can be made to the structure. This
+//         // is useful for incrementing/decrementing the sequence X changes at a
+//         // time.
+//         return fn
+//             ? fn(castDigitizedString(current), target)
+//             : (target === undefined ? undefined : castDigitizedString(current));
+//     }
+
+//     // Recursively match the current and target array structures.
+//     return recurse(current, target) as DigitizedValues;
+// }
+
+type SequencerOptions = {
+    charset?: CharsetContext,
+    stopAfter?: StopWalkerCallbackFunction
+    stopAfterChanges?: number
 }
 
-/**
- * Recursively walk the current array and call the function for each string.
- * The returned value of the function will replace the current value in the
- * array. If `true` is returned, the current value is used (similar to 
- * `continue` in a for loop). If `false` or `undefined` is returned, the current
- * value will be used and resursion is stopped (similar to `break` in a for
- * loop).
- */
-type WalkerFunction = (current: DigitizedValue, target: DigitizedValues | DigitizedValue | undefined) => DigitizedValues |DigitizedValue | boolean;
-
-
-/**
- * Recursively walk the current array and call the function for each string.
- * The returned value of the function will replace the current value in the
- * array. If `true` is returned, the current value is used (similar to 
- * `continue` in a for loop). If `false` or `undefined` is returned, the current
- * value will be used and resursion is stopped (similar to `break` in a for
- * loop).
- */
-export function walk(current: DigitizedValues, fn: WalkerFunction)
-export function walk(current: DigitizedValues, target: DigitizedValues, fn: WalkerFunction)
-export function walk(current: DigitizedValues, target: DigitizedValues | WalkerFunction | undefined, fn?: WalkerFunction) {
-    let stop = false;
-
-    if (typeof target === 'function') {
-        fn = target as WalkerFunction;
-
-        target = undefined;
-    }
-
-    function recurse(current: DigitizedValues | DigitizedValue, target?: DigitizedValues | DigitizedValue) {
-        // If the recursion has been stopped, return the current value.
-        if(stop) {
-            return current;
-        }
-
-        // If the current value is not an array, then call the function.
-        if (!Array.isArray(current)) {
-            const response = fn(current, target);
-
-            if (response === false || response === undefined) {
-                stop = true;
-            }
-            
-            if (typeof response !== 'boolean' && !stop) {
-                return response;
-            }
-
-            return current;
-        }
-
-        // Resurse through the array.
-        for (let x = current.length - 1; x >= 0; x--) {
-            current[x] = recurse(current[x], target?.[x]);
-        }
-
-        return current;
-    }
-
-    return recurse(current, (target as DigitizedValues|undefined));
-}
+type SequenceValue = DigitizedValue | DigitizedValues | undefined;
 
 /**
  * Use the sequencer to increment and decrement values until it reaches its
  * target value.
  */
 export function useSequencer(options: SequencerOptions = {}) {
-    const { charset, next, prev } = useCharset(options.charset);
+    const { charset, next, prev } = options.charset || useCharset();
 
     function decrement(value: FaceValue, targetValue: FaceValue, count: number = 1) {
-        const current = matchStructureLength(
-            matchArrayStructure(
-                value.digits, targetValue.digits
-            ), targetValue.digits, options.emptyChar || EMPTY_CHAR
+        const walker = useWalker((current, target) => {
+            return prev(current, target, count);
+        }, options.stopAfter || stopAfterChanges(options.stopAfterChanges));
+
+        const response = matchArrayStructure(
+            value.copy().digits, targetValue.digits, {direction: 'backwards'}, walker
         );
 
-        const digits = walk(current, targetValue.digits, (current, target) => {
-            return prev(current, castDigitizedString(target), count);
-        });
-
-        return value.copy(digits);
+        return new FaceValue(response);
     }
 
     function increment(value: FaceValue, targetValue: FaceValue, count: number = 1) {
-        const structure = matchArrayStructure(
-            value.digits, targetValue.digits
+        const walker = useWalker((current, target) => {
+            return next(current, target, count);
+        }, options.stopAfter || stopAfterChanges(options.stopAfterChanges));
+
+        const response = matchArrayStructure(
+            value.copy().digits, targetValue.digits, walker
         );
-
-        const current = matchStructureLength(
-            structure, targetValue.digits, options.emptyChar || ' '
-        );
-
-        const digits = walk(current, targetValue.digits, (current, target) => {
-            return next(current, castDigitizedString(target), count);
-        });
-
-        return value.copy(digits);
+        
+        return new FaceValue(response);
     }
 
     return {

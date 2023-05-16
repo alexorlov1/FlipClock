@@ -1,4 +1,4 @@
-import { RawFaceValue } from "../FaceValue";
+import { RawFaceLiterals, RawFaceValue } from "../FaceValue";
 
 export type DigitizerOptions = {
     emptyChar?: string,
@@ -8,8 +8,8 @@ export type DigitizerOptions = {
 export type CountFunction = (value: DigitizedValues) => number
 export type DigitizedValue = string
 export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
-export type DigitizeFunction = (value: RawFaceValue, override?: DigitizerOptions) => DigitizedValues
-export type UndigitizeFunction = (value: DigitizedValues) => string
+export type DigitizeFunction = (value: RawFaceValue) => DigitizedValues
+export type UndigitizeFunction = (value: DigitizedValues) => RawFaceValue
 export type IsDigitizedFunction = (value: RawFaceValue|DigitizedValues) => boolean
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
 
@@ -18,17 +18,7 @@ export type PadFunction = (value: DigitizedValues, minimumDigits: number) => Dig
  */
 export const EMPTY_CHAR = ' ';
 
-/**
-* Recursively count the number of digits in a value.
-* 
-* @public
-*/
-export function count(values: DigitizedValues) {
-    return [].concat(values).flat(Infinity).length;
-}
-
 export type DigitizerContext = {
-    count: CountFunction
     digitize: DigitizeFunction
     undigitize: UndigitizeFunction
     isDigitized: IsDigitizedFunction
@@ -85,60 +75,69 @@ export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
     }
 
     /**
-     * Recursively digitize a value into groups of characters.
+     * Recursively digitize a value into an array of individual characters.
      * 
      * @public
      */
-    function digitize(value: RawFaceValue | RawFaceValue[], overrideoptions?: DigitizerOptions): DigitizedValues {
-        const { minimumDigits } = Object.assign({}, options, overrideoptions);
-
-        function split(value: RawFaceValue, char: string = ''): RawFaceValue[] {
-            return value.toString().split(char);
-        }
-
-        function recurse(value: RawFaceValue|RawFaceValue[], depth: number = 0) {
-            if(Array.isArray(value)) {
-                return value.map(recurse, depth + 1);
+    function digitize(value: RawFaceValue): DigitizedValues {
+        function stringify(value: RawFaceLiterals): DigitizedValue | DigitizedValues {
+            if (!(typeof value === 'string')) {
+                return stringify(value.toString());
             }
 
-            return split(value, ' ').map(group => {
-                return split(group);
-            });
+            return value.length === 1 ? value : Array.from(value);
+        }
+        
+        function recurse<T>(value: RawFaceValue): T {
+            if (Array.isArray(value)) {
+                for (let i = 0; i < value.length; i++) {
+                    value[i] = recurse<DigitizedValues | DigitizedValue>(value[i]);
+                }
+
+                return value as T;
+            }
+
+            return stringify(value) as T;
         }
 
-        // If the value is already digitized, pad if necessary and return.
-        if(isDigitized(value)) {
-            return pad(value as DigitizedValues, minimumDigits);
-        }
-
-        let response = recurse(value);
-
-        if(Array.isArray(value)) {
-            response = response.flat(1);
-        }
-
-        return pad(response, minimumDigits);
+        return Array.from(recurse<DigitizedValues>(value));
     }
 
     /**
-     * The recursive undigitize function.
+     * Recursively undigitize a value into a string or array of strings.
      * 
      * @public
      */
-    function undigitize(value: DigitizedValues): string {
-        function recurse(value: DigitizedValues): string {
-            return (value as DigitizedValues[]).reduce((carry, value) => {
-                if(typeof value === 'string') {
-                    return carry + value;
+    function undigitize(value: DigitizedValues): RawFaceValue {
+        function recurse(value: DigitizedValues): DigitizedValues {
+            const digits = [];
+            
+            let containsArray = false, newString = true;
+
+            for(let i = 0; i < value.length; i++) {
+                if(Array.isArray(value[i])) {
+                    digits.push(recurse(value[i] as DigitizedValues));
+
+                    containsArray = newString = true;
+
+                    continue;
+                }
+                
+                if (newString) {
+                    digits.push('');
+
+                    newString = false;
                 }
 
-                return carry + ' ' + recurse(value);
-            }, String());
+                digits[digits.length - 1] += value[i];
+            }
+            
+            return (containsArray ? digits : digits[0]);
         }
 
-        return recurse(value).trim();
+        return recurse(value) || '';
     }
-
+    
     function isDigitized(value: RawFaceValue|DigitizedValues): boolean {
         function recurse(value: RawFaceValue): boolean {
             if (!Array.isArray(value)) {
@@ -169,7 +168,6 @@ export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
     }   
 
     return Object.assign({
-        count,
         digitize,
         isDigitized,
         pad,
