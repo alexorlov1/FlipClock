@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.98% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>292/298</span>
+                <span class='fraction'>294/294</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.13% </span>
+                <span class="strong">93.97% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>82/89</span>
+                <span class='fraction'>78/83</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">93.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>15/16</span>
+                <span class='fraction'>14/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.98% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>292/298</span>
+                <span class='fraction'>294/294</span>
             </div>
         
             
@@ -356,11 +356,7 @@
 <a name='L291'></a><a href='#L291'>291</a>
 <a name='L292'></a><a href='#L292'>292</a>
 <a name='L293'></a><a href='#L293'>293</a>
-<a name='L294'></a><a href='#L294'>294</a>
-<a name='L295'></a><a href='#L295'>295</a>
-<a name='L296'></a><a href='#L296'>296</a>
-<a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L294'></a><a href='#L294'>294</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -380,8 +376,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -464,10 +460,6 @@
 <span class="cline-any cline-yes">215x</span>
 <span class="cline-any cline-yes">215x</span>
 <span class="cline-any cline-yes">229x</span>
-<span class="cline-any cline-yes">264x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">229x</span>
 <span class="cline-any cline-yes">229x</span>
 <span class="cline-any cline-yes">207x</span>
 <span class="cline-any cline-yes">121x</span>
@@ -477,11 +469,11 @@
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">207x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
 <span class="cline-any cline-yes">75x</span>
 <span class="cline-any cline-yes">75x</span>
 <span class="cline-any cline-yes">75x</span>
@@ -673,12 +665,12 @@ export type ChildNode = VNode | DomElement | string | number;
 &nbsp;
 export type Children = ChildNode[];
 &nbsp;
-/**
- * Determines if the given string is a comment.
- */
-export function isComment(value: number | string | DomElement): boolean {
-    return typeof value === 'string' &amp;&amp; !!value.match(pattern);
-}
+// /**
+//  * Determines if the given string is a comment.
+//  */
+// export function isComment(value: number | string | DomElement): boolean {
+//     return typeof value === 'string' &amp;&amp; !!value.match(pattern);
+// }
 &nbsp;
 /**
  * Is the given value a DOM element?
@@ -761,10 +753,6 @@ export function h(
         $attrs = attrs;
     }
 &nbsp;
-    if(!$children.filter) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
-<span class="cstat-no" title="statement not covered" >        console.log($children)</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
-&nbsp;
     return new VNode(tagName, $attrs, $children.filter(value =&gt; value !== undefined).map(child =&gt; {
         if (child instanceof VNode) {
             return child;
@@ -774,11 +762,11 @@ export function h(
             return child.render();
         }
 &nbsp;
-        if (isComment(child)) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
-<span class="cstat-no" title="statement not covered" >            return h('comment', {</span>
-<span class="cstat-no" title="statement not covered" >                textContent: (child as string).replace(pattern, '$1')</span>
-<span class="cstat-no" title="statement not covered" >            });</span>
-<span class="cstat-no" title="statement not covered" >        }</span>
+        // if (isComment(child)) {
+        //     return h('comment', {
+        //         textContent: (child as string).replace(pattern, '$1')
+        //     });
+        // }
 &nbsp;
         return h('text', {
             textContent: child
@@ -961,7 +949,7 @@ export function render&lt;T = HTMLElement | Element | Text | Comment&gt;(vnode: 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-05-20T18:36:43.995Z
+                at 2023-05-20T18:47:25.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

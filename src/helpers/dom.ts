@@ -14,12 +14,12 @@ export type ChildNode = VNode | DomElement | string | number;
 
 export type Children = ChildNode[];
 
-/**
- * Determines if the given string is a comment.
- */
-export function isComment(value: number | string | DomElement): boolean {
-    return typeof value === 'string' && !!value.match(pattern);
-}
+// /**
+//  * Determines if the given string is a comment.
+//  */
+// export function isComment(value: number | string | DomElement): boolean {
+//     return typeof value === 'string' && !!value.match(pattern);
+// }
 
 /**
  * Is the given value a DOM element?
@@ -102,10 +102,6 @@ export function h(
         $attrs = attrs;
     }
 
-    if(!$children.filter) {
-        console.log($children)
-    }
-
     return new VNode(tagName, $attrs, $children.filter(value => value !== undefined).map(child => {
         if (child instanceof VNode) {
             return child;
@@ -115,11 +111,11 @@ export function h(
             return child.render();
         }
 
-        if (isComment(child)) {
-            return h('comment', {
-                textContent: (child as string).replace(pattern, '$1')
-            });
-        }
+        // if (isComment(child)) {
+        //     return h('comment', {
+        //         textContent: (child as string).replace(pattern, '$1')
+        //     });
+        // }
 
         return h('text', {
             textContent: child
