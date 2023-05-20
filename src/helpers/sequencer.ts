@@ -167,7 +167,7 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
             // If the current length is less than the target length, recursively
             // loop through it an add the digits. If a walker is used, it can
             // incrementall add the values.
-            for (let i = forwards ? current.length : target.length; forwards ? i < target.length : i >= current.length; forwards ? i++ : i--) {
+            for (let i = forwards ? current.length : target.length - 1; forwards ? i < target.length : i >= current.length; forwards ? i++ : i--) {
                 const response = recurse(undefined, target[i]);
 
                 // If the response gets undefined, just break the array and

@@ -101,6 +101,18 @@ test('decrementing the array walker after 1 change', () => {
     expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['a', 'b', ' ']);
 })
 
+test('decrementing the array walker from nothing to a target', () => {
+    const { prev } = useCharset();
+
+    function walker() {
+        return useWalker<{ target: DigitizedValue }>((current, { target }) => prev(current, target));
+    }
+
+    const subject = [], target = ['h', 'e', 'l', 'l', 'o'];
+
+    expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['?', '?', '?']);
+})
+
 test('incrementing towards "hello" 2 changes at a time', () => {
     const { increment } = useSequencer({
         stopAfterChanges: 2
