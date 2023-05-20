@@ -5,7 +5,6 @@ export type DigitizerOptions = {
     minimumDigits?: number
 }
 
-export type CountFunction = (value: DigitizedValues) => number
 export type DigitizedValue = string
 export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
 export type DigitizeFunction = (value: RawFaceValue) => DigitizedValues
@@ -22,7 +21,7 @@ export type DigitizerContext = {
     digitize: DigitizeFunction
     undigitize: UndigitizeFunction
     isDigitized: IsDigitizedFunction
-    pad: PadFunction
+    // pad: PadFunction
 } & DigitizerOptions
 
 /**
@@ -31,48 +30,48 @@ export type DigitizerContext = {
  *
  * @public
  */
-export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
+export function useDigitizer(options: DigitizerOptions = {}) {
     /**
      * Pad a value with spaces until it has the minimum number of digits. The
      * digits are applied to the first array with a string value.
      * 
      * @public
      */
-    function pad(value: DigitizedValues, minimumDigits: number|undefined = options.minimumDigits): DigitizedValues {
-        const digits = [].concat(value).flat(Infinity);
+    // function pad(value: DigitizedValues, minimumDigits: number|undefined = options.minimumDigits): DigitizedValues {
+    //     const digits = [].concat(value).flat(Infinity);
 
-        if (digits.length < minimumDigits) {
-            const pad = Array(minimumDigits - digits.length).fill(
-                options.emptyChar || EMPTY_CHAR
-            );
+    //     if (digits.length < minimumDigits) {
+    //         const pad = Array(minimumDigits - digits.length).fill(
+    //             options.emptyChar || EMPTY_CHAR
+    //         );
 
-            function unshift(value: DigitizedValues[], parent?: DigitizedValues): boolean {
-                for(let i = 0; i < value.length; i++) {
-                    if(value[i] === undefined) {
-                        continue;
-                    }
+    //         function unshift(value: DigitizedValues[], parent?: DigitizedValues): boolean {
+    //             for(let i = 0; i < value.length; i++) {
+    //                 if(value[i] === undefined) {
+    //                     continue;
+    //                 }
 
-                    if(Array.isArray(value[i])) {
-                        if(unshift(value[i] as DigitizedValues[], value)) {
-                            return true;
-                        }
+    //                 if(Array.isArray(value[i])) {
+    //                     if(unshift(value[i] as DigitizedValues[], value)) {
+    //                         return true;
+    //                     }
 
-                        continue;
-                    }
+    //                     continue;
+    //                 }
 
-                    value.unshift(...pad);
+    //                 value.unshift(...pad);
 
-                    return true;
-                }
+    //                 return true;
+    //             }
 
-                return false;
-            }
+    //             return false;
+    //         }
                 
-            unshift(value as DigitizedValues[], value);
-        } 
+    //         unshift(value as DigitizedValues[], value);
+    //     } 
         
-        return value;
-    }
+    //     return value;
+    // }
 
     /**
      * Recursively digitize a value into an array of individual characters.
@@ -170,7 +169,7 @@ export function useDigitizer(options: DigitizerOptions = {}): DigitizerContext {
     return Object.assign({
         digitize,
         isDigitized,
-        pad,
+        // pad,
         undigitize
     }, options)
 }

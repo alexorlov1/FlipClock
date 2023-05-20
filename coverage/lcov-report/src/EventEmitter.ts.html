@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/FaceValue.ts</title>
+    <title>Code coverage report for src/EventEmitter.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> FaceValue.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> EventEmitter.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>90/90</span>
+                <span class='fraction'>95/95</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/11</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>90/90</span>
+                <span class='fraction'>95/95</span>
             </div>
         
             
@@ -152,7 +152,12 @@
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
 <a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -180,155 +185,165 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">59x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">61x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
+<span class="cline-any cline-yes">7x</span></td><td class="text"><pre class="prettyprint lang-js">/** 
+ * The EmitterEvent defines the event for the EventEmitter.
+ * 
+ * @public 
+ */
+export interface EmitterEvent {
+    /**
+     * The event's key.
+     */
+    key: string
 &nbsp;
-export type RawFaceLiterals = undefined | string | number
-export type RawFaceValue = RawFaceLiterals | (RawFaceValue)[] | DigitizedValues;
+    /**
+     * The event's callback.
+     */
+    fn: Function,
 &nbsp;
-export type FaceValueProps = Pick&lt;FaceValue, 'carryLength' | 'digitizer'&gt;
+    /**
+     * Unwatch the event.
+     */
+    unwatch: Function
+}
 &nbsp;
 /**
- * The FaceValue class digitizes the raw value and so it can be used by the
- * clock face.
+ * The EventEmitter class gives event emitter method to classes that inherit it.
  * 
  * @public
  */
-export class FaceValue {
+export default class EventEmitter {
 &nbsp;
     /**
-     * The carry length is carry over when the instance it copied. The minimum
-     * number of digits could be 5. But say the string had 7 digits, the minimum
-     * required would still be maintained, but the carry can take priority to
-     * ensure no face value ever shrinks in the total number of digits.
+     * The instance events.
      */
-    public readonly carryLength?: number
+    protected events: EmitterEvent[] = [];
 &nbsp;
     /**
-     * An array of digits.
+     * Emit an event.
      */
-    public readonly digits?: DigitizedValues
+    emit(key: string, ...args) {
+        const events: EmitterEvent[] = this.events.filter(
+            (e: EmitterEvent) =&gt; e.key === key
+        );
+&nbsp;
+        for (const event of events) {
+            event.fn.call(undefined, event, ...args);
+        }
+    }
 &nbsp;
     /**
-     * Parameters that are passed to the digiter.
+     * Stop listening for an event to fire.
      */
-    public readonly digitizer?: DigitizerContext
+    off(key: string, fn?: Function) {
+        for (const event of this.events) {
+            if (!fn || fn === event.fn) {
+                event.unwatch();
+            }
+        }
+    }
 &nbsp;
     /**
-     * The raw value that was given.
+     * Start listening for an event to fire.
      */
-    public readonly value: RawFaceValue
+    on(key: string, fn: Function) {
+        const unwatch = () =&gt; {
+            const index = this.events.findIndex(event =&gt; {
+                return event.key === key &amp;&amp; event.fn === fn;
+            });
+&nbsp;
+            this.events.splice(index, 1);
+        }
+&nbsp;
+        this.events.push({ key, fn, unwatch });
+&nbsp;
+        return unwatch;
+    }
 &nbsp;
     /**
-     * Instantiate the face value.
+     * Listen form an event to fire once.
      */
-    constructor(value: RawFaceValue|DigitizedValues, props: FaceValueProps = {}) {
-        this.carryLength = props.carryLength;
+    once(key: string, fn: Function) {
+        return this.on(key, (event: EmitterEvent, ...args) =&gt; {
+            fn.call(undefined, event, ...args);
 &nbsp;
-        this.digitizer = props.digitizer || useDigitizer({
-            minimumDigits: props.carryLength,
+            event.unwatch();
         });
-&nbsp;
-        const { digitize, undigitize, isDigitized } = this.digitizer;
-&nbsp;
-        if(isDigitized(value)) {
-            this.value = undigitize(value as DigitizedValues);
-            this.digits = value as DigitizedValues;
-        }
-        else {
-            this.value = value;
-            this.digits = digitize(this.value);
-        }
-    }
-&nbsp;
-    get minimumLength() {
-        return Math.max(
-            this.carryLength || 0,
-            this.digits?.flat().length || 0,
-            this.digitizer.minimumDigits || 0
-        )
-    }
-&nbsp;
-    length() {
-        // @ts-ignore @todo Improve this type. "digits" is not Infinite.
-        return this.digits.flat(Infinity).length;
     }
 &nbsp;
     /**
-     * Compare the face value with the given subject.
+     * Unwatch and remove all the events.
      */
-    compare(subject: FaceValue) {
-        return JSON.stringify(this.value) === JSON.stringify(subject.value);
-    }
-&nbsp;
-    /**
-     * Create a new instance with the given value.
-     */
-    copy(value?: RawFaceValue, props: FaceValueProps = {}): FaceValue {
-        return new FaceValue(value === undefined ? this.value<span class="branch-0 cbranch-no" title="branch not covered" > : value,</span> Object.assign({
-            carryLength: this.minimumLength,
-            digitizer: this.digitizer
-        }, props));
+    unwatch() {
+        for (const event of this.events) {
+            event.unwatch();
+        }
     }
 }</pre></td></tr></table></pre>
 

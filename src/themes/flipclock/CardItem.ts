@@ -1,6 +1,7 @@
-import { prop } from "../../functions";
 import { DomElement, h } from "../../helpers/dom";
 import VNode from "../../VNode";
+
+type CartItemProps = Partial<Pick<CardItem, 'class'>>
 
 /** 
  * The CardItem generates the top and bottom elements for the parent Card class.
@@ -21,9 +22,9 @@ export default class CardItem implements DomElement {
     /**
      * Instantiate a CardItem
      */
-    constructor(value: string = '', attributes: Partial<CardItem> = {}) {
+    constructor(value: string = '', props: CartItemProps = {}) {
         this.value = value;
-        this.class = prop(attributes.class, '');
+        this.class = props.class
     }
     
     /**
@@ -31,7 +32,8 @@ export default class CardItem implements DomElement {
      */
     render(): VNode {
         return h('div', {
-            class: `flip-clock-card-item ${this.class}`
+            class: `flip-clock-card-item ${this.class}`,
+            type: 'flip-clock-card-item'
         }, [
             h('div', {
                 class: 'flip-clock-card-item-inner'

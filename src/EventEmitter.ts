@@ -26,7 +26,7 @@ export interface EmitterEvent {
  * @public
  */
 export default class EventEmitter {
-    
+
     /**
      * The instance events.
      */
@@ -41,23 +41,18 @@ export default class EventEmitter {
         );
 
         for (const event of events) {
-            event.fn.apply(this, args);
+            event.fn.call(undefined, event, ...args);
         }
     }
 
     /**
      * Stop listening for an event to fire.
      */
-    off(key?: string, fn?: Function) {
-        if(this.events[key]) {
-            for(const event of this.events[key]) {
-                if(!fn || fn === event.fn) {
-                    event.unwatch();
-                }
+    off(key: string, fn?: Function) {
+        for (const event of this.events) {
+            if (!fn || fn === event.fn) {
+                event.unwatch();
             }
-        }
-        else {
-            this.resetEvents();
         }
     }
 
@@ -66,9 +61,11 @@ export default class EventEmitter {
      */
     on(key: string, fn: Function) {
         const unwatch = () => {
-            this.events.splice(this.events.findIndex(event => {
+            const index = this.events.findIndex(event => {
                 return event.key === key && event.fn === fn;
-            }), 1);   
+            });
+
+            this.events.splice(index, 1);
         }
 
         this.events.push({ key, fn, unwatch });
@@ -79,9 +76,9 @@ export default class EventEmitter {
     /**
      * Listen form an event to fire once.
      */
-    once(key: string, fn: (...args) => void) {
+    once(key: string, fn: Function) {
         return this.on(key, (event: EmitterEvent, ...args) => {
-            fn(event, ...args);
+            fn.call(undefined, event, ...args);
 
             event.unwatch();
         });
@@ -90,7 +87,7 @@ export default class EventEmitter {
     /**
      * Unwatch and remove all the events.
      */
-    resetEvents() {
+    unwatch() {
         for (const event of this.events) {
             event.unwatch();
         }

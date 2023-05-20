@@ -54,9 +54,7 @@ export class FaceValue {
         }
         else {
             this.value = value;
-            this.digits = digitize(this.value, {
-                minimumDigits: this.minimumLength
-            });
+            this.digits = digitize(this.value);
         }
     }
 
@@ -66,6 +64,11 @@ export class FaceValue {
             this.digits?.flat().length || 0,
             this.digitizer.minimumDigits || 0
         )
+    }
+
+    length() {
+        // @ts-ignore @todo Improve this type. "digits" is not Infinite.
+        return this.digits.flat(Infinity).length;
     }
 
     /**

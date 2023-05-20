@@ -1,6 +1,7 @@
 import VNode from "../../VNode";
 import { DigitizedValue } from "../../helpers/digitizer";
 import { DomElement, h } from "../../helpers/dom";
+import { debounce } from "../../helpers/functions";
 import CardItem from "./CardItem";
 
 /**
@@ -11,40 +12,35 @@ import CardItem from "./CardItem";
  */
 export default class Card implements DomElement {
     /**
-     * The current digit displayed on the card.
-     */
-    public readonly currentDigit: string
-
-    /**
-     * The last digit, which is used to run the animated if different than the
-     * current digit.
-     */
-    public readonly lastDigit: string
-
-    /**
      * Instantiate a new Card.
      */
     constructor(
-        currentDigit: DigitizedValue,
-        lastDigit?: DigitizedValue,
+        public readonly currentDigit: DigitizedValue,
+        public readonly lastDigit?: DigitizedValue,
     ) {
-        this.currentDigit = currentDigit;
-        this.lastDigit = lastDigit;
+        if(this.lastDigit === undefined) {
+            this.lastDigit = this.currentDigit;
+        }
     }
 
-    /**
-     * Get the Card's current digit.
-     */
-    get digit(): string {
-        return this.currentDigit;
-    }
-    
     /**
      * Render the VNode.
      */
     render(): VNode {
+        const debounced = debounce((el: HTMLElement) => {
+            el.classList.remove('animate')
+        });
+
         return h('div', {
             class: `flip-clock-card ${this.currentDigit !== this.lastDigit ? 'animate' : ''}`,
+            type: 'flip-clock-card',
+            ['data-current-digit']: this.currentDigit,
+            ['data-last-digit']: this.lastDigit,
+            onAnimationend() {
+                if (this.classList.contains('animate')) {
+                    debounced(this);
+                }
+            }
         }, [
             h(new CardItem(this.currentDigit, {
                 class: 'active'

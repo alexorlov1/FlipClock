@@ -1,72 +1,94 @@
-import { FaceValue } from "../../FaceValue";
+import { FaceState } from "../../Face";
+import FlipClock from "../../FlipClock";
 import VNode from "../../VNode";
 import { DigitizedValue, DigitizedValues } from "../../helpers/digitizer";
 import { DomElement, h } from "../../helpers/dom";
+import { WalkerDirection, WalkerFactoryFunction, createWalker, defineContext } from "../../helpers/walker";
+import { Theme, ThemeContext } from "../../types";
 import Card from "./Card";
 import Group from "./Group";
 
-export type FlipClockThemeLabels = DigitizedValues | Record<string, string>;
+export type FlipClockThemeLabels = DigitizedValues;
 
 export type FlipClockThemeOptions = {
-    labels?: FlipClockThemeLabels
+    animationRate?: number,
+    labels?: FlipClockThemeLabels,
+    direction?: WalkerDirection
+    createWalker?: WalkerFactoryFunction<FlipClockThemeContext>
 }
 
-const pattern: RegExp = /[^\w]+/;
+export type FlipClockThemeContext = ThemeContext & {
+    labels?: FlipClockThemeLabels
+};
 
 /**
  * The FlipClock theme.
  * 
  * @public
  */
-export function useTheme(options: FlipClockThemeOptions = {}) {
-    /**
-     * Get the label using the given flag.
-     */
-    function label(format: string | undefined, x: number, y: number): string | undefined {
-        // If there are no labels, then just return undefined.
-        if (options.labels === undefined) {
-            return;
-        }
+export function useFlipClockTheme(options: FlipClockThemeOptions): Theme {
+    // const animationRate = options.animationRate || 100;
 
-        // If labels is an array, then try to extract the labels from the x,y
-        // coordinates of the multi-dimensional array.
-        if (Array.isArray(options.labels)
-            && options.labels[x]
-            && typeof options.labels[x][y] === 'string') {
-            return options.labels[x][y] as string;
-        }
+    function render<T extends FaceState = FaceState>(instance: FlipClock, context: T): VNode {
+        const ctx = defineContext<FlipClockThemeContext>({
+            labels: options.labels,
+            currentValue: context.currentValue.digits,
+            lastValue: context.lastValue.digits,
+            targetValue: context.targetValue.digits
+        });
 
-        // Get the flag groups
-        const flagGroups: string[] = String(format).split(/\s+/);
+        const walk = createWalker(ctx);
 
-        // Split the flag group using the pattern to match dividers.
-        const flagGroup: string[] = flagGroups[x]?.split(pattern);
-
-        // From the flag group, use the offset to get the current flag
-        const flag: string = flagGroup[y];
-
-        return options.labels[flag];
-    }
-
-    return function render(value: FaceValue, lastValue?: FaceValue): VNode {
-        function recurse(digit: DigitizedValues, prevDigits?: DigitizedValue | DigitizedValues, index: number = 0): DomElement {
-            if (Array.isArray(digit)) {
+        const tree = walk<Group>(context.currentValue.digits, (value, context) => {
+            if (Array.isArray(value)) {
                 return new Group({
-                    items: digit.map((digit, i) => {
-                        return recurse(digit, prevDigits?.[i], i)
-                    })
+                    label: typeof context.labels === 'string'
+                        ? context.labels
+                        : undefined,
+                    items: value as unknown as DomElement[]
                 })
             }
 
-            const lastDigit = Array.isArray(prevDigits)
-                ? prevDigits[index] as string
-                : prevDigits;
-
-            return new Card(digit, lastDigit);
-        }
-
+            return new Card(value, (context.lastValue as DigitizedValue || ' '));
+        });
+        
         return h('div', {
             class: 'flip-clock',
-        }, [recurse(value.digits, lastValue?.digits)]);
+            // style: `animation-duration: ${animationRate}ms; animation-delay: ${animationRate / 2}ms`,
+            type: 'flip-clock'
+        }, [ h(tree) ]);
+    }
+
+    return {
+        render
     }
 }
+
+// /**
+//  * Get the label using the given flag.
+//  */
+// function label(format: string | undefined, x: number, y: number): string | undefined {
+//     // If there are no labels, then just return undefined.
+//     if (options.labels === undefined) {
+//         return;
+//     }
+
+//     // If labels is an array, then try to extract the labels from the x,y
+//     // coordinates of the multi-dimensional array.
+//     if (Array.isArray(options.labels)
+//         && options.labels[x]
+//         && typeof options.labels[x][y] === 'string') {
+//         return options.labels[x][y] as string;
+//     }
+
+//     // Get the flag groups
+//     const flagGroups: string[] = String(format).split(/\s+/);
+
+//     // Split the flag group using the pattern to match dividers.
+//     const flagGroup: string[] = flagGroups[x]?.split(pattern);
+
+//     // From the flag group, use the offset to get the current flag
+//     const flag: string = flagGroup[y];
+
+//     return options.labels[flag];
+// }

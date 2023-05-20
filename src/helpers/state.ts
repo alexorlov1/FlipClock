@@ -1,22 +1,18 @@
-// type Ref<T> = { value: T }
-
 import EventEmitter from "../EventEmitter";
 
-type StateFunctions<T> = {
+export type StateProp<T> = keyof T
+
+export type StateFunctions<T> = {
     update: (state: Partial<T>) => void
-    unwatch: Function
-    watch: Function
+    off: (fn?: Function) => void
+    once: (fn: Function) => () => void
+    watch: (fn: Function) => () => void
+    unwatch: () => void
 };
 
 export type Reactive<T> = { [K in keyof T]: T[K] } & StateFunctions<T>;
 
-export type StateProp<T> = keyof T
-
-export type StateOptions<T> = {
-    watch?: StateProp<T>[]
-}
-
-export function useState<T extends object>(state: T, options: StateOptions<T> = {}) {
+export function useState<T extends Record<string, any>>(state: T) {
     const emitter = new EventEmitter();
 
     const mergedState: Reactive<T> = Object.assign(state, {
@@ -27,30 +23,23 @@ export function useState<T extends object>(state: T, options: StateOptions<T> = 
 
             emitter.emit('update', state, prevState);
         },
-        unwatch: () => {
-            emitter.off('set');
+        off: (fn?: Function) => {
+            emitter.off('update', fn);
+        },
+        unwatch() {
+            emitter.unwatch();
         },
         watch: (fn: Function) => {
-            return emitter.on('update', (...args) => fn(...args));
+            return emitter.on('update', fn);
+        },
+        once: (fn: Function) => {
+            return emitter.once('update', fn);
         }
     });
 
     return new Proxy<Reactive<Readonly<T>>>(mergedState, {
-        get(target: T, key?: string) {
-            return target?.[key] || target;
+        get(target: T, key: string) {
+            return target?.[key];
         }
-        // set(target: T, key: string, value) {
-        //     const lastValue = target[key];
-
-        //     target[key] = value;
-
-        //     if(!options.watch || options.watch.includes(key as StateProp<T>)) {
-        //         if(value !== lastValue) {
-        //             emitter.emit(`set:${key}`, value, lastValue);
-        //         }
-        //     }
-            
-        //     return true;
-        // }
     });
 }

@@ -65,11 +65,12 @@ export type CharsetCache = Map<string, string[]>;
 export type ChunkFunction = (value: DigitizedValue, size: number) => string[];
 export type IsBlacklistFunction = (value: DigitizedValue) => boolean;
 export type IsWhitelistFunction = (value: DigitizedValue) => boolean;
-export type NextFunction = (value: DigitizedValue, target: DigitizedValue, count?: number) => DigitizedValue;
-export type PrevFunction = (value: DigitizedValue, target: DigitizedValue, count?: number) => DigitizedValue;
+export type NextFunction = (value: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue;
+export type PrevFunction = (value: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue;
 
 export type CharsetContext = {
     charset: string[],
+    emptyChar: string,
     chunk: ChunkFunction,
     isBlacklisted: IsBlacklistFunction,
     isWhitelisted: IsWhitelistFunction,
@@ -132,7 +133,10 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
 
         let offset = 1;
 
-        if (!chunked.includes(value)) {
+        if(value === undefined) {
+            value = emptyChar;
+        }
+        else if (!chunked.includes(value)) {
             value = emptyChar;
             offset = 0;
         }
@@ -149,7 +153,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the next character in the charset relative to the given value.
      */
-    function next(current: DigitizedValue, target: DigitizedValue, count: number = 1): DigitizedValue {
+    function next(current: DigitizedValue, target?: DigitizedValue, count: number = 1): DigitizedValue {
         if (target === undefined && current === emptyChar) {
             return undefined
         }
@@ -181,8 +185,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the prev character in the charset relative to the given value.
      */
-    function prev(current: DigitizedValue, target: DigitizedValue, count: number = 1): DigitizedValue {
-        
+    function prev(current: DigitizedValue, target?: DigitizedValue, count: number = 1): DigitizedValue {
         if (target === undefined && current === emptyChar) {
             return undefined
         }
@@ -228,6 +231,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     return {
         charset,
         chunk,
+        emptyChar,
         isBlacklisted,
         isWhitelisted,
         next,

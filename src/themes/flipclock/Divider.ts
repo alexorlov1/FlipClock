@@ -10,19 +10,12 @@ import { DomElement, h } from "../../helpers/dom";
  */
 export default class Divider implements DomElement {
     /**
-     * The character used for the divider.
-     * 
-     * @readonly
-     */
-    protected readonly character: string;
-
-    /**
      * Instantiate a Divider.
-     * 
-     * @param character - The character used for the divider.
      */
-    constructor(character: string = ':') {
-        this.character = character;
+    constructor(
+        protected readonly character: string = ':'
+    ) {
+        //       
     }
     
     /**
@@ -32,7 +25,8 @@ export default class Divider implements DomElement {
      */
     render(): VNode {
         return h('div', {
-            class: 'flip-clock-divider'
+            class: 'flip-clock-divider',
+            type: 'flip-clock-divider'
         }, [
             h('div', {
                 class: 'flip-clock-divider-inner'

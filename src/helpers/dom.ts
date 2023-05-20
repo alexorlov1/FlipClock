@@ -83,7 +83,7 @@ export function h(
     attrs?: Attributes | Children | string | number,
     children?: Children | string | number
 ): VNode {
-    if(typeof tagName === 'object') {
+    if(isDomElement(tagName)) {
         return tagName.render();
     }
     
@@ -102,7 +102,11 @@ export function h(
         $attrs = attrs;
     }
 
-    return new VNode(tagName, $attrs, $children.map(child => {
+    if(!$children.filter) {
+        console.log($children)
+    }
+
+    return new VNode(tagName, $attrs, $children.filter(value => value !== undefined).map(child => {
         if (child instanceof VNode) {
             return child;
         }
@@ -120,7 +124,7 @@ export function h(
         return h('text', {
             textContent: child
         });
-    }).filter(value => value !== undefined));
+    }));
 }
 
 /**
@@ -269,7 +273,7 @@ export function diff(el: Node, vnode: VNode, prevNode?: VNode): void {
 /**
  * Render the VNode as a DOM element.
  */
-export function render<T = Element | Text | Comment>(vnode: VNode): T {
+export function render<T = HTMLElement | Element | Text | Comment>(vnode: VNode): T {
     // Create the DOM element
     const el = createElement(vnode);
 
@@ -290,5 +294,5 @@ export function render<T = Element | Text | Comment>(vnode: VNode): T {
     }
 
     // Return the new element
-    return el;
+    return el as T;
 }

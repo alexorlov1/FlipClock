@@ -11,34 +11,34 @@ export default class Timer {
     /**
      * The count increments with each interval.
      */
-    protected count: number = 0;
+    protected $count: number = 0;
 
     /**
      * The requestAnimationFrame handle number.
      */
-    protected handle: number;
+    protected $handle: number;
 
     /**
      * The number of milliseconds that define an interval.
      * 
      * @readonly
      */
-    protected readonly interval: number;
+    public readonly interval: number;
 
     /**
      * The timestamp of the last loop.
      */
-    protected lastLooped: number;
+    protected $lastLoop: number;
 
     /**
      * The date the timer starts.
      */
-    protected startDate: Date;
+    protected $startDate: Date;
 
     /**
      * The requestAnimationFrame handle number.
      */
-    protected running: boolean = false;
+    protected $running: boolean = false;
 
     /**
      * Create a new `Timer` instance.
@@ -48,14 +48,21 @@ export default class Timer {
     }
 
     /**
+     * Get the number of times the timer has ticked.
+     */
+    get count(): number {
+        return this.$count;
+    }
+
+    /**
      * The `elapsed` attribute.
      */
     get elapsed(): number {
-        if(!this.startDate) {
+        if(!this.$startDate) {
             return 0;
         }
 
-        return Math.max(0, Date.now() - this.startDate.getTime());
+        return Math.max(0, Date.now() - this.$startDate.getTime());
     }
 
     /**
@@ -73,28 +80,28 @@ export default class Timer {
      * Determines if the Timer is currently running.
      */
     get isRunning(): boolean {
-        return this.running === true;
+        return this.$running === true;
     }
 
     /**
      * Determines if the Timer is currently stopped.
      */
     get isStopped(): boolean {
-        return this.running === false;
+        return this.$running === false;
     }
 
     /**
      * Get the last timestamp the timer looped.
      */
     get lastLoop(): number {
-        return this.lastLooped || 0;
+        return this.$lastLoop || 0;
     }
 
     /**
      * Get the date object when the timer started.
      */
     get started(): Date|undefined {
-        return this.startDate;
+        return this.$startDate;
     }
 
     /**
@@ -102,8 +109,8 @@ export default class Timer {
      */
     reset(fn?: (timer: Timer) => void): Timer {
         this.stop(() => {
-            this.count = 0;
-            this.lastLooped = 0
+            this.$count = 0;
+            this.$lastLoop = 0
             this.start(fn);
         });
 
@@ -114,18 +121,18 @@ export default class Timer {
      * Starts the timer.
      */
     start(fn: (timer: Timer) => void): Timer {
-        this.startDate = new Date;
-        this.running = true;
+        this.$startDate = new Date;
+        this.$running = true;
 
         const loop = () => {
             if (Date.now() - this.lastLoop >= this.interval) {
                 call(fn, this.interval);
                 
-                this.lastLooped = Date.now();
-                this.count++;
+                this.$lastLoop = Date.now();
+                this.$count++;
             }
 
-            this.handle = window.requestAnimationFrame(loop);
+            this.$handle = window.requestAnimationFrame(loop);
 
             return this;
         };
@@ -138,13 +145,11 @@ export default class Timer {
      */
     stop(fn?: Function): Timer {
         if(this.isRunning) {
-            // setTimeout(() => {
-                window.cancelAnimationFrame(this.handle);
+            window.cancelAnimationFrame(this.$handle);
 
-                this.running = false;
+            this.$running = false;
 
-                call(fn);
-            // });
+            call(fn);
         }
 
         return this;

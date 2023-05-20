@@ -21,7 +21,7 @@ export default class VNode {
     /**
      * The element's attributes.
      */
-    public readonly attributes: Attributes = {}
+    public attributes: Attributes = {}
 
     /**
      * The element's text content.
@@ -34,6 +34,11 @@ export default class VNode {
     public readonly childNodes: VNode[] = []
 
     /**
+     * The type of node this is.
+     */
+    public readonly type: string | undefined = undefined;
+
+    /**
      * Construct the VNode.
      */
     constructor(tagName: string, attributes: Attributes = {}, childNodes: VNode[] = []) {
@@ -41,7 +46,10 @@ export default class VNode {
         this.tagName = tagName.toLowerCase();
 
         // Set the child nodes.
-        this.childNodes = childNodes;        
+        this.childNodes = childNodes;     
+        
+        // Set the node type.
+        this.type = attributes?.type as string | undefined || tagName;
 
         // Set the propetires and attributes.
         for(const key in attributes) {

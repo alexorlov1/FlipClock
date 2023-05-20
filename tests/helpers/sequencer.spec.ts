@@ -2,6 +2,7 @@ import { FaceValue } from '../../src/FaceValue';
 import { useCharset } from '../../src/helpers/charset';
 import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, useSequencer } from '../../src/helpers/sequencer';
 import { stopAfterChanges, useWalker } from '../../src/helpers/walker';
+import { DigitizedValue } from './../../src/helpers/digitizer';
 
 test('casting a string to a digitized string', () => {
     expect(castDigitizedString('1')).toBe('1');
@@ -73,20 +74,16 @@ test('incrementing the array walker after 1 change', () => {
     const { next } = useCharset();
 
     function walker() {
-        return useWalker((current, target) => next(current, target), stopAfterChanges(1));
+        return useWalker<{target: DigitizedValue}>((current, { target }) => next(current, target), stopAfterChanges(1));
     }
 
     const subject = [], target = ['a', 'b', 'c'];
 
-    expect(matchArrayStructure(subject, target, walker())).toStrictEqual([' ']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a']);
-    expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', ' ']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'a']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b']);
-    expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', ' ']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'a']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'b']);
-    expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'c']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'c']);
 })
 
@@ -94,7 +91,7 @@ test('decrementing the array walker after 1 change', () => {
     const { prev } = useCharset();
 
     function walker() {
-        return useWalker((current, target) => prev(current, target), stopAfterChanges(1));
+        return useWalker<{ target: DigitizedValue }>((current, { target }) => prev(current, target), stopAfterChanges(1));
     }
 
     const subject = ['a', 'b', 'c'], target = [];
@@ -113,75 +110,67 @@ test('incrementing towards "hello" 2 changes at a time', () => {
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['a', 'a']);
+    expect(subject.digits).toStrictEqual(['b', 'b']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['c', 'c']);
+    expect(subject.digits).toStrictEqual(['d', 'd']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['e', 'e']);
+    expect(subject.digits).toStrictEqual(['f', 'e']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['g', 'e', 'a']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'b']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'c']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'd', 'b']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'e', 'a']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'f', 'd']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'g', 'c']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'h', 'f']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'i', 'e']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'j', 'h']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'k', 'g']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'j']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'i']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'b']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'k', 'a']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'd']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'c']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'f']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'e']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'h']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'g']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'j']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'i']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'l']);
 
     subject = increment(subject, target, 2);
 
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'k']);
-
-    subject = increment(subject, target, 2);
-
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'm']);
-
-    subject = increment(subject, target, 2);
-
-    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'o']);
+    expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'n']);
 
     subject = increment(subject, target, 2);
 
@@ -275,17 +264,25 @@ test('incrementing a value using a custom stop function', () => {
 
     subject = increment(subject, target);
 
-    expect(subject.digits).toStrictEqual([' ', ' ']);
+    expect(subject.digits).toStrictEqual(['a', 'a']);
 
     subject = increment(subject, target);
 
-    expect(subject.digits).toStrictEqual(['a', 'a']);
+    expect(subject.digits).toStrictEqual(['a', 'b', 'a']);
     
     target = new FaceValue([])
 
     subject = decrement(subject, target);
 
-    expect(subject.digits).toStrictEqual([' ', ' ']);
+    expect(subject.digits).toStrictEqual(['a', 'a', ' ']);
+
+    subject = decrement(subject, target);
+
+    expect(subject.digits).toStrictEqual(['a', ' ']);
+
+    subject = decrement(subject, target);
+
+    expect(subject.digits).toStrictEqual([' ']);
 
     subject = decrement(subject, target);
 

@@ -16,17 +16,17 @@ test('retrieving chunks of the charset going forwards and backwards', () => {
     expect(chunk('@', 1)).toStrictEqual([' ']);
     expect(chunk('A', 1000)).toHaveLength(charset.length + 1);
     expect(chunk(':', 7)).toStrictEqual(['-', '.', ',', '!', '?', ' ', 'a']);
-    expect(chunk(' ', 1)).toStrictEqual(['a']);
-    expect(chunk(undefined, 1)).toStrictEqual([' ']);
-    expect(chunk(undefined, 5)).toStrictEqual([' ', 'a', 'b', 'c', 'd']);
+    expect(chunk(' ', 2)).toStrictEqual(['a', 'b']);
+    expect(chunk(undefined, 1)).toStrictEqual(['a']);
+    expect(chunk(undefined, 5)).toStrictEqual(['a', 'b', 'c', 'd', 'e']);
     expect(chunk(undefined, 1000)).toHaveLength(charset.length + 1);
 
     expect(chunk('@', -1)).toStrictEqual([' ']);
     expect(chunk('A', -1000)).toHaveLength(charset.length + 1);
     expect(chunk(':', -7)).toStrictEqual(['9', '8', '7', '6', '5', '4', '3']);
-    expect(chunk(' ', -1)).toStrictEqual(['?']);
-    expect(chunk(undefined, -1)).toStrictEqual([' ']);
-    expect(chunk(undefined, -5)).toStrictEqual([' ', '?', '!', ',', '.']);
+    expect(chunk(' ', -2)).toStrictEqual(['?', '!']);
+    expect(chunk(undefined, -1)).toStrictEqual(['?']);
+    expect(chunk(undefined, -5)).toStrictEqual(['?', '!', ',', '.', '-']);
     expect(chunk(undefined, -1000)).toHaveLength(charset.length + 1);
 });
 
@@ -36,9 +36,10 @@ test('retrieving the next value towards the target', () => {
         whitelist: ['@']
     });
 
-    expect(next('a', undefined)).toBe('b');
-    expect(next(' ', undefined)).toBe(undefined);
-    expect(next(undefined, 'a')).toBe(' ');
+    expect(next('a')).toBe('b');
+    expect(next('b')).toBe('c');
+    expect(next(' ')).toBe(undefined);
+    expect(next(undefined, 'a')).toBe('a');
     expect(next(undefined, 'a', 2)).toBe('a');
     expect(next('9', '!')).toBe(':');
     expect(next('9', '!', 2)).toBe('-');
@@ -53,15 +54,16 @@ test('retrieving the next value towards the target', () => {
     expect(next('!', '?')).toBe('?');
     expect(next('?', undefined)).toBe(undefined);
 
-    expect(prev('b', undefined)).toBe('a');
-    expect(prev('a', undefined)).toBe(' ');
-    expect(prev(' ', undefined)).toBe(undefined);
-    expect(prev(undefined, 'a')).toBe(' ');
-    expect(prev(undefined, 'a', 2)).toBe('?');
+    expect(prev('b')).toBe('a');
+    expect(prev('a')).toBe(' ');
+    expect(prev(' ')).toBe(undefined);
+    expect(prev(undefined, '?')).toBe('?');
+    expect(prev(undefined, '?', 2)).toBe('?');
     expect(prev('?', '.')).toBe('!');
     expect(prev('?', '.', 2)).toBe(',');
     expect(prev('?', '.', 100)).toBe('.');
     expect(prev('!', '!')).toBe('!');
+    expect(prev('@', '@')).toBe('@');
     expect(prev('#', '!')).toBe('!');
     expect(prev('z', 'a')).toBe('y');
     expect(prev('z', 'a', 5)).toBe('u');

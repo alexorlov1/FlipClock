@@ -1,136 +1,75 @@
-import { Face } from '../Face';
+import { Face, FaceState } from '../Face';
 import { FaceValue } from '../FaceValue';
 import FlipClock from '../FlipClock';
 import VNode from '../VNode';
-import { RandomizerFunction, useRandomizer } from '../helpers/randomizer';
+import { SequencerContext, useSequencer } from '../helpers/sequencer';
+import { SequencerOptions } from './../helpers/sequencer';
 import { Reactive, useState } from './../helpers/state';
 
-export type AlphanumericState = {
-    initialValue: FaceValue,
-    currentValue: FaceValue,
-    lastValue?: FaceValue,
-    targetValue: FaceValue,
-};
-
-export type AlphanumericParams = Partial<Pick<Alphanumeric, 'randomizer' | 'chunkSize'>> & {
-    initialValue?: FaceValue,
-    value: FaceValue,
-    targetValue?: FaceValue
-}
+export type AlphanumericParams = {
+    value?: FaceValue,
+    currentValue?: FaceValue,
+    targetValue?: FaceValue,
+    sequencer?: SequencerContext
+    skipChars?: number,
+} & SequencerOptions
 
 /**
- * This face is designed to increment and decrement values. Usually this face
- * is used as a counter for 0, 1, 2, 3, 4 (etc) for something like page views.
+ * This face is designed to flip through alphanumeric values similar to a flip
+ * board at a train station. The value will incrementally/decrementally flip
+ * the digits until it reaches the target.
  * 
  * @public
- * @example
- * ```html
- * <div id="clock"></div>
- * ```
- * 
- * ```js
- * const instance = new FlipClock({
- *   face: new Counter({
- *     value: new FaceValue(100, {
- *       format: value => value * 100
- *     })
- *   })
- * });
- * 
- * instance.mount(document.querySelector('#clock'));
- * ```
  */
 export default class Alphanumeric implements Face {
-
-    /**
-     * The chunkSize for generating random characters. Incease this value to
-     * speed up how fast the clock finds the correct value.
-     */
-    public chunkSize: number = 3;
-
     /**
      * A callback to override how digits are randomly selected.
      */
-    public randomizer?: RandomizerFunction
+    public readonly sequencer: SequencerContext
+
+    /**
+     * The number of characters to skip during the incrementing/decrementing.
+     */
+    public readonly skipChars: number = 1;
 
     /**
      * The reactive state.
      */
-    protected $state: Reactive<AlphanumericState>
+    protected $state: Reactive<FaceState>
 
     /**
      * Instantiate the clock face.
      */
     constructor(params: AlphanumericParams) {
-        if (params.chunkSize) {
-            this.chunkSize = params.chunkSize;
+        this.sequencer = params.sequencer || useSequencer({
+            charset: params.charset,
+            stopAfter: params.stopAfter,
+            stopAfterChanges: params.stopAfterChanges
+        });
+
+        if (params.skipChars) {
+            this.skipChars = params.skipChars;
         }
 
-        this.randomizer = params.randomizer || useRandomizer({
-            chunkSize: this.chunkSize
-        });
-
-        const initialValue = params.initialValue || new FaceValue('')
-
-        const currentValue = this.randomizer(initialValue, params.value);
+        const currentValue = params.currentValue || new FaceValue('');
 
         this.$state = useState({
-            initialValue,
             currentValue,
-            lastValue: undefined,
-            targetValue: params.value,
+            lastValue: currentValue,
+            targetValue: params.targetValue || params.value,
         });
+
+        if(!this.$state.targetValue) {
+            throw new Error('You must pass `targetValue` or `value` to `new Alphanumeric(...)`');
+        }
     }
 
+    /**
+     * Get the protected state property.
+     */
     get state() {
         return this.$state
     }
-
-    // /**
-    //  * Get the face value.
-    //  */
-    // get value(): FaceValue | undefined {
-    //     return super.value;
-    // }
-
-    // /**
-    //  * Set the face value.
-    //  */
-    // set value(value: FaceValue) {
-    //     this.state.value = value;
-    // }
-
-    // /**
-    //  * Get the face value.
-    //  */
-    // get targetValue(): FaceValue|undefined {
-    //     return this.state.targetValue;
-    // }
-
-    // /**
-    //  * Set the face value.
-    //  */
-    // set targetValue(value: FaceValue) {
-    //     this.state.targetValue = value
-    // }
-
-    // /**
-    //  * Define the initial state of the clock. This allows us to watch for
-    //  * reactivity changes.
-    //  */
-    // defineState(): attrs {
-    //     return {
-    //         value: undefined,
-    //         targetValue: undefined
-    //     }
-    // }
-
-    // /**
-    //  * Get the default FaceValue using the instantiated value.
-    //  */
-    // public defaultValue(value: RawFaceValue, attrs: Partial<FaceValue> = {}): FaceValue {
-    //     return FaceValue.make(value, attrs);
-    // }
 
     /**
      * This method is called with every interval, or every time the clock
@@ -138,39 +77,27 @@ export default class Alphanumeric implements Face {
      * clock's `FaceValue`.
      */
     public interval(instance: FlipClock): void {
-        // if (this.state.currentValue.compare(this.state.targetValue)) {
-        //     return;
-        // }
+        const method = this.$state.currentValue.length() > this.$state.targetValue.length()
+            ? 'decrement'
+            : 'increment';
 
-        // const lastValue = this.state.currentValue;
+        const lastValue = this.$state.currentValue.copy();
 
-        // const currentValue = this.randomizer(
-        //     this.state.currentValue, this.state.targetValue
-        // );
+        const currentValue = this.sequencer[method](
+            this.$state.currentValue, this.$state.targetValue, this.skipChars
+        );
 
-        // console.log(currentValue)
+        if(currentValue.compare(this.$state.targetValue)) {
+            instance.stop();
+        }
 
-        // this.state.update({
-        //     lastValue,
-        //     currentValue
-        // });
+        this.state.update({ currentValue, lastValue });
     }
 
     /**
      * Render the clock face.
      */
     public render(instance: FlipClock): VNode {
-        return instance.theme(this.state.currentValue, this.state.lastValue);
+        return instance.theme.render(instance, this.$state);
     }
-
-    // /**
-    //  * Bind a watcher function to the state.
-    //  */
-    // watch(fn: Function): Function {
-    //     const unwatch = this.state.watch(fn);
-
-    //     this.watchers.push(unwatch);
-
-    //     return unwatch;
-    // }
 }

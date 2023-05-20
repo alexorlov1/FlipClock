@@ -1,6 +1,9 @@
 import VNode from "../../VNode";
-import { DomElement, h } from "../../helpers/dom";
+import { h } from "../../helpers/dom";
+import { DomElement } from './../../helpers/dom';
 import { Label } from "./Label";
+
+export type GroupProps = Pick<Group, 'items'|'label'>
 
 /**
  * The Group class groups DOM elements together.
@@ -10,7 +13,7 @@ export default class Group implements DomElement {
     /**
      * The children in the group.
      */
-    public readonly items: DomElement[];
+    public readonly items: (VNode | DomElement)[];
     
     /**
      * The group's label.
@@ -20,8 +23,8 @@ export default class Group implements DomElement {
     /**
      * Construct the Group.
      */
-    constructor(attrs: Partial<Group>) {
-        this.items = attrs.items || [];
+    constructor(attrs: GroupProps) {
+        this.items = attrs.items;
         this.label = attrs.label;
     }
     
@@ -30,7 +33,8 @@ export default class Group implements DomElement {
      */
     render(): VNode {
         return h('div', {
-            class: 'flip-clock-group'
+            class: 'flip-clock-group',
+            type: 'flip-clock-group'
         }, [
             this.label && h(new Label(this.label)),
             h('div', {
