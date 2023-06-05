@@ -1,4 +1,5 @@
-import { RawFaceLiterals, RawFaceValue } from "../FaceValue";
+import { RawFaceValue } from "../FaceValue";
+import { RawFaceLiterals } from './../FaceValue';
 
 export type DigitizerOptions = {
     emptyChar?: string,
@@ -8,7 +9,7 @@ export type DigitizerOptions = {
 export type DigitizedValue = string
 export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
 export type DigitizeFunction = (value: RawFaceValue) => DigitizedValues
-export type UndigitizeFunction = (value: DigitizedValues) => RawFaceValue
+export type UndigitizeFunction<T extends RawFaceLiterals = T> = (value: DigitizedValues) => RawFaceValue<T>
 export type IsDigitizedFunction = (value: RawFaceValue|DigitizedValues) => boolean
 export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
 

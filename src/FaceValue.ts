@@ -1,7 +1,7 @@
 import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
 
-export type RawFaceLiterals = undefined | string | number
-export type RawFaceValue = RawFaceLiterals | (RawFaceValue)[] | DigitizedValues;
+export type RawFaceLiterals =  undefined | string | number | DigitizedValues;
+export type RawFaceValue<T extends RawFaceLiterals = RawFaceLiterals> = T | (RawFaceValue<T>)[];
 
 export type FaceValueProps = Pick<FaceValue, 'carryLength' | 'digitizer'>
 
@@ -11,7 +11,7 @@ export type FaceValueProps = Pick<FaceValue, 'carryLength' | 'digitizer'>
  * 
  * @public
  */
-export class FaceValue {
+export class FaceValue<T extends RawFaceLiterals = RawFaceLiterals> {
 
     /**
      * The carry length is carry over when the instance it copied. The minimum
@@ -34,12 +34,12 @@ export class FaceValue {
     /**
      * The raw value that was given.
      */
-    public readonly value: RawFaceValue
+    public readonly value: T
 
     /**
      * Instantiate the face value.
      */
-    constructor(value: RawFaceValue|DigitizedValues, props: FaceValueProps = {}) {
+    constructor(value: RawFaceValue<T> | DigitizedValues, props: FaceValueProps = {}) {
         this.carryLength = props.carryLength;
 
         this.digitizer = props.digitizer || useDigitizer({
@@ -53,7 +53,7 @@ export class FaceValue {
             this.digits = value as DigitizedValues;
         }
         else {
-            this.value = value;
+            this.value = value as T;
             this.digits = digitize(this.value);
         }
     }
@@ -81,7 +81,7 @@ export class FaceValue {
     /**
      * Create a new instance with the given value.
      */
-    copy(value?: RawFaceValue, props: FaceValueProps = {}): FaceValue {
+    copy(value?: T, props: FaceValueProps = {}): FaceValue<T> {
         return new FaceValue(value === undefined ? this.value : value, Object.assign({
             carryLength: this.minimumLength,
             digitizer: this.digitizer

@@ -13,7 +13,6 @@ import Group from './src/themes/flipclock/Group';
 import Label from './src/themes/flipclock/Label';
 
 export * from './src/faces';
-export * from './src/functions';
 export * from './src/types';
 export {
     Card,

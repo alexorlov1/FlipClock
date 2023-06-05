@@ -3,8 +3,8 @@ import FlipClock from "../../FlipClock";
 import VNode from "../../VNode";
 import { DigitizedValue, DigitizedValues } from "../../helpers/digitizer";
 import { DomElement, h } from "../../helpers/dom";
-import { WalkerDirection, WalkerFactoryFunction, createWalker, defineContext } from "../../helpers/walker";
-import { Theme, ThemeContext } from "../../types";
+import { WalkerFactoryFunction, createWalker, defineContext } from "../../helpers/walker";
+import { Theme, ThemeContext, ThemeRenderFunctionOptions } from "../../types";
 import Card from "./Card";
 import Group from "./Group";
 
@@ -13,7 +13,6 @@ export type FlipClockThemeLabels = DigitizedValues;
 export type FlipClockThemeOptions = {
     animationRate?: number,
     labels?: FlipClockThemeLabels,
-    direction?: WalkerDirection
     createWalker?: WalkerFactoryFunction<FlipClockThemeContext>
 }
 
@@ -26,18 +25,20 @@ export type FlipClockThemeContext = ThemeContext & {
  * 
  * @public
  */
-export function useFlipClockTheme(options: FlipClockThemeOptions): Theme {
+export function useFlipClockTheme(theme: FlipClockThemeOptions = {}): Theme {
     // const animationRate = options.animationRate || 100;
 
-    function render<T extends FaceState = FaceState>(instance: FlipClock, context: T): VNode {
+    function render<T extends FaceState = FaceState>(instance: FlipClock, context: T, options: ThemeRenderFunctionOptions = {}): VNode {
         const ctx = defineContext<FlipClockThemeContext>({
-            labels: options.labels,
+            labels: theme.labels,
             currentValue: context.currentValue.digits,
             lastValue: context.lastValue.digits,
-            targetValue: context.targetValue.digits
+            // targetValue: context.targetValue.digits
         });
 
-        const walk = createWalker(ctx);
+        const walk = (theme.createWalker ?? createWalker)(
+            ctx, options.direction ?? 'forwards'
+        );
 
         const tree = walk<Group>(context.currentValue.digits, (value, context) => {
             if (Array.isArray(value)) {
@@ -49,7 +50,11 @@ export function useFlipClockTheme(options: FlipClockThemeOptions): Theme {
                 })
             }
 
-            return new Card(value, (context.lastValue as DigitizedValue || ' '));
+            if (value === undefined) {
+                return;
+            }
+
+            return new Card(value, (context.lastValue ?? value) as DigitizedValue);
         });
         
         return h('div', {

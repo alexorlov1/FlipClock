@@ -92,8 +92,16 @@ export function createWalker<T>(direction: WalkerDirection): WalkFunction<T>
 export function createWalker<T>(ctx: ContextDefinition<T>): WalkFunction<T>
 export function createWalker<T>(ctx: ContextDefinition<T>, direction: WalkerDirection): WalkFunction<T>
 export function createWalker<T>(ctx?: ContextDefinition<T> | WalkerDirection, direction: WalkerDirection = 'forwards'): WalkFunction<T> {
-    const $ctx = typeof ctx === 'object' ? ctx : undefined;
-    const $direction = typeof ctx === 'string' ? ctx : direction;
+    let $ctx: ContextDefinition<T> | undefined = undefined;
+    let $direction: WalkerDirection = direction;
+
+    if(typeof ctx === 'object') {
+        $ctx = ctx;
+    }
+    else if(ctx) {
+        $direction = ctx;
+    }
+
     const forwards = $direction === 'forwards';
     const context = $ctx?.context || ({} as T);
     const useContext = $ctx?.useContext || ((ctx: T) => ctx);

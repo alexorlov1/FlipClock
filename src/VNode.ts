@@ -6,12 +6,12 @@ import { Attributes } from './helpers/dom';
  * 
  * @public
  */
-export default class VNode {
+export default class VNode<T = any> {
 
     /**
      * The rendered Element.
      */
-    public el: Element | Text | Comment;
+    public el: T;
 
     /**
      * The element's tagname.

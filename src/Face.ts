@@ -1,13 +1,13 @@
 import { FaceValue } from "./FaceValue";
 import FlipClock from "./FlipClock";
 import VNode from "./VNode";
-import { Reactive } from "./helpers/state";
+import { State } from "./helpers/signal";
 
-export type FaceState = {
+export type FaceState = State<{
     currentValue: FaceValue,
-    lastValue?: FaceValue | undefined,
-    targetValue?: FaceValue | undefined
-}
+    lastValue?: FaceValue,
+    targetValue?: FaceValue
+}>
 
 export type FaceHooks = {
     /**
@@ -48,16 +48,6 @@ export type FaceHooks = {
      * The `afterRender` hook.
      */
     afterRender?: (instance: FlipClock, vnode: VNode) => void;
-
-    /**
-     * The `beforeAnimation` hook.
-     */
-    beforeAnimation?: (instance: FlipClock, vnode: VNode) => void;
-
-    /**
-     * The `afterAnimation` hook.
-     */
-    afterAnimation?: (instance: FlipClock, vnode: VNode) => void;
 
     /**
      * The `beforeStart` hook.
@@ -102,10 +92,9 @@ export interface Face<T extends FaceState = FaceState> {
     render(instance: FlipClock): VNode;
 
     /**
-     * Get the reactive state for the face. Anytime the state changes, the face
-     * will be re-rendered.
+     * Get the current value.
      */
-    get state(): Reactive<T>
+    get state(): State<T>
 }
 
 export type UseFaceFunction<T> = (props: T) => T

@@ -4,6 +4,7 @@ import Timer from "./Timer";
 import VNode from "./VNode";
 import { diff } from "./helpers/dom";
 import call from "./helpers/functions";
+import { createEffect } from "./helpers/signal";
 import { Reactive, useState } from "./helpers/state";
 import { Theme, ThemeRenderFunction } from "./types";
 
@@ -90,10 +91,9 @@ export default class FlipClock {
     }
 
     set face(face: Face) {
-        face.state.watch(() => this.render());
-
         this.state.face = face;
-        this.render();
+
+        createEffect(() => this.render());
     }
 
     get node(): VNode | undefined {

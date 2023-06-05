@@ -6,7 +6,7 @@ import { useFlipClockTheme } from "../../src/themes/flipclock";
 import Card from "../../src/themes/flipclock/Card";
 import Divider from "../../src/themes/flipclock/Divider";
 import Group from "../../src/themes/flipclock/Group";
-import { Label } from "../../src/themes/flipclock/Label";
+import Label from "../../src/themes/flipclock/Label";
 
 test('rendering labels within a nested groups', () => {
     const el = document.createElement('div');
@@ -20,7 +20,7 @@ test('rendering labels within a nested groups', () => {
         targetValue: new FaceValue(['a', ['b']])
     });
 
-    const clock = new FlipClock({
+    new FlipClock({
         el,
         face,
         theme,
@@ -28,13 +28,11 @@ test('rendering labels within a nested groups', () => {
         autoStart: false,
     });
 
-    clock.render();
+    const labels = el.querySelectorAll('.flip-clock-label');
 
-    // const labels = el.querySelectorAll('.flip-clock-label');
-
-    // expect(labels).toHaveLength(2);
-    // expect(labels?.[0].textContent).toBe('a');
-    // expect(labels?.[1].textContent).toBe('b');
+    expect(labels).toHaveLength(2);
+    expect(labels?.[0].textContent).toBe('a');
+    expect(labels?.[1].textContent).toBe('b');
 });
 
 test('rendering a clock using the theme', () => {
@@ -47,7 +45,7 @@ test('rendering a clock using the theme', () => {
     });
 
     const face = new Alphanumeric({
-        value: new FaceValue('b')
+        targetValue: new FaceValue('b')
     });
 
     const clock = new FlipClock({
@@ -63,8 +61,8 @@ test('rendering a clock using the theme', () => {
     
     expect(el.querySelector('.active')?.children[0]?.children[0]?.textContent).toBe('a')
     expect(el.querySelector('.active')?.children[0]?.children[1]?.textContent).toBe('a')
-    expect(el.querySelector('.before')?.children[0]?.children[0]?.textContent).toBe(' ')
-    expect(el.querySelector('.before')?.children[0]?.children[1]?.textContent).toBe(' ')
+    expect(el.querySelector('.before')?.children[0]?.children[0]?.textContent).toBe('a')
+    expect(el.querySelector('.before')?.children[0]?.children[1]?.textContent).toBe('a')
 
     jest.advanceTimersByTime(100)
 

@@ -1,7 +1,7 @@
 import VNode from "../../VNode";
 import { h } from "../../helpers/dom";
 import { DomElement } from './../../helpers/dom';
-import { Label } from "./Label";
+import Label from "./Label";
 
 export type GroupProps = Pick<Group, 'items'|'label'>
 

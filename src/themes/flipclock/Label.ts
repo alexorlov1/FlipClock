@@ -8,7 +8,7 @@ import { DomElement, h } from "../../helpers/dom";
  * 
  * @public
  */
-export class Label implements DomElement {
+export default class Label implements DomElement {
     /**
      * The label's value.
      */

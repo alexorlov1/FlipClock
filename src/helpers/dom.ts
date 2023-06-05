@@ -33,7 +33,7 @@ var KEBAB_REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
 /**
  * Bind the events from the vnode to the element.
  */
-export function bindEvents(el: Element, vnode: VNode) {
+export function bindEvents<T extends Element = Element>(el: T, vnode: VNode<T>) {
     for (let key in vnode.attributes) {
         if (typeof vnode.attributes[key] !== 'function') {
             continue;
@@ -49,7 +49,7 @@ export function bindEvents(el: Element, vnode: VNode) {
 /**
  * Unbind the events from the vnode to the element.
  */
-export function unbindEvents(el: Element, vnode: VNode) {
+export function unbindEvents<T extends Element = Element>(el: Element, vnode: VNode<T>) {
     for (const key in vnode.attributes) {
         if (typeof vnode.attributes[key] !== 'function') {
             continue;
@@ -65,7 +65,7 @@ export function unbindEvents(el: Element, vnode: VNode) {
 /**
  * Set the attributes from the vnode on the element.
  */
-export function setAttributes(el: Element, vnode: VNode) {
+export function setAttributes<T extends Element = Element>(el: Element, vnode: VNode<T>) {
     for (const key in vnode.attributes) {
         if (typeof vnode.attributes[key] === 'function') {
             continue;
@@ -78,13 +78,13 @@ export function setAttributes(el: Element, vnode: VNode) {
 /**
  * Create a virtual DOM node.
  */
-export function h(
+export function h<T = Element | Text | Comment>(
     tagName: string | DomElement,
     attrs?: Attributes | Children | string | number,
     children?: Children | string | number
-): VNode {
+): VNode<T> {
     if(isDomElement(tagName)) {
-        return tagName.render();
+        return tagName.render() as VNode<T>;
     }
     
     let $attrs: Attributes = {};
@@ -102,7 +102,7 @@ export function h(
         $attrs = attrs;
     }
 
-    return new VNode(tagName, $attrs, $children.filter(value => value !== undefined).map(child => {
+    const childNodes = $children.filter(value => value !== undefined).map(child => {
         if (child instanceof VNode) {
             return child;
         }
@@ -120,22 +120,24 @@ export function h(
         return h('text', {
             textContent: child
         });
-    }));
+    });
+
+    return new VNode<T>(tagName, $attrs, childNodes);
 }
 
 /**
  * Creates the DOM element from the VNode.
  */
-export function createElement(vnode: VNode): Element {
+export function createElement<T = Element>(vnode: VNode<T>): T {
     const tags = {
         'text': (vnode: VNode): Text => document.createTextNode(String(vnode.textContent)),
         'comment': (vnode: VNode): Comment => document.createComment(String(vnode.textContent)),
         'element': (vnode: VNode): Element => document.createElement(vnode.tagName)
     };
 
-    return tags[vnode.tagName]
+    return (tags[vnode.tagName]
         ? tags[vnode.tagName](vnode)
-        : tags['element'](vnode);
+        : tags['element'](vnode)) as T;
 }
 
 /**
@@ -269,19 +271,19 @@ export function diff(el: Node, vnode: VNode, prevNode?: VNode): void {
 /**
  * Render the VNode as a DOM element.
  */
-export function render<T = HTMLElement | Element | Text | Comment>(vnode: VNode): T {
+export function render<T extends Element = Element>(vnode: VNode<T>): T {
     // Create the DOM element
-    const el = createElement(vnode);
+    const el = createElement<T>(vnode);
 
     if (vnode.isText) {
-        el.textContent = typeof vnode.textContent === 'string'
+        (el as Element).textContent = typeof vnode.textContent === 'string'
             ? vnode.textContent
             : vnode.textContent.toString();
     }    
     // Set the attributes on the element.
     else if (vnode.isElement) {
-        bindEvents(el, vnode);
-        setAttributes(el, vnode);
+        bindEvents<T>(el, vnode);
+        setAttributes<T>(el, vnode);
     }
 
     // Append the children to the new element
@@ -290,5 +292,5 @@ export function render<T = HTMLElement | Element | Text | Comment>(vnode: VNode)
     }
 
     // Return the new element
-    return el as T;
+    return vnode.el = el as T;
 }

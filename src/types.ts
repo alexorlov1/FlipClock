@@ -2,8 +2,13 @@ import { FaceHooks, FaceState } from "./Face";
 import FlipClock from "./FlipClock";
 import VNode from "./VNode";
 import { DigitizedValue, DigitizedValues } from "./helpers/digitizer";
+import { WalkerDirection } from "./helpers/walker";
 
-export type ThemeRenderFunction<T = FaceState> = (instance: FlipClock, context: T) => VNode
+export type ThemeRenderFunctionOptions = {
+    direction?: WalkerDirection
+}
+
+export type ThemeRenderFunction<T = FaceState> = (instance: FlipClock, context: T, options: ThemeRenderFunctionOptions) => VNode
 
 export type Theme = {
     render: ThemeRenderFunction
