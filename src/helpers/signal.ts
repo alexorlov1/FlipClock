@@ -1,66 +1,44 @@
-let current: Function | undefined;
+let currentListener: (() => void)|undefined = undefined;
 
-export type SignalGetter<T = unknown> = () => T;
-export type SignalSetter<T = unknown> = (newValue: T | ((value: T) => T)) => void;
-export type Signal<T = unknown> = [SignalGetter<T>, SignalSetter<T>]
+export type Signal<T> = [ReadFunction<T>, WriteFunction<T>, ResetFunction<T>];
+export type ReadFunction<T> = () => T;
+export type WriteFunction<T> = (value: T) => void;
+export type ResetFunction<T> = () => T;
 
-export type StateDefinition = Record<string, unknown>;
+export function createSignal<T>(initialValue: T): Signal<T> 
+export function createSignal<T>(initialValue?: T): Signal<T|undefined> 
+export function createSignal<T>(initialValue?: T): Signal<T|undefined> {
+    let value: T|undefined = initialValue;
 
-export type State<T> = {
-    [P in keyof T]: T[P]
-}
+    const subscribers: Function[] = [];
 
-/**
- * Define a proxy state with getters/setters for each property that execute
- * the signals. This is a way to define a structure of signals to represent a
- * state.
- */
-export function defineState<T>(definition: T): State<T> {
-    const state = {};
-
-    for(const i in definition) {
-        const [ get, set ] = createSignal(definition[i]);
-
-        Object.defineProperty(state, i, { get, set });
-    }
-    
-    return state as State<T>;
-}
-
-/**
- * Create a signal using the given value.
- */
-export function createSignal<T>(value?: T): Signal<T> {
-    const observers: Function[] = [];
-
-    function get(): T {
-        if(current && !observers.includes(current)) {
-            observers.push(current)
+    function read() {
+        if(currentListener) {
+            subscribers.push(currentListener);
         }
 
         return value;
-    }
-    
-    function set(newValue: T | ((value: T) => T)) {
-        if(typeof newValue === 'function') {
-            newValue = (newValue as (value: T) => T)(value)
-        }
+    };
 
+    function write(newValue?: T) {
         value = newValue;
 
-        for(const fn of observers) {
-            fn();
-        }
-    }
+        subscribers.forEach(fn => fn());
+    };
 
-    return [ get, set ];
+    function reset() {
+        value = initialValue;
+
+        subscribers.splice(0, subscribers.length);
+
+        return value;
+    };
+
+    return [read, write, reset];
 }
 
-/**
- * Create a signal effect.
- */
-export function createEffect(fn: Function) {
-    current = fn;
-    fn();
-    current = undefined;
+export function watchEffect(callback: () => void) {
+    currentListener = callback;
+    callback();
+    currentListener = undefined;
 }

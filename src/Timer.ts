@@ -3,8 +3,6 @@ import call from "./helpers/functions";
 /**
  * The Timer class uses a requestAnimationFrame loop to build a timer that can
  * start and stop.
- * 
- * @public
  */
 export default class Timer {
 
@@ -16,7 +14,7 @@ export default class Timer {
     /**
      * The requestAnimationFrame handle number.
      */
-    protected $handle: number;
+    protected $handle?: number;
 
     /**
      * The number of milliseconds that define an interval.
@@ -28,17 +26,12 @@ export default class Timer {
     /**
      * The timestamp of the last loop.
      */
-    protected $lastLoop: number;
+    protected $lastLoop?: number;
 
     /**
      * The date the timer starts.
      */
-    protected $startDate: Date;
-
-    /**
-     * The requestAnimationFrame handle number.
-     */
-    protected $running: boolean = false;
+    protected $startDate?: Date;
 
     /**
      * Create a new `Timer` instance.
@@ -80,14 +73,14 @@ export default class Timer {
      * Determines if the Timer is currently running.
      */
     get isRunning(): boolean {
-        return this.$running === true;
+        return this.$handle !== undefined;
     }
 
     /**
      * Determines if the Timer is currently stopped.
      */
     get isStopped(): boolean {
-        return this.$running === false;
+        return this.$handle === undefined;
     }
 
     /**
@@ -120,9 +113,8 @@ export default class Timer {
     /**
      * Starts the timer.
      */
-    start(fn: (timer: Timer) => void): Timer {
+    start(fn?: (timer: Timer) => void): Timer {
         this.$startDate = new Date;
-        this.$running = true;
 
         const loop = () => {
             if (Date.now() - this.lastLoop >= this.interval) {
@@ -144,10 +136,10 @@ export default class Timer {
      * Stops the timer.
      */
     stop(fn?: Function): Timer {
-        if(this.isRunning) {
+        if(this.isRunning && this.$handle) {
             window.cancelAnimationFrame(this.$handle);
 
-            this.$running = false;
+            this.$handle = undefined;
 
             call(fn);
         }

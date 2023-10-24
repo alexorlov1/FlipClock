@@ -62,11 +62,11 @@ export type CharsetOptions = {
 export type CharsetCache = Map<string, string[]>;
 
 
-export type ChunkFunction = (value: DigitizedValue, size: number) => string[];
+export type ChunkFunction = (value: DigitizedValue | undefined, size: number) => string[];
 export type IsBlacklistFunction = (value: DigitizedValue) => boolean;
 export type IsWhitelistFunction = (value: DigitizedValue) => boolean;
-export type NextFunction = (value: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue;
-export type PrevFunction = (value: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue;
+export type NextFunction = (value?: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue | undefined;
+export type PrevFunction = (value?: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue | undefined;
 
 export type CharsetContext = {
     charset: string[],
@@ -79,19 +79,16 @@ export type CharsetContext = {
 }
 
 /**
- * A use function to capture the state of the spin cycle so that random
- * characters may be generated for each digit without repeats. When the random
- * 
- * @public
+ * Use a character set to define what characters show up in the sequence.
  */
 export function useCharset(options: CharsetOptions = {}): CharsetContext {
     const blacklist = options.blacklist || [];
     const whitelist = options.whitelist || [];
     const emptyChar = options.emptyChar || EMPTY_CHAR;
 
-    const shuffle: ShuffleFunction = options.shuffle && (
-        typeof options.shuffle === 'function' ? options.shuffle : fisherYatesShuffle
-    );
+    const shuffle = typeof options.shuffle === 'function'
+        ? options.shuffle
+        : options.shuffle ? fisherYatesShuffle : undefined
 
     /**
      * Creates a charset and shuffles it if required.
@@ -124,7 +121,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the next chunks of characters relative to another character.
      */
-    function chunk(value: DigitizedValue, size: number = 1): string[] {
+    function chunk(value?: DigitizedValue, size: number = 1): string[] {
         let chunked = [emptyChar, ...charset, emptyChar, ...charset];
 
         if(size < 0) {
@@ -153,7 +150,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the next character in the charset relative to the given value.
      */
-    function next(current: DigitizedValue, target?: DigitizedValue, count: number = 1): DigitizedValue {
+    function next(current?: DigitizedValue, target?: DigitizedValue, count: number = 1) {
         if (target === undefined && current === emptyChar) {
             return undefined
         }
@@ -161,21 +158,23 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
             return target;
         }
 
-        if (isWhitelisted(current) || target === current) {
+        if (current && (isWhitelisted(current) || target === current)) {
             return current;
         }
 
-        if (isBlacklisted(current)) {
+        if (current && isBlacklisted(current)) {
             return nearest(current);
         }
 
         const matches = chunk(current, count);
 
-        if (matches.includes(target)) {
+        if (target && matches.includes(target)) {
             return target;
         }
 
-        if (target === undefined && charset.indexOf(matches[count - 1]) < charset.indexOf(current)) {
+        if (target === undefined 
+            && current 
+            && charset.indexOf(matches[count - 1]) < charset.indexOf(current)) {
             return undefined;
         }
         
@@ -185,7 +184,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the prev character in the charset relative to the given value.
      */
-    function prev(current: DigitizedValue, target?: DigitizedValue, count: number = 1): DigitizedValue {
+    function prev(current?: DigitizedValue, target?: DigitizedValue, count: number = 1) {
         if (target === undefined && current === emptyChar) {
             return undefined
         }
@@ -193,21 +192,23 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
             return target;
         }
 
-        if (isWhitelisted(current) || target === current) {
+        if (current && (isWhitelisted(current) || target === current)) {
             return current;
         }
 
-        if (isBlacklisted(current)) {
+        if (current && isBlacklisted(current)) {
             return nearest(current);
         }
 
         const matches = chunk(current, -count);
 
-        if (matches.includes(target)) {
+        if (target && matches.includes(target)) {
             return target;
         }
 
-        if (target === undefined && charset.indexOf(matches[count - 1]) > charset.indexOf(current)) {
+        if (target === undefined
+            && current
+            && charset.indexOf(matches[count - 1]) > charset.indexOf(current)) {
             return undefined;
         }
 

@@ -7,8 +7,6 @@ import CardItem from "./CardItem";
 /**
  * The Card class renders a DOM element that has a flipping effect when the
  * number changes.
- * 
- * @public
  */
 export default class Card implements DomElement {
     /**

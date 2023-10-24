@@ -34,45 +34,7 @@ test('digitizing and undigitizing values', () => {
 
     expect(digitize(['1', ['2', '3']])).toEqual(['1', ['2', '3']]);
     expect(undigitize(['1', ['2', '3']])).toEqual(['1', '23']);
-
-
-
-    // expect(digitize(['1', '23'])).toEqual(['1', ['2', '3']]);
-    // expect(digitize(['1', 23])).toEqual(['1', ['2', '3']]);
-    // expect(digitize(['1', ['2', '3']])).toEqual(['1', ['2', '3']]);
-    
-    // expect(undigitize([['1', '2', '3']])).toEqual('123');
-    // expect(undigitize(['a', ' '])).toEqual('a ');
-    // expect(undigitize([['1', ['2', '3']]])).toEqual('1 23');
-    // expect(undigitize([['1', ['2', ['3']]]])).toEqual('1 2 3');
-    // expect(digitize('hello world')).toEqual(['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd']);
-    // expect(digitize(['hello','world'])).toEqual([['h', 'e', 'l', 'l', 'o'],['w', 'o', 'r', 'l', 'd']]);
-    // expect(undigitize([['h', 'e', 'l', 'l', 'o'], ['w', 'o', 'r', 'l', 'd']])).toEqual('hello world');
 });
-
-// test('digitizing and undigitize "hello" with 8 minimum digits', () => {
-//     const { digitize } = useDigitizer({
-//         minimumDigits: 8,
-//     });
-
-//     expect(digitize('hello'))
-//         .toEqual([[' ', ' ', ' ', 'h', 'e', 'l', 'l', 'o']]);
-
-//     expect(digitize(['a', ['b']]))
-//         .toEqual([' ', ' ', ' ', ' ', ' ', ' ', 'a', ['b']]);
-
-//     expect(digitize([[[], ['a'], 'b'], 'c']))
-//         .toEqual([[[], [' ', ' ', ' ', ' ', ' ', 'a'], 'b'], 'c']);
-        
-//     expect(digitize([[[]], ['c']]))
-//         .toEqual([[[]], [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'c']]);
-
-//     expect(digitize([['a', 'b', ['c']]]))
-//         .toEqual([[' ', ' ', ' ', ' ', ' ', 'a', 'b', ['c']]]);
-
-//     expect(digitize([[['a', 'b', 'c']]]))
-//         .toEqual([[[' ', ' ', ' ', ' ', ' ', 'a', 'b', 'c']]]);
-// })
 
 test('checking if a value is a digitized array', () => {
     const { isDigitized } = useDigitizer();

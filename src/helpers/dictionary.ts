@@ -4,16 +4,61 @@ export type DictionaryRecord = Record<string, string | Translator>
 export type DictionaryMap = Map<string, string | Translator>
 export type DefinitionTerms = Record<string, string | Translator>;
 
-var KEBAB_REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
+export type DefineFunction<V> = (key: string | Record<string,V>, value?: V) => void;
+
+export type UnsetFunction = (key: string | string[]) => void;
+
+export type UseDefinitionMap<V> = {
+    map: Map<string,V>
+    define: (key: string | Record<string, V>, value?: V) => void
+    unset: (keys: string | string[]) => void
+}
+
+/**
+ * A definition map is a reusable interface to create key/value pairs.
+ */
+export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
+    const map = new Map(items);
+
+    // function define(key: Record<string,V>): void
+    // function define(key: string, value: V): void
+    function define(key: string | Record<string, V>, value?: V): void {
+        if(typeof key === 'string' && value) {
+            map.set(key, value);
+        }
+        else if(typeof key === 'object') {
+            for (const entry of Object.entries(key)) {
+                map.set(entry[0], entry[1]);
+            }
+        }        
+    }
+
+    // function unset(keys: string): void
+    // function unset(keys: string[]): void
+    function unset(keys: string|string[]): void {
+        if (Array.isArray(keys)) {
+            for(const key of keys) {
+                map.delete(key);
+            }
+        }
+        else {
+            map.delete(keys);
+        }
+    }
+
+    return {
+        map, define, unset
+    }
+}
 
 /**
  * Create a new date string formatter.
  */
 export function useDictionary(definitions: DefinitionTerms = {}) {
-    const dictionary: DictionaryMap = new Map(Object.entries(definitions));
-
+    const { map, define, unset } = useDefinitionMap(Object.entries(definitions));
+    
     function translate(key: string): string {
-        const term = dictionary.get(key);
+        const term = map.get(key);
 
         if (typeof term === 'function') {
             return term(key);
@@ -26,34 +71,10 @@ export function useDictionary(definitions: DefinitionTerms = {}) {
         return term;
     }
 
-    function define(key: string, value: string)
-    function define(key: DictionaryRecord)
-    function define(key: string | DictionaryRecord, value?: string): void {
-        if(typeof key === 'string') {
-            dictionary.set(key, value);
-        }
-        else {
-            for (const entry of Object.entries(key)) {
-                dictionary.set(entry[0], entry[1]);
-            }
-        }        
-    }
-
-    function undefine(keys: string|string[]): void {
-        if (Array.isArray(keys)) {
-            for(const key of keys) {
-                dictionary.delete(key);
-            }
-        }
-        else {
-            dictionary.delete(keys);
-        }
-    }
-
     return {
-        dictionary,
-        translate,
+        map,
         define,
-        undefine,
+        translate,
+        unset,
     }
 }

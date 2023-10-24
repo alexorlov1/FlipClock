@@ -1,7 +1,7 @@
 import { useDictionary } from '../../src/helpers/dictionary';
 
 test('using the dictionary to translate to spanish', () => {
-    const { define, undefine, translate } = useDictionary({
+    const { define, unset, translate } = useDictionary({
         'Monday': 'Lunes'
     })
 
@@ -19,8 +19,8 @@ test('using the dictionary to translate to spanish', () => {
 
     expect(translate('Tuesday')).toBe('Martes');
 
-    undefine('Tuesday');
-    undefine(['Wednesday']);
+    unset('Tuesday');
+    unset(['Wednesday']);
     
     expect(translate('Tuesday')).toBe('Tuesday');
     expect(translate('Wednesday')).toBe('Wednesday');

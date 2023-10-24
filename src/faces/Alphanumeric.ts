@@ -1,34 +1,30 @@
-import { Face, FaceState } from '../Face';
+import { Face } from '../Face';
 import { FaceValue } from '../FaceValue';
-import FlipClock from '../FlipClock';
-import VNode from '../VNode';
+import { FlipClock } from '../FlipClock';
+import { DigitizedValues } from '../helpers/digitizer';
 import { SequencerContext, useSequencer } from '../helpers/sequencer';
-import { defineState } from '../helpers/signal';
-import { WalkerDirection } from '../helpers/walker';
+import { watchEffect } from '../helpers/signal';
 import { SequencerOptions } from './../helpers/sequencer';
 
-export type AlphanumericParams = {
-    value?: FaceValue,
-    currentValue?: FaceValue,
-    direction?: 'auto' | WalkerDirection,
-    targetValue: FaceValue,
-    sequencer?: SequencerContext
-    skipChars?: number | (() => number),
-} & SequencerOptions
+export type AlphanumericProps = {
+    value: FaceValue<string|DigitizedValues>,
+    direction?: 'auto' | 'forwards' | 'backwards',
+    targetValue: FaceValue<string|DigitizedValues>,
+    sequencer?: SequencerContext | SequencerOptions
+    skipChars?: number,
+}
 
 /**
  * This face is designed to flip through alphanumeric values similar to a flip
  * board at a train station. The value will incrementally/decrementally flip
  * the digits until it reaches the target.
- * 
- * @public
  */
 export default class Alphanumeric implements Face {
     /**
      * The flip direction. If auto, the direction is automatically determined
      * based on the current value and target value.
      */
-    public readonly direction: 'auto' | WalkerDirection = 'auto';
+    public readonly direction: 'auto' | 'forwards' | 'backwards' = 'auto';
 
     /**
      * Override how digits are sequenced.
@@ -38,65 +34,51 @@ export default class Alphanumeric implements Face {
     /**
      * The number of characters to skip during the incrementing/decrementing.
      */
-    public readonly skipChars: number|(() => number) = 1;
-    
+    public readonly skipChars?: number;
+
     /**
-     * The reactive state.
+     * The face's current value.
      */
-    protected $state: FaceState & {direction: WalkerDirection}
+    public value: FaceValue<string|DigitizedValues>
+
+    /**
+     * The face's target value.
+     */
+    public targetValue: FaceValue<string|DigitizedValues>
     
     /**
      * Instantiate the clock face.
      */
-    constructor(params: AlphanumericParams) {
-        if (params.skipChars) {
-            this.skipChars = params.skipChars;
+    constructor(props: AlphanumericProps) {
+        if (props.skipChars) {
+            this.skipChars = props.skipChars;
         }
 
-        if (params.direction) {
-            this.direction = params.direction;
+        if (props.direction) {
+            this.direction = props.direction;
         }
 
-        this.sequencer = params.sequencer || useSequencer({
-            charset: params.charset,
-            stopAfter: params.stopAfter,
-            stopAfterChanges: params.stopAfterChanges
-        });
+        this.sequencer = props.sequencer && 'increment' in props.sequencer
+            ? props.sequencer
+            : useSequencer(props.sequencer);
 
-        const currentValue = params.currentValue || new FaceValue('');
-        const targetValue = params.targetValue;
-
-        this.$state = defineState({
-            currentValue,
-            lastValue: currentValue,
-            targetValue: params.targetValue,
-            direction: this.direction === 'auto'
-                ? this.autoDirection(currentValue, targetValue)
-                : this.direction,
-        });
+        this.value = props.value;
+        this.targetValue = props.targetValue;
     }
-
-    /**
-     * Get the protected state property.
-     */
-    get state() {
-        return this.$state
-    }
-
+    
     /**
      * The sequencer method to call.
      */
-    get method(): 'increment' | 'decrement' {
-        return this.$state.direction === 'backwards'
-            ? 'decrement'
-            : 'increment';
-    }
+    get backwards(): boolean {
+        if(this.direction === 'backwards') {
+            return true;
+        }
 
-    /**
-     * Set the target value.
-     */
-    set value(value: FaceValue) {
-        this.state.targetValue = value;
+        if(this.direction === 'forwards') {
+            return false;
+        }
+
+        return this.value.length >= (this.targetValue?.length ?? 0)
     }
 
     /**
@@ -105,52 +87,31 @@ export default class Alphanumeric implements Face {
      * clock's `FaceValue`.
      */
     public interval(instance: FlipClock): void {
-        const lastValue = this.$state.currentValue;
-
-        const skipChars = typeof this.skipChars === 'function'
-            ? this.skipChars()
-            : this.skipChars;
-
-        const currentValue = this.sequencer[this.method](
-            this.$state.currentValue, this.$state.targetValue, skipChars
+        this.sequencer.increment(
+            this.value, this.targetValue, this.skipChars, this.backwards
         );
 
-        if(currentValue.compare(this.$state.targetValue)) {
+        if(this.value.compare(this.targetValue)) {
             instance.stop();
         }
-
-        this.state.currentValue = currentValue;
-        this.state.lastValue = lastValue;
-    }
-
-    /**
-     * Render the clock face.
-     */
-    public render(instance: FlipClock): VNode {
-        return instance.theme.render(instance, this.$state, {
-            direction: this.$state.direction
-        });
     }
 
     /**
      * Update the direction before the interval starts.
      */
-    public beforeStart() {
-        if(this.direction === 'auto') {
-            this.state.direction = this.autoDirection(
-                this.$state.currentValue, this.$state.targetValue
-            );
-        }
+    public afterCreate(instance: FlipClock) {
+        watchEffect(() => {
+            if(instance.timer.isStopped && this.value.value) {
+                instance.start();
+            }
+        });
     }
 
-    /**
-     * Get the direction of the clock face. If the current digit length is 
-     * less than the target digit length, then the clock face will be
-     * going forwards.
-     */
-    protected autoDirection(currentValue: FaceValue, targetValue?: FaceValue): WalkerDirection {
-        return currentValue.length() <= targetValue.length()
-            ? 'forwards'
-            : 'backwards';
-    }
+}
+
+/**
+ * Instantiate a new instnace of Alphanumeric
+ */
+export function alphanumeric(props: AlphanumericProps) {
+    return new Alphanumeric(props);
 }

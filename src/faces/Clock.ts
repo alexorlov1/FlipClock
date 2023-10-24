@@ -1,15 +1,18 @@
 
 import { Face } from '../Face';
-import { FaceValue } from '../FaceValue';
-import FlipClock from '../FlipClock';
-import VNode from '../VNode';
-import { prop } from '../functions';
-import FormattableFace from './FormattableFace';
+import { FaceValue, faceValue } from '../FaceValue';
+import { FlipClock } from '../FlipClock';
+import { DateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/date';
+
+export type ClockProps = {
+    date?: Date,
+    format?: string,
+    formatter?: UseDateFormats | DateFormatOptions,
+}
 
 /**
  * This face will show a clock in a given format.
  * 
- * @public
  * @example
  * ```html
  * <div id="clock"></div>
@@ -27,67 +30,65 @@ import FormattableFace from './FormattableFace';
  * instance.mount(document.querySelector('#clock'));
  * ```
  */
-export default class Clock extends FormattableFace {
+export default class Clock implements Face {
+
+    /**
+     * The starting date on the clock. If no date is set, the current time
+     * will be used.
+     */
+    date?: Date
+
+    /**
+     * The current formatted value.
+     */
+    value: FaceValue<string>
     
     /**
-     * The string or callback function used to format the value.
+     * The format string.
      */
-    format: string|((value: FaceValue, face: Face) => string) = 'hh:mm:ss A';
+    format: string = 'hh:mm:ss A'
+
+    /**
+     * The duration formatter.
+     */
+    formatter: UseDateFormats
 
     /**
      * Instantiate the clock face.
      */
-    constructor(attrs: Partial<Clock> = {}) {
-        super()
+    constructor(props?: ClockProps) {
+        this.date = props?.date
+        this.formatter = props?.formatter && 'format' in props.formatter
+            ? props.formatter
+            : useDateFormats(props?.formatter as DateFormatOptions);
 
-        this.format = prop(attrs.format, this.format);
-    }
-
-    /**
-     * Get the default value if no value is passed.
-     */
-    public defaultValue(value: any): FaceValue {
-        if(value instanceof FaceValue) {
-            return FaceValue.make(value);
+        if(props?.format) {
+            this.format = props.format;
         }
 
-        if(value === undefined) {
-            value = new Date();
-        }
-
-        return FaceValue.make(new Date(value));
+        this.value = faceValue(this.formatter.format(new Date, this.format));
     }
 
     /**
-     * Format the face value into a string.
-     */
-    public formatFaceValue(value: FaceValue): (format: string) => string {
-        return (format: string) => formatDate(
-            value.value || new Date, format, this.dictionary
-        );
-    }
-
-    /**
-     * This method is called with every interval, or every time the clock
-     * should change, and handles the actual incrementing and decrementing the
-     * clock's `FaceValue`.
+     * Format the face value to the current date/time.
      */
     public interval(instance: FlipClock): void {
-        const interval: number = instance.timer.lastLoop
-            ? new Date().getTime() - instance.timer.lastLoop
-            : 0;
+        if(!this.date) {
+            this.value.value = this.formatter.format(new Date, this.format)
+        }
+        else {
+            const date = new Date;
 
-        this.value = this.value.copy(
-            new Date(this.value.value.getTime() + interval)
-        );
-    }
+            date.setTime(this.date.getTime() + instance.timer.elapsed);
 
-    /**
-     * Render the clock face.
-     */
-    public render(): VNode {
-        // return h('div', { class: 'flip-clock' }, this.createGroups(
-        //     this.state.value, this.createGroups(this.prevState?.value || this.state.value)
-        // ));
+            this.value.value = this.formatter.format(date, this.format);
+        }
     }
+}
+
+/**
+ * Instantiate a new instance of Clock.
+ */
+export function clock(props: ClockProps) {
+    return new Clock(props);
 }

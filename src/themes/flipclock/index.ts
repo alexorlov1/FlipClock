@@ -1,67 +1,21 @@
-import { FaceState } from "../../Face";
-import FlipClock from "../../FlipClock";
-import VNode from "../../VNode";
-import { DigitizedValue, DigitizedValues } from "../../helpers/digitizer";
-import { DomElement, h } from "../../helpers/dom";
-import { WalkerFactoryFunction, createWalker, defineContext } from "../../helpers/walker";
-import { Theme, ThemeContext, ThemeRenderFunctionOptions } from "../../types";
-import Card from "./Card";
-import Group from "./Group";
-
-export type FlipClockThemeLabels = DigitizedValues;
+import { FaceValue } from "../../FaceValue";
+import { FlipClock } from "../../FlipClock";
+import { DigitizedValues } from "../../helpers/digitizer";
+import { HTMLClassAttribute, classes, el } from "../../helpers/dom";
+import { debounce } from "../../helpers/functions";
+import { watchEffect } from '../../helpers/signal';
 
 export type FlipClockThemeOptions = {
-    animationRate?: number,
-    labels?: FlipClockThemeLabels,
-    createWalker?: WalkerFactoryFunction<FlipClockThemeContext>
+    labels?: DigitizedValues
 }
 
-export type FlipClockThemeContext = ThemeContext & {
-    labels?: FlipClockThemeLabels
-};
-
-/**
- * The FlipClock theme.
- * 
- * @public
- */
-export function useFlipClockTheme(theme: FlipClockThemeOptions = {}): Theme {
-    // const animationRate = options.animationRate || 100;
-
-    function render<T extends FaceState = FaceState>(instance: FlipClock, context: T, options: ThemeRenderFunctionOptions = {}): VNode {
-        const ctx = defineContext<FlipClockThemeContext>({
-            labels: theme.labels,
-            currentValue: context.currentValue.digits,
-            lastValue: context.lastValue.digits,
-            // targetValue: context.targetValue.digits
-        });
-
-        const walk = (theme.createWalker ?? createWalker)(
-            ctx, options.direction ?? 'forwards'
-        );
-
-        const tree = walk<Group>(context.currentValue.digits, (value, context) => {
-            if (Array.isArray(value)) {
-                return new Group({
-                    label: typeof context.labels === 'string'
-                        ? context.labels
-                        : undefined,
-                    items: value as unknown as DomElement[]
-                })
-            }
-
-            if (value === undefined) {
-                return;
-            }
-
-            return new Card(value, (context.lastValue ?? value) as DigitizedValue);
-        });
-        
-        return h('div', {
-            class: 'flip-clock',
-            // style: `animation-duration: ${animationRate}ms; animation-delay: ${animationRate / 2}ms`,
-            type: 'flip-clock'
-        }, [ h(tree) ]);
+export function theme(options: FlipClockThemeOptions = {}): Theme {
+    function render(instance: FlipClock) {
+        watchEffect(() => clock({
+            el: instance.el,
+            labels: options.labels,
+            value: instance.face.value,
+        }))
     }
 
     return {
@@ -69,31 +23,160 @@ export function useFlipClockTheme(theme: FlipClockThemeOptions = {}): Theme {
     }
 }
 
-// /**
-//  * Get the label using the given flag.
-//  */
-// function label(format: string | undefined, x: number, y: number): string | undefined {
-//     // If there are no labels, then just return undefined.
-//     if (options.labels === undefined) {
-//         return;
-//     }
+export type ClockOptions = {
+    value: FaceValue<unknown>,
+    el?: Element | null,
+    labels?: DigitizedValues
+}
 
-//     // If labels is an array, then try to extract the labels from the x,y
-//     // coordinates of the multi-dimensional array.
-//     if (Array.isArray(options.labels)
-//         && options.labels[x]
-//         && typeof options.labels[x][y] === 'string') {
-//         return options.labels[x][y] as string;
-//     }
+export function clock(options: ClockOptions) {
+    return el({
+        el: options.el,
+        tagName: 'div',
+        class: {
+            'flip-clock': true
+        },
+        children: parent => [
+            group({
+                el: parent.children.item(0),
+                values: options.value.digits,
+                labels: options.labels?.[0]
+            })
+        ]
+    });
+}
 
-//     // Get the flag groups
-//     const flagGroups: string[] = String(format).split(/\s+/);
+export type FlipClockGroupOptions = {
+    el?: Element|null,
+    labels?: DigitizedValues | string,
+    values: DigitizedValues,
+    depth?: number
+}
 
-//     // Split the flag group using the pattern to match dividers.
-//     const flagGroup: string[] = flagGroups[x]?.split(pattern);
+export function group(options: FlipClockGroupOptions): Element {
+    return el({
+        el: options.el,
+        tagName: 'div',
+        class: 'flip-clock-group',
+        children: parent => {
+            return [
+                typeof options.labels === 'string' && el({
+                    tagName: 'div',
+                    el: parent.querySelector('.flip-clock-group-label'),
+                    class: 'flip-clock-label',
+                    textContent: options.labels
+                }),
+                el({
+                    el: parent.querySelector('.flip-clock-group-items'),
+                    tagName: 'div',
+                    class: 'flip-clock-group-items',
+                    children: parent => options.values.map((value, i) => {
+                        if(Array.isArray(value)) {
+                            return group({
+                                el: parent.children.item(i),
+                                values: value,
+                                labels: options.labels?.[i],
+                                depth: options.depth ?? 1 + 1
+                            });
+                        }
+        
+                        return card({
+                            el: parent.children.item(i),
+                            value
+                        });
+                    })
+                })
+            ];
+        }
+    });
+}
 
-//     // From the flag group, use the offset to get the current flag
-//     const flag: string = flagGroup[y];
+export type CardOptions = {
+    el?: Element | null,
+    value: string
+}
 
-//     return options.labels[flag];
-// }
+export function card(options: CardOptions): Element {
+    const lastValue = options.el?.getAttribute('data-value');
+
+    const element = el({
+        el: options.el,
+        tagName: 'div',
+        attrs: {
+            'data-value': options.value
+        },
+        class: {
+            'flip-clock-card': true,
+            'animate': options.el?.getAttribute('data-value') !== options.value
+        },
+        events: {
+            onanimationend() {
+                debounced();
+            }
+        },
+        children: parent => {
+            const active = cardItem({
+                el: parent.children.item(0),
+                value: options.value,
+                class: 'active'
+            });
+
+            const before = cardItem({
+                el: parent.children.item(1),
+                value: lastValue,
+                class: 'before'
+            })
+
+            return [
+                active,
+                before
+            ]
+        }
+    });
+
+    const debounced = debounce(() => {
+        element.classList.remove('animate')
+    }, 100);
+
+    return element;
+}
+
+export type CardItemOptions = {
+    el?: Element|null,
+    value?: string | null,
+    class?: HTMLClassAttribute
+}
+
+export function cardItem(options: CardItemOptions): Element {
+    return el({
+        el: options.el,
+        tagName: 'div',
+        class: {
+            'flip-clock-card-item': true,
+            [classes(options?.class)]: !!options?.class
+        },
+        children: (parent) => {
+            return [
+                el({
+                    el: parent.children.item(0),
+                    tagName: 'div',
+                    class: 'flip-clock-card-item-inner',
+                    children: parent =>[
+                        el({
+                            el: parent.children.item(0),
+                            tagName: 'div',
+                            class: 'top',
+                            textContent: options?.value ?? ' '
+                        }),
+                        el({
+                            el: parent.children.item(1),
+                            tagName: 'div',
+                            class: 'bottom',
+                            textContent: options?.value ?? ' '
+                        })       
+                    ]
+                })
+            ];
+        }
+    });
+}

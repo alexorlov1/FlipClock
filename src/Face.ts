@@ -1,15 +1,14 @@
 import { FaceValue } from "./FaceValue";
-import FlipClock from "./FlipClock";
-import VNode from "./VNode";
-import { State } from "./helpers/signal";
+import { FlipClock } from "./FlipClock";
 
-export type FaceState = State<{
-    currentValue: FaceValue,
-    lastValue?: FaceValue,
-    targetValue?: FaceValue
-}>
+export interface FaceHooks {
+    /**
+     * The `afterCreate` hook.
+     * 
+     * After the clock has been created.
+     */
+    afterCreate?: (instance: FlipClock) => void;
 
-export type FaceHooks = {
     /**
      * The `beforeMount` hook.
      */
@@ -19,20 +18,6 @@ export type FaceHooks = {
      * The `afterMount` hook.
      */
     afterMount?: (instance: FlipClock) => void;
-
-    /**
-     * The `beforeCreate` hook.
-     * 
-     * This is the hook to change the VNode before it hits the DOM.
-     */
-    beforeCreate?: (instance: FlipClock) => void;
-
-    /**
-     * The `beforeCreate` hook.
-     * 
-     * This is the hook to change the VNode before it hits the DOM.
-     */
-    afterCreate?: (instance: FlipClock, vnode: VNode) => void;
 
     /**
      * The `beforeUnmount` hook.
@@ -45,9 +30,14 @@ export type FaceHooks = {
     afterUnmount?: (instance: FlipClock) => void;
 
     /**
-     * The `afterRender` hook.
+     * The `beforeInterval` hook.
      */
-    afterRender?: (instance: FlipClock, vnode: VNode) => void;
+    beforeInterval?: (instance: FlipClock) => void;
+
+    /**
+     * The `afterInterval` hook.
+     */
+    afterInterval?: (instance: FlipClock) => void;
 
     /**
      * The `beforeStart` hook.
@@ -70,11 +60,11 @@ export type FaceHooks = {
     afterStop?: (instance: FlipClock) => void;
 }
 
-export function useFaceHooks(hooks: FaceHooks = {}) {
-    return Object.assign({}, hooks);
-}
+export type FaceHookArgs<T extends keyof FaceHooks> = FaceHooks[T] extends (...args: infer A) => any ? A : never;
 
-export interface Face<T extends FaceState = FaceState> {
+export interface Face extends FaceHooks {
+
+    value: FaceValue<any>
 
     /**
      * This method is called with every timer interval. The purpose of method is
@@ -82,19 +72,5 @@ export interface Face<T extends FaceState = FaceState> {
      * re-rendered.
      */
     interval(instance: FlipClock): void;
-
-    /**
-     * This method delegates the clock rendering to the face. Since each face
-     * is responsible for its own instantiation. The face will then defer that
-     * to the theme. This provides the face a chance to intercept before the
-     * theme starts to render.
-     */
-    render(instance: FlipClock): VNode;
-
-    /**
-     * Get the current value.
-     */
-    get state(): State<T>
+    
 }
-
-export type UseFaceFunction<T> = (props: T) => T

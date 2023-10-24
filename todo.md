@@ -1,0 +1,5 @@
+- fix rendering alpha issues with faceValues(['stop'])
+- Clean up any unsed code
+- renamed the -new files
+- fix broken tests
+- docs/storyboards

@@ -1,65 +1,34 @@
-/** 
- * The EmitterEvent defines the event for the EventEmitter.
- * 
- * @public 
- */
-export interface EmitterEvent {
-    /**
-     * The event's key.
-     */
-    key: string
-
-    /**
-     * The event's callback.
-     */
-    fn: Function,
-
-    /**
-     * Unwatch the event.
-     */
+export type Event<T, K extends keyof T> = {
+    key: keyof T,
+    fn: EventEmitterCallback<T, K>,
     unwatch: Function
 }
 
-/**
- * The EventEmitter class gives event emitter method to classes that inherit it.
- * 
- * @public
- */
-export default class EventEmitter {
+export type EventEmitterCallback<T, K extends keyof Required<T>> = (...args: Required<T>[K][]) => void
 
-    /**
-     * The instance events.
-     */
-    protected events: EmitterEvent[] = [];
+/**
+ * An event emitter to facilitate emitter and listening for events.
+ */
+export default class EventEmitter<T> {
+    protected events: Event<T,any>[] = [];
 
     /**
      * Emit an event.
      */
-    emit(key: string, ...args) {
-        const events: EmitterEvent[] = this.events.filter(
-            (e: EmitterEvent) => e.key === key
-        );
-
-        for (const event of events) {
-            event.fn.call(undefined, event, ...args);
-        }
-    }
-
-    /**
-     * Stop listening for an event to fire.
-     */
-    off(key: string, fn?: Function) {
-        for (const event of this.events) {
-            if (!fn || fn === event.fn) {
-                event.unwatch();
+    public emit<K extends keyof Required<T>>(key: K, ...args: Required<T>[K] extends (...args: infer P) => void ? P : any[]) {
+        for(const event of this.events) {
+            if(event.key !== key) {
+                continue;
             }
+
+            event.fn(...args);
         }
     }
 
     /**
-     * Start listening for an event to fire.
+     * Listen for an event.
      */
-    on(key: string, fn: Function) {
+    public on<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): () => void {
         const unwatch = () => {
             const index = this.events.findIndex(event => {
                 return event.key === key && event.fn === fn;
@@ -72,24 +41,35 @@ export default class EventEmitter {
 
         return unwatch;
     }
-
+    
     /**
-     * Listen form an event to fire once.
+     * Listen for an event once.
      */
-    once(key: string, fn: Function) {
-        return this.on(key, (event: EmitterEvent, ...args) => {
-            fn.call(undefined, event, ...args);
-
-            event.unwatch();
+    once<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): void {
+        const unwatch = this.on(key, (...args: T[K][]) => {
+            fn(...args);
+            unwatch();
         });
     }
 
     /**
+     * Stop listening for an event by key, or with a key a specific function.
+     */
+    off<K extends keyof Required<T>>(key: K): void
+    off<K extends keyof Required<T>>(key: K, fn?: T[K]): void {
+        for (const event of this.events) {
+            if (event.key === key && (!fn || fn === event.fn)) {
+                event.unwatch();
+            }
+        }
+    }
+    
+    /**
      * Unwatch and remove all the events.
      */
-    unwatch() {
-        for (const event of this.events) {
-            event.unwatch();
+    unwatch(): void {
+        for (const { unwatch } of this.events) {
+            unwatch();
         }
     }
 }

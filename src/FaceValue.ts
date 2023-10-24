@@ -1,17 +1,16 @@
 import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
+import { Ref, ref } from "./helpers/ref";
+import { watchEffect } from "./helpers/signal";
 
-export type RawFaceLiterals =  undefined | string | number | DigitizedValues;
-export type RawFaceValue<T extends RawFaceLiterals = RawFaceLiterals> = T | (RawFaceValue<T>)[];
-
-export type FaceValueProps = Pick<FaceValue, 'carryLength' | 'digitizer'>
+export type FaceValueProps = {
+    digitizer?: DigitizerContext
+}
 
 /**
  * The FaceValue class digitizes the raw value and so it can be used by the
  * clock face.
- * 
- * @public
  */
-export class FaceValue<T extends RawFaceLiterals = RawFaceLiterals> {
+export class FaceValue<T> {
 
     /**
      * The carry length is carry over when the instance it copied. The minimum
@@ -19,43 +18,42 @@ export class FaceValue<T extends RawFaceLiterals = RawFaceLiterals> {
      * required would still be maintained, but the carry can take priority to
      * ensure no face value ever shrinks in the total number of digits.
      */
-    public readonly carryLength?: number
-
-    /**
-     * An array of digits.
-     */
-    public readonly digits?: DigitizedValues
+    protected $carryLength: number
 
     /**
      * Parameters that are passed to the digiter.
      */
-    public readonly digitizer?: DigitizerContext
+    public readonly digitizer: DigitizerContext
 
     /**
-     * The raw value that was given.
+     * The reactive value
      */
-    public readonly value: T
+    protected $value: Ref<T>;
 
     /**
      * Instantiate the face value.
      */
-    constructor(value: RawFaceValue<T> | DigitizedValues, props: FaceValueProps = {}) {
-        this.carryLength = props.carryLength;
+    constructor(value: T, props?: FaceValueProps) {
+        this.digitizer = props?.digitizer || useDigitizer();
+        
+        this.$value = ref(value);
+        this.$carryLength = this.digits.length;
 
-        this.digitizer = props.digitizer || useDigitizer({
-            minimumDigits: props.carryLength,
+        watchEffect(() => {
+            this.$carryLength = this.digits.length;
         });
+    }
 
-        const { digitize, undigitize, isDigitized } = this.digitizer;
+    get carryLength() {
+        return this.$carryLength;
+    }
 
-        if(isDigitized(value)) {
-            this.value = undigitize(value as DigitizedValues);
-            this.digits = value as DigitizedValues;
-        }
-        else {
-            this.value = value as T;
-            this.digits = digitize(this.value);
-        }
+    get digits() {
+        return this.digitizer.digitize(this.value);
+    }
+
+    set digits(value: DigitizedValues) {
+        this.value = this.digitizer.undigitize(value);
     }
 
     get minimumLength() {
@@ -66,15 +64,24 @@ export class FaceValue<T extends RawFaceLiterals = RawFaceLiterals> {
         )
     }
 
-    length() {
-        // @ts-ignore @todo Improve this type. "digits" is not Infinite.
+    get length() {
+        // @ts-ignore
+        // @todo Improve this type. "digits" is not Infinite.
         return this.digits.flat(Infinity).length;
+    }
+
+    get value() {
+        return this.$value.value
+    }
+
+    set value(value) {
+        this.$value.value = value;
     }
 
     /**
      * Compare the face value with the given subject.
      */
-    compare(subject: FaceValue) {
+    compare(subject: FaceValue<any>) {
         return JSON.stringify(this.value) === JSON.stringify(subject.value);
     }
 
@@ -83,8 +90,15 @@ export class FaceValue<T extends RawFaceLiterals = RawFaceLiterals> {
      */
     copy(value?: T, props: FaceValueProps = {}): FaceValue<T> {
         return new FaceValue(value === undefined ? this.value : value, Object.assign({
-            carryLength: this.minimumLength,
             digitizer: this.digitizer
         }, props));
     }
+}
+
+/**
+ * Helper function to create a new FaceValue instance.
+ */
+export function faceValue<T>(value: T): FaceValue<T>
+export function faceValue<T>(value: T, props?: FaceValueProps): FaceValue<T> {
+    return new FaceValue(value, props);
 }

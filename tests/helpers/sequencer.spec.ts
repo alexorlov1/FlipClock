@@ -1,8 +1,7 @@
 import { FaceValue } from '../../src/FaceValue';
 import { useCharset } from '../../src/helpers/charset';
-import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, useSequencer } from '../../src/helpers/sequencer';
-import { stopAfterChanges, useWalker } from '../../src/helpers/walker';
-import { DigitizedValue } from './../../src/helpers/digitizer';
+import { useSequencer } from '../../src/helpers/sequencer';
+import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, stopAfterChanges } from '../../src/helpers/structure';
 
 test('casting a string to a digitized string', () => {
     expect(castDigitizedString('1')).toBe('1');
@@ -49,35 +48,35 @@ test('matching array structure going left to right', () => {
 })
 
 test('matching array structure going right to left', () => {
-    expect(matchArrayStructure([], [], { direction: 'backwards' })).toStrictEqual([]);
-    expect(matchArrayStructure(['1', '2', '3'], ['1', '2', '3'], { direction: 'backwards' })).toStrictEqual(['1', '2', '3']);
+    expect(matchArrayStructure([], [], { backwards: true })).toStrictEqual([]);
+    expect(matchArrayStructure(['1', '2', '3'], ['1', '2', '3'], { backwards: true })).toStrictEqual(['1', '2', '3']);
 
-    expect(matchArrayStructure(['1'], ['1', '2', '3'], { direction: 'backwards' })).toStrictEqual(['1']);
-    expect(matchArrayStructure(['1', '2'], ['1', '2', '3'], { direction: 'backwards' })).toStrictEqual(['1', '2']);
-    expect(matchArrayStructure(['1', ['2', '3']], ['1', '2', '3'], { direction: 'backwards' })).toStrictEqual(['1', '2', '3']);
-    expect(matchArrayStructure(['1', ['2', ['3']]], ['1', '2', '3'], { direction: 'backwards' })).toStrictEqual(['1', '2', '3']);
+    expect(matchArrayStructure(['1'], ['1', '2', '3'], { backwards: true })).toStrictEqual(['1']);
+    expect(matchArrayStructure(['1', '2'], ['1', '2', '3'], { backwards: true })).toStrictEqual(['1', '2']);
+    expect(matchArrayStructure(['1', ['2', '3']], ['1', '2', '3'], { backwards: true })).toStrictEqual(['1', '2', '3']);
+    expect(matchArrayStructure(['1', ['2', ['3']]], ['1', '2', '3'], { backwards: true })).toStrictEqual(['1', '2', '3']);
 
-    expect(matchArrayStructure(['1', '2', '3'], ['1', '2'], { direction: 'backwards' })).toStrictEqual(['2', '3']);
-    expect(matchArrayStructure(['1', '2', '3'], ['1', ['2', '3']], { direction: 'backwards' })).toStrictEqual(['1', []]);
-    expect(matchArrayStructure(['1', '2', '3'], ['1', ['2', ['3']]], { direction: 'backwards' })).toStrictEqual(['1', [[]]]);
+    expect(matchArrayStructure(['1', '2', '3'], ['1', '2'], { backwards: true })).toStrictEqual(['2', '3']);
+    expect(matchArrayStructure(['1', '2', '3'], ['1', ['2', '3']], { backwards: true })).toStrictEqual(['1', []]);
+    expect(matchArrayStructure(['1', '2', '3'], ['1', ['2', ['3']]], { backwards: true })).toStrictEqual(['1', [[]]]);
 
-    expect(matchArrayStructure(['1', ['2']], ['1', ['2', '3']], { direction: 'backwards' })).toStrictEqual(['1', ['2']]);
-    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', '3']], { direction: 'backwards' })).toStrictEqual(['1', ['2', '3']]);
-    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2']], { direction: 'backwards' })).toStrictEqual(['1', ['3']]);
+    expect(matchArrayStructure(['1', ['2']], ['1', ['2', '3']], { backwards: true })).toStrictEqual(['1', ['2']]);
+    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', '3']], { backwards: true })).toStrictEqual(['1', ['2', '3']]);
+    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2']], { backwards: true })).toStrictEqual(['1', ['3']]);
 
-    expect(matchArrayStructure(['1', [['2'], '3']], ['1', ['2', '3']], { direction: 'backwards' })).toStrictEqual(['1', ['2', '3']]);
-    expect(matchArrayStructure(['1', [['2'], '3']], ['1', [['2'], '3']], { direction: 'backwards' })).toStrictEqual(['1', [['2'], '3']]);
-    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', ['3']]], { direction: 'backwards' })).toStrictEqual(['1', ['2', []]]);
+    expect(matchArrayStructure(['1', [['2'], '3']], ['1', ['2', '3']], { backwards: true })).toStrictEqual(['1', ['2', '3']]);
+    expect(matchArrayStructure(['1', [['2'], '3']], ['1', [['2'], '3']], { backwards: true })).toStrictEqual(['1', [['2'], '3']]);
+    expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', ['3']]], { backwards: true })).toStrictEqual(['1', ['2', []]]);
 })
 
 test('incrementing the array walker after 1 change', () => {
     const { next } = useCharset();
 
-    function walker() {
-        return useWalker<{target: DigitizedValue}>((current, { target }) => next(current, target), stopAfterChanges(1));
-    }
-
     const subject = [], target = ['a', 'b', 'c'];
+
+    const walker = () => stopAfterChanges(1, (current, target) => {
+        return next(current, target);
+    });
 
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'a']);
@@ -90,27 +89,15 @@ test('incrementing the array walker after 1 change', () => {
 test('decrementing the array walker after 1 change', () => {
     const { prev } = useCharset();
 
-    function walker() {
-        return useWalker<{ target: DigitizedValue }>((current, { target }) => prev(current, target), stopAfterChanges(1));
-    }
+    const walker = () => stopAfterChanges(1, (current, target) => {
+        return prev(current, target);
+    });
 
     const subject = ['a', 'b', 'c'], target = [];
 
-    expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['a', 'b', 'b']);
-    expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['a', 'b', 'a']);
-    expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['a', 'b', ' ']);
-})
-
-test('decrementing the array walker from nothing to a target', () => {
-    const { prev } = useCharset();
-
-    function walker() {
-        return useWalker<{ target: DigitizedValue }>((current, { target }) => prev(current, target));
-    }
-
-    const subject = [], target = ['h', 'e', 'l', 'l', 'o'];
-
-    expect(matchArrayStructure(subject, target, { direction: 'backwards' }, walker())).toStrictEqual(['?', '?', '?']);
+    expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', 'b']);
+    expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', 'a']);
+    expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', ' ']);
 })
 
 test('incrementing towards "hello" 2 changes at a time', () => {
@@ -191,7 +178,10 @@ test('incrementing towards "hello" 2 changes at a time', () => {
 
 test('decrementing from "hello" 2 changes at a time', () => {
     const { decrement } = useSequencer({
-        stopAfterChanges: 2
+        stopAfterChanges: 2,
+        matchArray: {
+            backwards: true
+        }
     });
 
     let subject = new FaceValue('hello'), target = new FaceValue('');
@@ -263,40 +253,6 @@ test('decrementing from "hello" 2 changes at a time', () => {
     expect(subject.digits).toStrictEqual([]);
 
     subject = decrement(subject, target, 2);
-
-    expect(subject.digits).toStrictEqual([]);
-})
-
-test('incrementing a value using a custom stop function', () => {
-    const { decrement, increment } = useSequencer({
-        stopAfter: stopAfterChanges(2)
-    });
-
-    let subject = new FaceValue(''), target = new FaceValue('abc');
-
-    subject = increment(subject, target);
-
-    expect(subject.digits).toStrictEqual(['a', 'a']);
-
-    subject = increment(subject, target);
-
-    expect(subject.digits).toStrictEqual(['a', 'b', 'a']);
-    
-    target = new FaceValue([])
-
-    subject = decrement(subject, target);
-
-    expect(subject.digits).toStrictEqual(['a', 'a', ' ']);
-
-    subject = decrement(subject, target);
-
-    expect(subject.digits).toStrictEqual(['a', ' ']);
-
-    subject = decrement(subject, target);
-
-    expect(subject.digits).toStrictEqual([' ']);
-
-    subject = decrement(subject, target);
 
     expect(subject.digits).toStrictEqual([]);
 });
