@@ -5,6 +5,8 @@ test('using the dictionary to translate to spanish', () => {
         'Monday': 'Lunes'
     })
 
+    unset('test')
+
     expect(translate('Monday')).toBe('Lunes');
     expect(translate('Tuesday')).toBe('Tuesday');
 

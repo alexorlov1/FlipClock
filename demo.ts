@@ -1,43 +1,31 @@
 import { faceValue } from './src/FaceValue';
-import { useSequencer } from './src/helpers/sequencer';
+import { flipClock } from './src/FlipClock';
+import { alphanumeric } from './src/faces';
+import { theme } from './src/themes/flipclock';
 
 const parent = document.querySelector('#app') as HTMLDivElement;
 
-const subject = faceValue(' '), target = faceValue('');
-
-const { decrement } = useSequencer({
-    stopAfterChanges: 2,
-    matchArray: {
-        backwards: true
-    }
+const instance = flipClock({
+    autoStart: true,
+    timer: 100,
+    theme: theme({
+        
+    }),
+    face: alphanumeric({
+        targetValue: faceValue('hello world'),
+        value: faceValue('this is a test'),
+        skipChars: 4,
+        sequencer: {
+            stopAfterChanges: 2
+        }
+    })
 });
 
-console.log(decrement(subject, target).digits);
-console.log(decrement(subject, target).digits);
+// instance.emitter.on('afterInterval', () => {
+//     console.log('after', instance.face.value.digits)
+// })
 
-// const instance = flipClock({
-//     timer: 100,
-//     theme: theme({
-//         labels: ['Days', 'Hours', 'Minutes', 'Seconds']
-//     }),
-//     face: alphanumeric({
-//         value: faceValue(''),
-//         targetValue: faceValue('stop'),
-//         skipChars: 5,
-//         sequencer: {
-//             charset: {
-//                 shuffle: true
-//             },
-//             stopAfterChanges: 2
-//         }
-//     })
-// });
-
-// instance.emitter.on('afterStop', (instance) => {
-//     console.log(instance);
-// });
-
-// instance.mount(parent);
+instance.mount(parent);
 
 // const element = clock(value, parent);
 

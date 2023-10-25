@@ -1,5 +1,5 @@
 import { FaceValue } from "../../FaceValue";
-import { FlipClock } from "../../FlipClock";
+import { FlipClock, Theme } from "../../FlipClock";
 import { DigitizedValues } from "../../helpers/digitizer";
 import { HTMLClassAttribute, classes, el } from "../../helpers/dom";
 import { debounce } from "../../helpers/functions";
@@ -26,7 +26,7 @@ export function theme(options: FlipClockThemeOptions = {}): Theme {
 export type ClockOptions = {
     value: FaceValue<unknown>,
     el?: Element | null,
-    labels?: DigitizedValues
+    labels?: DigitizedValues | string
 }
 
 export function clock(options: ClockOptions) {
@@ -36,21 +36,38 @@ export function clock(options: ClockOptions) {
         class: {
             'flip-clock': true
         },
-        children: parent => [
-            group({
-                el: parent.children.item(0),
-                values: options.value.digits,
-                labels: options.labels?.[0]
-            })
-        ]
+        children: options.value.digits.map((digits, i) => {
+            return walk(digits, options?.el?.children.item(i), options.labels)
+        })
     });
+}
+
+export function walk(digits: DigitizedValues | string, el?: Element | null, labels?: string | DigitizedValues): Element {
+    if(Array.isArray(digits)) {
+        return group({
+            el,
+            label: typeof labels === 'string' ? labels : undefined,
+            children: parent => digits.map((digits, i) => {
+                return walk(
+                    digits,
+                    parent?.children.item(i),
+                    Array.isArray(labels?.[i]) ? labels?.[i] : undefined
+                );
+            })
+        });
+    }
+    
+    return card({
+        el,
+        value: digits
+    })
 }
 
 export type FlipClockGroupOptions = {
     el?: Element|null,
-    labels?: DigitizedValues | string,
-    values: DigitizedValues,
-    depth?: number
+    label?: string,
+    depth?: number,
+    children: ((parent: Element) => Element[])
 }
 
 export function group(options: FlipClockGroupOptions): Element {
@@ -58,37 +75,20 @@ export function group(options: FlipClockGroupOptions): Element {
         el: options.el,
         tagName: 'div',
         class: 'flip-clock-group',
-        children: parent => {
-            return [
-                typeof options.labels === 'string' && el({
-                    tagName: 'div',
-                    el: parent.querySelector('.flip-clock-group-label'),
-                    class: 'flip-clock-label',
-                    textContent: options.labels
-                }),
-                el({
-                    el: parent.querySelector('.flip-clock-group-items'),
-                    tagName: 'div',
-                    class: 'flip-clock-group-items',
-                    children: parent => options.values.map((value, i) => {
-                        if(Array.isArray(value)) {
-                            return group({
-                                el: parent.children.item(i),
-                                values: value,
-                                labels: options.labels?.[i],
-                                depth: options.depth ?? 1 + 1
-                            });
-                        }
-        
-                        return card({
-                            el: parent.children.item(i),
-                            value
-                        });
-                    })
-                })
-            ];
-        }
-    });
+        children: parent => [
+            !!options.label && el({
+                el: parent.querySelector('.flip-clock-label'),
+                tagName: 'div',
+                children: [ options.label ]
+            }),
+            el({
+                el: parent.querySelector('.flip-clock-group-items'),
+                tagName: 'div',
+                class: 'flip-clock-group-items',
+                children: options.children
+            })
+        ]
+    })
 }
 
 export type CardOptions = {
@@ -155,7 +155,7 @@ export function cardItem(options: CardItemOptions): Element {
             'flip-clock-card-item': true,
             [classes(options?.class)]: !!options?.class
         },
-        children: (parent) => {
+        children: parent => {
             return [
                 el({
                     el: parent.children.item(0),
@@ -166,17 +166,17 @@ export function cardItem(options: CardItemOptions): Element {
                             el: parent.children.item(0),
                             tagName: 'div',
                             class: 'top',
-                            textContent: options?.value ?? ' '
+                            children: [options?.value ?? ' ']
                         }),
                         el({
                             el: parent.children.item(1),
                             tagName: 'div',
                             class: 'bottom',
-                            textContent: options?.value ?? ' '
+                            children: [options?.value ?? ' ']
                         })       
                     ]
                 })
-            ];
+            ]
         }
     });
 }

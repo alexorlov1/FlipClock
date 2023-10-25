@@ -185,6 +185,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
      * Get the prev character in the charset relative to the given value.
      */
     function prev(current?: DigitizedValue, target?: DigitizedValue, count: number = 1) {
+        
         if (target === undefined && current === emptyChar) {
             return undefined
         }

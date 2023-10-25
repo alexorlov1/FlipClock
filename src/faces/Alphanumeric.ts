@@ -86,7 +86,7 @@ export default class Alphanumeric implements Face {
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
      */
-    public interval(instance: FlipClock): void {
+    public interval(instance: FlipClock<any>): void {
         this.sequencer.increment(
             this.value, this.targetValue, this.skipChars, this.backwards
         );
@@ -99,9 +99,9 @@ export default class Alphanumeric implements Face {
     /**
      * Update the direction before the interval starts.
      */
-    public afterCreate(instance: FlipClock) {
+    public afterCreate(instance: FlipClock<any>) {
         watchEffect(() => {
-            if(instance.timer.isStopped && this.value.value) {
+            if(instance.autoStart && instance.timer.isStopped && this.value.value) {
                 instance.start();
             }
         });

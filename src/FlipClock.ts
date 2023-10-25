@@ -2,15 +2,15 @@ import EventEmitter from "./EventEmitter";
 import { Face, FaceHooks } from './Face';
 import Timer from "./Timer";
 
-export type Theme = {
-    render: (instance: FlipClock) => void
+export type Theme<T extends Face> = {
+    render: (instance: FlipClock<T>) => void
 } & FaceHooks
 
-export type FlipClockProps = {
+export type FlipClockProps<T extends Face> = {
     autoStart?: boolean,
     emitter?: EventEmitter<FaceHooks>,
-    face: Face
-    theme: Theme
+    face: T
+    theme: Theme<T>
     timer?: Timer | number,
     el?: Element | null,
 }
@@ -20,7 +20,7 @@ export type FlipClockProps = {
  * The clock also tracks the time and renders the clock with each interval.
 
  */
-export class FlipClock {
+export class FlipClock<T extends Face> {
     
     /**
      * Determines if the clock should automatically start when it is mounted.
@@ -40,12 +40,12 @@ export class FlipClock {
     /**
      * The face used to display the clock.
      */
-    public readonly face: Face
+    public readonly face: T
 
     /**
      * The face used to display the clock.
      */
-    public readonly theme: Theme
+    public readonly theme: Theme<T>
     
     /**
      * The face value displayed on the clock.
@@ -55,15 +55,15 @@ export class FlipClock {
     /**
      * Construct the FlipClock.
      */
-    constructor(props: FlipClockProps) {
+    constructor(props: FlipClockProps<T>) {
         this.face = props.face;
         this.theme = props.theme;
         this.emitter = props.emitter || new EventEmitter();
         
-        this.autoStart = props.autoStart === undefined
-            ? this.autoStart
-            : props.autoStart;
-            
+        if(typeof props.autoStart === 'boolean') {
+            this.autoStart = props.autoStart;
+        }
+
         this.timer = props.timer instanceof Timer
             ? props.timer
             : new Timer(props.timer);
@@ -105,7 +105,7 @@ export class FlipClock {
     /**
      * Start the clock instance.
      */
-    start(fn?: (instance: FlipClock) => void): this {
+    start(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStart', this);
 
         this.timer.start(() => {
@@ -130,7 +130,7 @@ export class FlipClock {
     /**
      * Stop the clock instance.
      */
-    stop(fn?: (instance: FlipClock) => void): this {
+    stop(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStop', this);
         
         this.timer.stop(() => {
@@ -147,7 +147,7 @@ export class FlipClock {
     /**
      * Toggle starting/stopping the clock instance.
      */
-    toggle(fn?: (instance: FlipClock) => void): this {
+    toggle(fn?: (instance: FlipClock<T>) => void): this {
         if(this.timer.isStopped) {
             this.start(fn);
         }
@@ -194,6 +194,6 @@ export class FlipClock {
 /**
  * Instantiate a new FlipClock instance.
  */
-export function flipClock(props: FlipClockProps): FlipClock {
-    return new FlipClock(props);
+export function flipClock<T extends Face>(props: FlipClockProps<T>): FlipClock<T> {
+    return new FlipClock<T>(props);
 }

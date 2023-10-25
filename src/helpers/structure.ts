@@ -11,7 +11,7 @@ export type MatchArrayStructureOptions = {
     backwards?: boolean
 }
 
-export type MatchArrayStructureCallback = Callback<[value?: DigitizedValue, target?: DigitizedValue], DigitizedValue | undefined>
+export type MatchArrayStructureCallback = Callback<[value?: DigitizedValue, target?: DigitizedValue | DigitizedValues], DigitizedValue | undefined>
 
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, fn?: MatchArrayStructureCallback): DigitizedValues
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options: MatchArrayStructureOptions | undefined, fn?: MatchArrayStructureCallback): DigitizedValues
@@ -19,32 +19,46 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
     // Allow for the method overloading. If options is a function, assign it.
     if(typeof options === 'function') {
         fn = options;
-        options = undefined;
+        options = {};
+    }
+    else if(!options) {
+        options = {};
     }
     
-    // Is the direction 'forwards'. Used to make ternary's shorter.
-    const forwards = typeof options === 'object'
-        ? !options.backwards
-        : true;
+    const forwards = !options.backwards;
         
-    function recurse(current: undefined, target: DigitizedValues | DigitizedValue): undefined
-    function recurse(current: DigitizedValues | DigitizedValue | undefined, target: DigitizedValues | DigitizedValue): DigitizedValues | DigitizedValue
     function recurse(current: DigitizedValues | DigitizedValue | undefined, target: DigitizedValues | DigitizedValue): DigitizedValues | DigitizedValue | undefined {
         // If target is a digit group, then loop through them and recursively
         // iterate over the groups.
         if(isDigitizedGroup(target)) {
             // Cast the current value to a digitized group.
             current = castDigitizedGroup(current);
-            
-            // Loop through the target array. We could implement this backwards
-            // if it becomes necessary. No reason it has to go forwards...            
-            for (let i = forwards ? 0 : target.length - 1; forwards ? i < target.length : i >= 0; forwards ? i++ : i--) {
+
+            // Loop through the current using the max length of target and
+            // current. This recursively interates through the arrays
+            // regardless of which is longer.
+            const length = Math.max(target.length, current.length);
+          
+            for (let i = forwards ? 0 : length - 1; forwards ? i < length : i >= 0; forwards ? i++ : i--) {
                 // If the current value doesn't exist, recurively match the
                 // target array against an empty array to match the structure.
                 // If the current value exists recursively match against target.
-                current[i] = !current[i]
+                const value = !current[i]
                     ? recurse([], target[i])
                     : recurse(current[i], target[i]);
+
+                // This typescript could be improved. It is cast to `any`
+                // because `DigitizedValues` doesn't accept `undefined`. We
+                // should probably add a placeholder type to accept undefined
+                // and recast to `DigitizedValues`. But this hack is fine for
+                // now. The loop below removes the undefined so its still
+                // guaranteed to be typesafe.
+                if(current[i]) {
+                    current[i] = value as any
+                }
+                else {
+                    current.push(value as any);
+                }
             }
             
             // Remove the undefined items in the array. Use this instead of
@@ -73,9 +87,10 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
                 const currentIndex = forwards ? i : current.length - 1 - i;
                 const targetIndex = forwards ? i : target.length - 1 - i;
 
+                // Again we type `any` to because we remove undefined below.
                 current[currentIndex] = recurse(
                     current[currentIndex], target[targetIndex]
-                );
+                ) as any;
 
                 if (current[currentIndex] === undefined) {
                     current.splice(currentIndex, 1);
@@ -103,20 +118,21 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
             
             return current;
         }
-
+        
         // If the callback is defined, use it to walk through the digits. The
         // walker can modify the digits. If used with `useWalker()` you can
         // limit the total changes that can be made to the structure. This
         // is useful for incrementing/decrementing the sequence X changes at a
         // time.
         return fn
-            ? fn(castDigitizedString(current), target as DigitizedValue | undefined)
+            ? fn(castDigitizedString(current), target)
             : (target === undefined ? undefined : castDigitizedString(current)); 
     }
 
     // Recursively match the current and target array structures.
     return recurse(current, target) as DigitizedValues;
 }
+
 
 /**
  * Cast a value to a string.

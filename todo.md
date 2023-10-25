@@ -1,5 +1,7 @@
-- fix rendering alpha issues with faceValues(['stop'])
+- write CSS-in-JS solution
+- implement the old Divider class functionality.
+- create another theme as an example that multiple themes can work.
 - Clean up any unsed code
-- renamed the -new files
-- fix broken tests
+- write test for refs
+- write test for flipclock theme
 - docs/storyboards

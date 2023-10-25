@@ -67,7 +67,8 @@ test('matching array structure going right to left', () => {
     expect(matchArrayStructure(['1', [['2'], '3']], ['1', ['2', '3']], { backwards: true })).toStrictEqual(['1', ['2', '3']]);
     expect(matchArrayStructure(['1', [['2'], '3']], ['1', [['2'], '3']], { backwards: true })).toStrictEqual(['1', [['2'], '3']]);
     expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', ['3']]], { backwards: true })).toStrictEqual(['1', ['2', []]]);
-})
+});
+
 
 test('incrementing the array walker after 1 change', () => {
     const { next } = useCharset();

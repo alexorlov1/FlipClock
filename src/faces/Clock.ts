@@ -72,7 +72,7 @@ export default class Clock implements Face {
     /**
      * Format the face value to the current date/time.
      */
-    public interval(instance: FlipClock): void {
+    public interval(instance: FlipClock<any>): void {
         if(!this.date) {
             this.value.value = this.formatter.format(new Date, this.format)
         }

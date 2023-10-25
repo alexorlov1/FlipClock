@@ -53,20 +53,18 @@ export class FaceValue<T> {
     }
 
     set digits(value: DigitizedValues) {
-        this.value = this.digitizer.undigitize(value);
+        this.value = this.digitizer.undigitize(value) as T;
     }
 
     get minimumLength() {
         return Math.max(
             this.carryLength || 0,
-            this.digits?.flat().length || 0,
-            this.digitizer.minimumDigits || 0
+            this.digits?.flat().length || 0
         )
     }
 
     get length() {
         // @ts-ignore
-        // @todo Improve this type. "digits" is not Infinite.
         return this.digits.flat(Infinity).length;
     }
 
