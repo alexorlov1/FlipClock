@@ -64,6 +64,11 @@ export type UseDurationFormats = {
     unset: UnsetFunction
 }
 
+/**
+ * A composable that creates dictionary and formatter for durations.
+ * 
+ * @public 
+ */
 export function useDurationFormats(options?: DurationFormatOptions): UseDurationFormats {
     const { map, define, unset } = useDefinitionMap(Object.entries<DurationMapDefinition>(
         {

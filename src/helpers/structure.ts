@@ -13,6 +13,11 @@ export type MatchArrayStructureOptions = {
 
 export type MatchArrayStructureCallback = Callback<[value?: DigitizedValue, target?: DigitizedValue | DigitizedValues], DigitizedValue | undefined>
 
+/**
+ * Match the structure of the current value to the target.
+ * 
+ * @public
+ */
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, fn?: MatchArrayStructureCallback): DigitizedValues
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options: MatchArrayStructureOptions | undefined, fn?: MatchArrayStructureCallback): DigitizedValues
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options?: MatchArrayStructureOptions | MatchArrayStructureCallback, fn?: MatchArrayStructureCallback): DigitizedValues {

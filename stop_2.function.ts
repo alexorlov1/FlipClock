@@ -1,0 +1,1 @@
+declare function stop_2(): Stop;

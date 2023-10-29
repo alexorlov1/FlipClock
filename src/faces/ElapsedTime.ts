@@ -2,6 +2,11 @@ import { Face } from '../Face';
 import { FaceValue, faceValue } from '../FaceValue';
 import { DurationFormatOptions, UseDurationFormats, useDurationFormats } from '../helpers/duration';
 
+/**
+ * The `ElapsedTime` face options.
+ * 
+ * @public
+ */
 export type ElapsedTimeProps = {
     end?: Date,
     format: string,
@@ -14,50 +19,49 @@ export type ElapsedTimeProps = {
  * display it a specific format. For example 'hh:mm:ss' will show the elapsed
  * time in hours, minutes, seconds.
  * 
- * @example
- * ```html
- * <div id="clock"></div>
- * ```
- * 
- * ```js
- * const instance = new FlipClock({
- *   face: new ElapsedTime({
- *      format: 'hh:mm:ss'
- *   })
- * });
- * 
- * instance.mount(document.querySelector('#clock'));
- * ```
+ * @public
  */
-export default class ElapsedTime implements Face {
+export class ElapsedTime implements Face {
 
     /**
      * The ending date used to calculate the elsapsed time.
+     * 
+     * @public
      */
     end?: Date
 
     /**
      * The format string.
+     * 
+     * @public
      */
     format: string
 
     /**
      * The duration formatter.
+     * 
+     * @public
      */
     formatter: UseDurationFormats
     
     /**
      * The starting date used to calculate the elsapsed time.
+     * 
+     * @public
      */
     start?: Date;
 
     /**
      * The current face value.
+     * 
+     * @public
      */
     public value: FaceValue<string>
 
     /**
      * Instantiate a Clock face with a given value and attributes.
+     * 
+     * @public
      */
     constructor(props: ElapsedTimeProps) {
         this.start = props.start;
@@ -74,6 +78,8 @@ export default class ElapsedTime implements Face {
 
     /**
      * Get the start and end date.
+     * 
+     * @public
      */
     get span() {
         return {
@@ -84,6 +90,8 @@ export default class ElapsedTime implements Face {
     
     /**
      * Format the value with the new elapsed time.
+     * 
+     * @public
      */
     public interval(): void {
         this.value.value = this.formatter.format(this.span.start, this.span.end, this.format);
@@ -91,7 +99,9 @@ export default class ElapsedTime implements Face {
 }
 
 /**
- * Instantiate a new ElapsedTime instance.
+ * Instantiate a new `ElapsedTime` instance.
+ * 
+ * @public
  */
 export function elapsedTime(props: ElapsedTimeProps) {
     return new ElapsedTime(props);

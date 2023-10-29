@@ -1,0 +1,1 @@
+type SignalReadFunction<T> = () => T;

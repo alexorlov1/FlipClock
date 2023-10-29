@@ -1,68 +1,66 @@
 import { FaceValue } from "./FaceValue";
 import { FlipClock } from "./FlipClock";
 
-export interface FaceHooks {
+export interface FaceHooks<T extends Face<T>> {
     /**
      * The `afterCreate` hook.
      * 
      * After the clock has been created.
      */
-    afterCreate?: (instance: FlipClock) => void;
+    afterCreate?: (instance: FlipClock<T>) => void;
 
     /**
      * The `beforeMount` hook.
      */
-    beforeMount?: (instance: FlipClock) => void;
+    beforeMount?: (instance: FlipClock<T>) => void;
 
     /**
      * The `afterMount` hook.
      */
-    afterMount?: (instance: FlipClock) => void;
+    afterMount?: (instance: FlipClock<T>) => void;
 
     /**
      * The `beforeUnmount` hook.
      */
-    beforeUnmount?: (instance: FlipClock) => void;
+    beforeUnmount?: (instance: FlipClock<T>) => void;
 
     /**
      * The `afterUnmount` hook.
      */
-    afterUnmount?: (instance: FlipClock) => void;
+    afterUnmount?: (instance: FlipClock<T>) => void;
 
     /**
      * The `beforeInterval` hook.
      */
-    beforeInterval?: (instance: FlipClock) => void;
+    beforeInterval?: (instance: FlipClock<T>) => void;
 
     /**
      * The `afterInterval` hook.
      */
-    afterInterval?: (instance: FlipClock) => void;
+    afterInterval?: (instance: FlipClock<T>) => void;
 
     /**
      * The `beforeStart` hook.
      */
-    beforeStart?: (instance: FlipClock) => void;
+    beforeStart?: (instance: FlipClock<T>) => void;
 
     /**
      * The `afterStart` hook.
      */
-    afterStart?: (instance: FlipClock) => void;
+    afterStart?: (instance: FlipClock<T>) => void;
 
     /**
      * The `beforeStop` hook.
      */
-    beforeStop?: (instance: FlipClock) => void;
+    beforeStop?: (instance: FlipClock<T>) => void;
 
     /**
      * The `afterStop` hook.
      */
-    afterStop?: (instance: FlipClock) => void;
+    afterStop?: (instance: FlipClock<T>) => void;
 }
 
-export type FaceHookArgs<T extends keyof FaceHooks> = FaceHooks[T] extends (...args: infer A) => any ? A : never;
-
-export interface Face extends FaceHooks {
+export interface Face<T extends Face<T> = any> extends FaceHooks<T> {
 
     value: FaceValue<any>
 
@@ -71,6 +69,6 @@ export interface Face extends FaceHooks {
      * to return a new value. Each time the value changes, the clock is be
      * re-rendered.
      */
-    interval(instance: FlipClock): void;
+    interval(instance: FlipClock<T>): void;
     
 }

@@ -1,75 +1,146 @@
 import { FaceValue } from "../../FaceValue";
-import { FlipClock, Theme } from "../../FlipClock";
-import { DigitizedValues } from "../../helpers/digitizer";
+import { FlipClock } from "../../FlipClock";
+import { DigitizedValue, DigitizedValues } from "../../helpers/digitizer";
 import { HTMLClassAttribute, classes, el } from "../../helpers/dom";
 import { debounce } from "../../helpers/functions";
-import { watchEffect } from '../../helpers/signal';
 
+/**
+ * @public
+ */
+export type Dividers = RegExp | string | string[];
+
+/**
+ * The FlipClock theme options.
+ * 
+ * @public
+ */
 export type FlipClockThemeOptions = {
-    labels?: DigitizedValues
+    labels?: DigitizedValues,
+    dividers?: Dividers
 }
 
-export function theme(options: FlipClockThemeOptions = {}): Theme {
-    function render(instance: FlipClock) {
-        watchEffect(() => clock({
+/**
+ * The theme's factory function.
+ * 
+ * @public
+ */
+export function theme(options: FlipClockThemeOptions = {}) {
+    return {
+        render: (instance: FlipClock<any>) => render({
             el: instance.el,
             labels: options.labels,
+            dividers: options.dividers,
             value: instance.face.value,
-        }))
-    }
-
-    return {
-        render
+        })
     }
 }
 
+/**
+ * @public
+ */
 export type ClockOptions = {
-    value: FaceValue<unknown>,
+    dividers?: Dividers,
     el?: Element | null,
-    labels?: DigitizedValues | string
+    labels?: DigitizedValues | string,
+    value: FaceValue<unknown>,
 }
 
-export function clock(options: ClockOptions) {
+/**
+ * Renders a FlipClock.
+ * 
+ * @public
+ */
+export function render(options: ClockOptions) {
+    function regexp(dividers?: Dividers): RegExp|undefined {
+        if(divider === undefined) {
+            return;
+        }
+
+        if(dividers instanceof RegExp) {
+            return dividers;
+        }
+
+        return new RegExp(
+            `[${(Array.isArray(dividers) ? dividers : [dividers]).join('|')}]`
+        );
+    }
+    
+    function isDivider(value: DigitizedValue, dividers?: Dividers) {
+        const pattern = regexp(dividers);
+
+        if(!pattern) {
+            return false;
+        }
+
+        return value.match(pattern);
+    }
+
+
+    function walk(digits: DigitizedValues | string, el?: Element | null, labels?: string | DigitizedValues): Element {
+        if(Array.isArray(digits)) {
+            const nextLabel = typeof labels === 'string'
+                ? undefined
+                : labels?.shift();
+            
+            return group({
+                el,
+                label: typeof nextLabel === 'string' ? nextLabel : undefined,
+                children: parent => digits.map((digits, i) => {
+                    return walk(
+                        digits,
+                        parent?.children.item(i),
+                        nextLabel,
+                    );
+                })
+            });
+        }
+        
+        if(isDivider(digits, options.dividers)) {
+            return divider({
+                el,
+                value: digits
+            });
+        }
+
+        return card({
+            el,
+            value: digits
+        })
+    }
+
+    const labels = Array.isArray(options.labels)
+        ? structuredClone(options.labels)
+        : options.labels;
+    
     return el({
         el: options.el,
         tagName: 'div',
         class: {
             'flip-clock': true
         },
-        children: options.value.digits.map((digits, i) => {
-            return walk(digits, options?.el?.children.item(i), options.labels)
-        })
+        children: options.value.digits.map((digits, i) => walk(
+            digits,
+            options?.el?.children.item(i),
+            labels
+        ))
     });
 }
 
-export function walk(digits: DigitizedValues | string, el?: Element | null, labels?: string | DigitizedValues): Element {
-    if(Array.isArray(digits)) {
-        return group({
-            el,
-            label: typeof labels === 'string' ? labels : undefined,
-            children: parent => digits.map((digits, i) => {
-                return walk(
-                    digits,
-                    parent?.children.item(i),
-                    Array.isArray(labels?.[i]) ? labels?.[i] : undefined
-                );
-            })
-        });
-    }
-    
-    return card({
-        el,
-        value: digits
-    })
-}
-
+/**
+ * @public
+ */
 export type FlipClockGroupOptions = {
-    el?: Element|null,
+    el?: Element | null,
     label?: string,
     depth?: number,
     children: ((parent: Element) => Element[])
 }
 
+/**
+ * Renders a group element.
+ * 
+ * @public
+ */
 export function group(options: FlipClockGroupOptions): Element {
     return el({
         el: options.el,
@@ -91,11 +162,19 @@ export function group(options: FlipClockGroupOptions): Element {
     })
 }
 
+/**
+ * @public
+ */
 export type CardOptions = {
     el?: Element | null,
     value: string
 }
 
+/**
+ * Renders a card element.
+ * 
+ * @public
+ */
 export function card(options: CardOptions): Element {
     const lastValue = options.el?.getAttribute('data-value');
 
@@ -141,12 +220,20 @@ export function card(options: CardOptions): Element {
     return element;
 }
 
+/**
+ * @public
+ */
 export type CardItemOptions = {
-    el?: Element|null,
+    el?: Element | null,
     value?: string | null,
     class?: HTMLClassAttribute
 }
 
+/**
+ * Renders a card item.
+ * 
+ * @public
+ */
 export function cardItem(options: CardItemOptions): Element {
     return el({
         el: options.el,
@@ -178,5 +265,36 @@ export function cardItem(options: CardItemOptions): Element {
                 })
             ]
         }
+    });
+}
+
+/**
+ * @public
+ */
+export type DividerOptions = {
+    el?: Element | null,
+    value: string
+}
+
+/**
+ * Renders a divider.
+ * 
+ * @public
+ */
+export function divider(options: DividerOptions) {
+    return el({
+        el: options.el,
+        tagName: 'div',
+        class: 'flip-clock-divider',
+        children: parent => [
+            el({
+                el: parent.childNodes.item(0),
+                tagName: 'div',
+                class: 'flip-clock-divider-inner',
+                children: [
+                    options.value
+                ]
+            })
+        ]
     });
 }

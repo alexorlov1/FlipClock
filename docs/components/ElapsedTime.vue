@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { ElapsedTime, FlipClock } from 'flipclock';
+import { elapsedTime, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -9,26 +9,28 @@ const el = ref<Element>();
 
 function run(el: Element) {
     // #region example
+    const start = new Date();
+
     const end = new Date();
     
-    const start = new Date(
-        end.getTime() + (24 * 3600 * 1000)
-    );
+    end.setFullYear(end.getFullYear() + 1);
+    end.setMonth(1);
+    end.setDate(1);
+    end.setHours(0);
+    end.setMinutes(0);
 
-    const face = new ElapsedTime({
-        start,
-        end,
-        format: 'DD hh:mm:ss',
-        labels: {
-            YY: 'Years',
-            DD: 'Days',
-            hh: 'Hours',
-            mm: 'Minutes',
-            ss: 'Seconds'
-        }
+    flipClock({
+        el,
+        face: elapsedTime({
+            start,
+            end,
+            format: '[dd] [hh]:[mm]:[ss]'
+        }),
+        theme: theme({
+            dividers: [':', ' '],
+            labels: ['Days', 'Hours', 'Minutes', 'Seconds']
+        })
     });
-
-    const clock = new FlipClock({ el, face });
     // #endregion example
 }
 

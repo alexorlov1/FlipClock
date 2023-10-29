@@ -1,43 +1,59 @@
 import { Face } from '../Face';
 import { FaceValue } from '../FaceValue';
-import { SequencerContext, SequencerOptions } from '../helpers/sequencer';
+import { FlipClock } from '../FlipClock';
 
+/**
+ * The `Counter` face options.
+ * 
+ * @public
+ */
 export type CounterProps = {
     countdown?: boolean,
     value: FaceValue<number>
-    sequencer?: SequencerContext
     step?: number
     targetValue?: FaceValue<number>
-} & SequencerOptions
+}
 
 /**
  * This face is designed to increment and decrement values. Usually this face
  * is used as a counter for 0, 1, 2, 3, 4 (etc) for something like page views.
+ * 
+ * @public
  */
 export class Counter implements Face {
 
     /**
      * Should the face count down instead of up.
+     * 
+     * @internal
      */
     public countdown: boolean = false;
 
     /**
      * The number to increment/decrement in the interval.
+     * 
+     * @internal
      */
     public step: number = 1;
 
     /**
      * The target value determines when the counter should stop.
+     * 
+     * @internal
      */
     public targetValue?: FaceValue<number>;
 
     /**
      * The current face value.
+     * 
+     * @internal
      */
     public value: FaceValue<number>;
 
     /**
      * Instantiate the clock face.
+     * 
+     * @public
      */
     constructor(props: CounterProps) {
         this.value = props.value;
@@ -54,6 +70,8 @@ export class Counter implements Face {
 
     /**
      * Substract the face value by the given value.
+     * 
+     * @public
      */
     public decrement(value: number = 1): void {
         this.value.value = this.value.value - value;
@@ -61,6 +79,8 @@ export class Counter implements Face {
 
     /**
      * Add to the face value by the given value.
+     * 
+     * @public
      */
     public increment(value: number = 1): void {
         this.value.value = this.value.value + value;
@@ -70,20 +90,28 @@ export class Counter implements Face {
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
+     * 
+     * @public
      */
-    public interval(): void {
+    public interval(instance: FlipClock<Counter>): void {
         if(this.countdown) {
             this.decrement();
         }
         else {
             this.increment();
         }
+        
+        if(this.value.compare(this.targetValue)) {
+            instance.stop();
+        }
     }
 
 }
 
 /**
- * Instantiate a new Counter instance.
+ * Instantiate a new `Counter` instance.
+ * 
+ * @public
  */
 export function counter(props: CounterProps) {
     return new Counter(props);

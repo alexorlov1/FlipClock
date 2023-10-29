@@ -1,0 +1,1 @@
+function el<T extends keyof HTMLElementTagNameMap>(options: ElementOptions<T>): HTMLElementTagNameMap[T];

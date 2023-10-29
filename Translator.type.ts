@@ -1,0 +1,1 @@
+type Translator = (value: string) => string;

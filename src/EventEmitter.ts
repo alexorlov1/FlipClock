@@ -1,20 +1,35 @@
+/**
+ * The event instance.
+ * 
+ * @public
+ */
 export type Event<T, K extends keyof T> = {
     key: keyof T,
     fn: EventEmitterCallback<T, K>,
     unwatch: Function
 }
 
+/**
+ * The callback from the event emitter.
+ */
 export type EventEmitterCallback<T, K extends keyof Required<T>> = (...args: Required<T>[K][]) => void
 
 /**
  * An event emitter to facilitate emitter and listening for events.
+ * 
+ * @public
  */
-export default class EventEmitter<T> {
+export class EventEmitter<T> {
+    /**
+     * @protected
+     */
     protected events: Event<T,any>[] = [];
 
     /**
      * Emit an event.
-     */
+     * 
+     * @public
+    */
     public emit<K extends keyof Required<T>>(key: K, ...args: Required<T>[K] extends (...args: infer P) => void ? P : any[]) {
         for(const event of this.events) {
             if(event.key !== key) {
@@ -26,7 +41,9 @@ export default class EventEmitter<T> {
     }
 
     /**
-     * Listen for an event.
+     * Listen for an event. This returns a function to unwatch the event.
+     * 
+     * @public
      */
     public on<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): () => void {
         const unwatch = () => {
@@ -44,16 +61,22 @@ export default class EventEmitter<T> {
     
     /**
      * Listen for an event once.
+     * 
+     * @public
      */
-    once<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): void {
+    once<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): () => void {
         const unwatch = this.on(key, (...args: T[K][]) => {
             fn(...args);
             unwatch();
         });
+
+        return unwatch;
     }
 
     /**
-     * Stop listening for an event by key, or with a key a specific function.
+     * Stop listening for all events using a, or with a key and a function.
+     * 
+     * @public
      */
     off<K extends keyof Required<T>>(key: K): void
     off<K extends keyof Required<T>>(key: K, fn?: T[K]): void {
@@ -65,9 +88,11 @@ export default class EventEmitter<T> {
     }
     
     /**
-     * Unwatch and remove all the events.
+     * Reset the event bus and remove all watchers.
+     * 
+     * @public
      */
-    unwatch(): void {
+    reset(): void {
         for (const { unwatch } of this.events) {
             unwatch();
         }

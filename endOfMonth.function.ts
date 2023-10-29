@@ -1,0 +1,1 @@
+function endOfMonth(date: Date): Date;

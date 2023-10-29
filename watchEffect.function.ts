@@ -1,0 +1,1 @@
+function watchEffect(callback: () => void): void;

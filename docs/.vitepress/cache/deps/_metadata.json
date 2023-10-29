@@ -1,17 +1,17 @@
 {
-  "hash": "d478fdce",
-  "browserHash": "e9864e9d",
+  "hash": "d642bf46",
+  "browserHash": "21bbd81d",
   "optimized": {
     "vue": {
-      "src": "../../../../node_modules/.pnpm/vue@3.2.47/node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "src": "../../../../node_modules/.pnpm/vue@3.3.7_typescript@5.2.2/node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "08c08acb",
+      "fileHash": "e8020448",
       "needsInterop": false
     },
     "flipclock": {
       "src": "../../../../node_modules/.pnpm/file+/node_modules/flipclock/dist/flipclock.es.js",
       "file": "flipclock.js",
-      "fileHash": "a5cd29a5",
+      "fileHash": "28891f39",
       "needsInterop": false
     }
   },

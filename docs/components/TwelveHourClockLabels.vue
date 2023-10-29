@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { Clock, FlipClock } from 'flipclock';
+import { clock, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -8,16 +8,17 @@ import { onMounted, ref } from 'vue';
 const el = ref<Element>();
 
 function run(el: Element) {
+    // @todo: The labels dont work on this example. Fix.
     // #region example
-    const face = new Clock({
-        format: 'HH:ss',
-        labels: {
-            HH: 'Hours',
-            ss: 'Seconds'
-        }
-    });
-
-    const clock = new FlipClock({ el, face });
+    flipClock({
+        el,
+        face: clock({
+            format: '[MM]:[ss]'
+        }),
+        theme: theme({
+            labels: ['Minutes', 'Seconds']
+        })
+     });
     // #endregion example
 }
 

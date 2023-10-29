@@ -1,16 +1,17 @@
-import EventEmitter from "./EventEmitter";
+import { EventEmitter } from "./EventEmitter";
 import { Face, FaceHooks } from './Face';
-import Timer from "./Timer";
+import { Timer } from "./Timer";
+import { watchEffect } from "./helpers/signal";
+import { theme } from './themes/flipclock/index';
 
-export type Theme<T extends Face> = {
+export type Theme<T extends Face<T>> = {
     render: (instance: FlipClock<T>) => void
-} & FaceHooks
+} & FaceHooks<T>
 
-export type FlipClockProps<T extends Face> = {
+export type FlipClockProps<T extends Face<T>> = {
     autoStart?: boolean,
-    emitter?: EventEmitter<FaceHooks>,
     face: T
-    theme: Theme<T>
+    theme?: Theme<T>
     timer?: Timer | number,
     el?: Element | null,
 }
@@ -20,35 +21,40 @@ export type FlipClockProps<T extends Face> = {
  * The clock also tracks the time and renders the clock with each interval.
 
  */
-export class FlipClock<T extends Face> {
+export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
     
     /**
      * Determines if the clock should automatically start when it is mounted.
+     * 
+     * @public
      */
     public readonly autoStart: boolean = true
 
     /**
      * The element the count is mounted.
+     * 
+     * @public
      */
     public el?: Element | null
 
     /**
-     * The event emitter.
-     */
-    public readonly emitter: EventEmitter<FaceHooks>
-
-    /**
      * The face used to display the clock.
+     * 
+     * @public
      */
     public readonly face: T
 
     /**
      * The face used to display the clock.
+     * 
+     * @public
      */
     public readonly theme: Theme<T>
     
     /**
      * The face value displayed on the clock.
+     * 
+     * @public
      */
     public readonly timer: Timer
 
@@ -56,9 +62,10 @@ export class FlipClock<T extends Face> {
      * Construct the FlipClock.
      */
     constructor(props: FlipClockProps<T>) {
+        super();
+
         this.face = props.face;
-        this.theme = props.theme;
-        this.emitter = props.emitter || new EventEmitter();
+        this.theme = props.theme ?? theme();
         
         if(typeof props.autoStart === 'boolean') {
             this.autoStart = props.autoStart;
@@ -85,13 +92,17 @@ export class FlipClock<T extends Face> {
 
     /**
      * Mount the clock instance to the DOM.
+     * 
+     * @public
      */
     mount(el: Element) {
         this.hook('beforeMount', this);
 
         this.el = el;
 
-        this.theme.render(this);
+        watchEffect(() => {
+            this.theme.render(this);
+        });
         
         this.hook('afterMount', this);
 
@@ -104,6 +115,8 @@ export class FlipClock<T extends Face> {
 
     /**
      * Start the clock instance.
+     * 
+     * @public
      */
     start(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStart', this);
@@ -129,6 +142,8 @@ export class FlipClock<T extends Face> {
 
     /**
      * Stop the clock instance.
+     * 
+     * @public
      */
     stop(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStop', this);
@@ -146,6 +161,8 @@ export class FlipClock<T extends Face> {
 
     /**
      * Toggle starting/stopping the clock instance.
+     * 
+     * @public
      */
     toggle(fn?: (instance: FlipClock<T>) => void): this {
         if(this.timer.isStopped) {
@@ -160,6 +177,8 @@ export class FlipClock<T extends Face> {
 
     /**
      * Unmount the clock instance from the DOM.
+     * 
+     * @public
      */
     unmount(): this {
         this.hook('beforeUnmount', this);
@@ -173,8 +192,10 @@ export class FlipClock<T extends Face> {
 
     /**
      * Dispatch the event and call the method that corresponds to given hook.
+     * 
+     * @protected
      */
-    protected hook<K extends keyof Required<FaceHooks>>(key: K, ...args: Required<FaceHooks>[K] extends (...args: infer P) => void ? P : any[]): void {
+    protected hook<K extends keyof Required<FaceHooks<T>>>(key: K, ...args: Required<FaceHooks<T>>[K] extends (...args: infer P) => void ? P : any[]): void {
         if(key in this.face && typeof this.face[key] === 'function') {
             const fn = this.face[key] as Function;
 
@@ -187,13 +208,13 @@ export class FlipClock<T extends Face> {
             fn?.(...args);
         }
 
-        this.emitter.emit(key, ...args);
+        this.emit(key, ...args);
     }
 }
 
 /**
  * Instantiate a new FlipClock instance.
  */
-export function flipClock<T extends Face>(props: FlipClockProps<T>): FlipClock<T> {
+export function flipClock<T extends Face<T>>(props: FlipClockProps<T>): FlipClock<T> {
     return new FlipClock<T>(props);
 }

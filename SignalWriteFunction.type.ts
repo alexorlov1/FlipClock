@@ -1,0 +1,1 @@
+type SignalWriteFunction<T> = (value: T) => void;

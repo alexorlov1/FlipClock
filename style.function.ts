@@ -1,0 +1,1 @@
+function style(value: HTMLStyleAttribute): string;

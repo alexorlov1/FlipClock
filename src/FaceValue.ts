@@ -1,9 +1,9 @@
-import { DigitizedValues, DigitizerContext, useDigitizer } from "./helpers/digitizer";
+import { DigitizedValues, UseDigitizer, useDigitizer } from "./helpers/digitizer";
 import { Ref, ref } from "./helpers/ref";
 import { watchEffect } from "./helpers/signal";
 
 export type FaceValueProps = {
-    digitizer?: DigitizerContext
+    digitizer?: UseDigitizer
 }
 
 /**
@@ -23,7 +23,7 @@ export class FaceValue<T> {
     /**
      * Parameters that are passed to the digiter.
      */
-    public readonly digitizer: DigitizerContext
+    public readonly digitizer: UseDigitizer
 
     /**
      * The reactive value
@@ -79,8 +79,8 @@ export class FaceValue<T> {
     /**
      * Compare the face value with the given subject.
      */
-    compare(subject: FaceValue<any>) {
-        return JSON.stringify(this.value) === JSON.stringify(subject.value);
+    compare(subject?: FaceValue<any>) {
+        return JSON.stringify(this.value) === JSON.stringify(subject?.value);
     }
 
     /**
@@ -97,6 +97,7 @@ export class FaceValue<T> {
  * Helper function to create a new FaceValue instance.
  */
 export function faceValue<T>(value: T): FaceValue<T>
+export function faceValue<T>(value: T, props: FaceValueProps): FaceValue<T>
 export function faceValue<T>(value: T, props?: FaceValueProps): FaceValue<T> {
     return new FaceValue(value, props);
 }

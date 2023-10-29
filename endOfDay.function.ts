@@ -1,0 +1,1 @@
+function endOfDay(date: Date): Date;

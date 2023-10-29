@@ -1,5 +1,7 @@
 import { DefineFunction, Translator, UnsetFunction, useDefinitionMap } from "./dictionary";
+import { DigitizedValues, UseDigitizer, useDigitizer } from "./digitizer";
 import { Duration } from "./duration";
+import { ParsedString, parse as p } from "./parser";
 
 /**
  * The number of days in a week.
@@ -84,21 +86,24 @@ export const monthAbbreviations = [
     'Dec'
 ];
 
-export type DateFormatter = (date: Date, format: string) => string;
+export type DateFormatFunction = (date: Date, format: string) => string;
+export type DateParseFunction = (date: Date, format: string) => DigitizedValues;
 
-export type DateFlagFormatter = (date: Date) => string;
+export type DateFlagFormatFunction = (date: Date) => string;
 
 export type DateFormatOptions = {
+    digitizer?: UseDigitizer,
     translate?: Translator,
-    formats?: Record<string, DateFlagFormatter>,
+    formats?: Record<string, DateFlagFormatFunction>,
 }
 
-export type DateMapDefinition = Map<string, DateFlagFormatter>;
+export type DateMapDefinition = Map<string, DateFlagFormatFunction>;
 
 export type UseDateFormats = {
     map: DateMapDefinition,
-    define: DefineFunction<DateFlagFormatter>
-    format: DateFormatter,
+    define: DefineFunction<DateFlagFormatFunction>
+    format: DateFormatFunction,
+    parse: DateParseFunction,
     unset: UnsetFunction
 }
 
@@ -106,7 +111,7 @@ export type UseDateFormats = {
  * Create a new date string formatter.
  */
 export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
-    const { map, define, unset } = useDefinitionMap<DateFlagFormatter>(Object.entries(
+    const { map, define, unset } = useDefinitionMap<DateFlagFormatFunction>(Object.entries(
         Object.assign({
             A: (date: Date) => date.getHours() < 12 ? 'AM' : 'PM',
             a: (date: Date) => date.getHours() < 12 ? 'am' : 'pm',
@@ -136,24 +141,51 @@ export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
         }, options?.formats)
     ));
 
-    function format(value: Date, format: string): string {
-        const flagFormats = sort(map);
-        const flagPattern: RegExp = new RegExp(flagFormats.join('|'), 'g');
-
-        return format.replace(flagPattern, key => {
+    const { digitize } = options?.digitizer ?? useDigitizer();
+    
+    function format(date: Date, str: string) {
+        const flagPattern: RegExp = new RegExp([...sort(map)].join('|'), 'g');
+        
+        return str.replace(flagPattern, key => {
             const formatter = map.get(key);
 
             if(!formatter) {
                 return key;
             }
 
-            const str = formatter(value);
+            const str = formatter(date);
 
             return options?.translate?.(str) ?? str;
         });
     }
 
-    return { map, define, format, unset };
+    function parse(date: Date, str: string) {
+        function recurse(array: string): string
+        function recurse(array: ParsedString): DigitizedValues
+        function recurse(array: ParsedString | string): DigitizedValues | string {
+            if(Array.isArray(array)) {
+                for(const item of array) {
+                    const index = array.indexOf(item);
+
+                    if(Array.isArray(item)) {
+                        array.splice(index, 1, recurse(item));
+                    }
+                    else {                        
+                        array.splice(index, 1, ...recurse(item));
+                    }
+                }
+
+                return array;
+            }
+
+            return digitize(array);
+        }
+
+        return recurse(p(format(date, str)))
+    }
+    
+
+    return { map, define, format, parse, unset };
 }
 
 

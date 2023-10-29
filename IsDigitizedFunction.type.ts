@@ -1,0 +1,1 @@
+type IsDigitizedFunction = (value: any) => boolean;

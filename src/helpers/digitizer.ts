@@ -11,7 +11,7 @@ export type PadFunction = (value: DigitizedValues, minimumDigits: number) => Dig
  */
 export const EMPTY_CHAR = ' ';
 
-export type DigitizerContext = {
+export type UseDigitizer = {
     digitize: DigitizeFunction
     undigitize: UndigitizeFunction
     isDigitized: IsDigitizedFunction
@@ -21,7 +21,7 @@ export type DigitizerContext = {
  * Create a digiter that can be used to convert a string into arrays of
  * individual characters.
  */
-export function useDigitizer(): DigitizerContext {
+export function useDigitizer(): UseDigitizer {
     /**
      * Recursively digitize a value into an array of individual characters.
      */

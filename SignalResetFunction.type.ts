@@ -1,0 +1,1 @@
+type SignalResetFunction<T> = () => T;

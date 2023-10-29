@@ -1,0 +1,1 @@
+type HTMLClassAttribute = string | string[] | Record<string, boolean | undefined | null>;

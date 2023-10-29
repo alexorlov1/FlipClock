@@ -1,0 +1,1 @@
+function useDateFormats(options?: DateFormatOptions): UseDateFormats;

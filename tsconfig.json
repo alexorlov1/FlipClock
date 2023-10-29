@@ -5,13 +5,13 @@
       "module": "ESNext",
       "lib": ["ES2020", "DOM", "DOM.Iterable"],
       "skipLibCheck": true,
+      "declaration": true,
+      "declarationMap": true,
+      "emitDeclarationOnly": true,
   
       /* Bundler mode */
-      "moduleResolution": "bundler",
-      "allowImportingTsExtensions": true,
-      "resolveJsonModule": true,
+      "moduleResolution": "Bundler",
       "isolatedModules": true,
-      "noEmit": true,
   
       /* Linting */
       "strict": true,
@@ -19,6 +19,6 @@
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "demo.ts"]
+    "include": ["index.ts", "src", "demo.ts"]
   }
   

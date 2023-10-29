@@ -1,0 +1,1 @@
+function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V>;

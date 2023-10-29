@@ -1,9 +1,17 @@
 import { createSignal } from "./signal";
 
+/**
+ * @public
+ */
 export type Ref<T> = {
 	value: T
 }
 
+/**
+ * Create a ref.
+ * 
+ * @public
+ */
 export function ref<T>(value: T): Ref<T>
 export function ref<T>(value?: T): Ref<T|undefined>
 export function ref<T>(value: T): Ref<T|undefined> {
@@ -23,14 +31,35 @@ export function ref<T>(value: T): Ref<T|undefined> {
     });
 }
 
+/**
+ * A computed getter.
+ * 
+ * @public
+ */
 export type ComputedGetter<T> = () => T;
 
+/**
+ * A computed getter and setter.
+ * 
+ * @public
+ */
 export type ComputedGetterSetter<T> = {
 	get(): T,
 	set(value: T): void
 };
 
+/**
+ * A computed ref.
+ * 
+ * @public
+ */
 export type ComputedRef<T> = Readonly<Ref<T>>
+
+/**
+ * A writeable computed ref.
+ * 
+ * @public
+ */
 export type WriteableComputedRef<T> = Ref<T>
 
 export function computed<T>(proxy: ComputedGetterSetter<T>): WriteableComputedRef<T>

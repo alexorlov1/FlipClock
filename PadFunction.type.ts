@@ -1,0 +1,1 @@
+type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;

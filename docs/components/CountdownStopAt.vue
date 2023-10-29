@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { Counter, FaceValue, FlipClock } from 'flipclock';
+import { counter, faceValue, flipClock } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -9,13 +9,14 @@ const el = ref<Element>();
 
 function run(el: Element) {
     // #region example
-    const face = new Counter({
-        countdown: true,
-        stopAt: FaceValue.make(0),
-        value: FaceValue.make(10)
+    flipClock({
+        el,
+        face: counter({
+            countdown: true,
+            value: faceValue(10),
+            targetValue: faceValue(0)
+        })
     });
-
-    const clock = new FlipClock({ el, face });
     // #endregion example
 }
 

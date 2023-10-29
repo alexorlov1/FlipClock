@@ -1,0 +1,1 @@
+type IncrementFunction = (current: FaceValue<any>, target: FaceValue<any>, count?: number, backwards?: boolean) => FaceValue<any>;

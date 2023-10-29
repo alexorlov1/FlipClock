@@ -1,0 +1,17 @@
+start = value: (array / string) {
+  if(value.length === 1 && typeof value[0] === 'string') {
+  	return value[0]
+  }
+  
+  if(value.length === 1 && Array.isArray(value[0])) {
+    return value[0]
+  }
+
+  return value;
+}
+
+array = value: (string / "[" value: (string / array) "]" { return [value] })* { return value}
+
+string = value: char+ { return value.flat(1).join('') }
+
+char = !([\[\]]).

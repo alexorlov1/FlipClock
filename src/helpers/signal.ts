@@ -1,10 +1,38 @@
 let currentListener: (() => void)|undefined = undefined;
 
-export type Signal<T> = [ReadFunction<T>, WriteFunction<T>, ResetFunction<T>];
-export type ReadFunction<T> = () => T;
-export type WriteFunction<T> = (value: T) => void;
-export type ResetFunction<T> = () => T;
+/**
+ * The tuple that is returned when creating a signal.
+ * 
+ * @public
+ */
+export type Signal<T> = [SignalReadFunction<T>, SignalWriteFunction<T>, SignalResetFunction<T>];
 
+/**
+ * The signal's read function.
+ * 
+ * @public
+ */
+export type SignalReadFunction<T> = () => T;
+
+/**
+ * The signal's write function.
+ * 
+ * @public
+ */
+export type SignalWriteFunction<T> = (value: T) => void;
+
+/**
+ * The signal's reset function.
+ * 
+ * @public
+ */
+export type SignalResetFunction<T> = () => T;
+
+/**
+ * Create a signal.
+ * 
+ * @public
+ */
 export function createSignal<T>(initialValue: T): Signal<T> 
 export function createSignal<T>(initialValue?: T): Signal<T|undefined> 
 export function createSignal<T>(initialValue?: T): Signal<T|undefined> {
@@ -37,6 +65,11 @@ export function createSignal<T>(initialValue?: T): Signal<T|undefined> {
     return [read, write, reset];
 }
 
+/**
+ * Create a signal "watch" effect.
+ * 
+ * @public
+ */
 export function watchEffect(callback: () => void) {
     currentListener = callback;
     callback();

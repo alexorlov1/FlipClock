@@ -1,0 +1,1 @@
+type IsWhitelistFunction = (value: DigitizedValue) => boolean;

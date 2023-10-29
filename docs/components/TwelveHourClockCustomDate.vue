@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { Clock, FaceValue, FlipClock } from 'flipclock';
+import { clock, flipClock } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -9,20 +9,22 @@ const el = ref<Element>();
 
 function run(el: Element) {
     // #region example
-    const value = new Date();
+    const date = new Date();
 
-    value.setFullYear(1970);
-    value.setMonth(0);
-    value.setDate(1);
-    value.setHours(0);
-    value.setMinutes(0);
-    value.setSeconds(0);
+    date.setFullYear(1970);
+    date.setMonth(0);
+    date.setDate(1);
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
 
-    const face = new Clock({
-        value: FaceValue.make(value)
+    flipClock({
+        el,
+        face: clock({
+            date,
+            format: 'MMM YYYY hh:mm:ss A'
+        })
     });
-
-    const clock = new FlipClock({ el, face });
     // #endregion example
 }
 
@@ -34,3 +36,18 @@ onMounted(() => el.value && run(el.value));
         <div ref="el" style="margin: 1rem"></div>
     </div>
 </template>
+
+<style scoped>
+* >>> .flip-clock .flip-clock-card {
+    font-size: 8px;
+    border-radius: 2px;
+}
+/*
+// #region css
+.flip-clock .flip-clock-card {
+    font-size: 8px;
+    border-radius: 2px;
+}
+// #endregion css
+*/
+</style>

@@ -1,0 +1,1 @@
+function isLastDayOfMonth(dirtyDate: Date): boolean;

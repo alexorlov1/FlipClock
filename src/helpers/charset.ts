@@ -1,4 +1,4 @@
-import { DigitizedValue, EMPTY_CHAR } from './digitizer';
+import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from './digitizer';
 
 /**
  * Get a range of numbers using the given size and starting point.
@@ -65,8 +65,8 @@ export type CharsetCache = Map<string, string[]>;
 export type ChunkFunction = (value: DigitizedValue | undefined, size: number) => string[];
 export type IsBlacklistFunction = (value: DigitizedValue) => boolean;
 export type IsWhitelistFunction = (value: DigitizedValue) => boolean;
-export type NextFunction = (value?: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue | undefined;
-export type PrevFunction = (value?: DigitizedValue, target?: DigitizedValue, count?: number) => DigitizedValue | undefined;
+export type NextFunction = (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined;
+export type PrevFunction = (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined;
 
 export type CharsetContext = {
     charset: string[],
@@ -150,11 +150,11 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the next character in the charset relative to the given value.
      */
-    function next(current?: DigitizedValue, target?: DigitizedValue, count: number = 1) {
+    function next(current?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count: number = 1) {
         if (target === undefined && current === emptyChar) {
             return undefined
         }
-        else if (target && !charset.includes(target)) {
+        else if (typeof target === 'string' && !charset.includes(target)) {
             return target;
         }
 
@@ -168,7 +168,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
 
         const matches = chunk(current, count);
 
-        if (target && matches.includes(target)) {
+        if (typeof target === 'string' && matches.includes(target)) {
             return target;
         }
 
@@ -184,12 +184,12 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
     /**
      * Get the prev character in the charset relative to the given value.
      */
-    function prev(current?: DigitizedValue, target?: DigitizedValue, count: number = 1) {
+    function prev(current?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count: number = 1) {
         
         if (target === undefined && current === emptyChar) {
             return undefined
         }
-        else if (target && !charset.includes(target)) {
+        else if (typeof target === 'string' && !charset.includes(target)) {
             return target;
         }
 
@@ -203,7 +203,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
 
         const matches = chunk(current, -count);
 
-        if (target && matches.includes(target)) {
+        if (typeof target === 'string' && matches.includes(target)) {
             return target;
         }
 

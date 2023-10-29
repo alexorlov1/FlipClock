@@ -1,9 +1,9 @@
-import Timer from '../src/Timer';
+import { timer } from '../src/Timer';
 
 jest.useFakeTimers();
 
 test('if can the timer be started and stopped.', () => {
-    const instance = new Timer(500);
+    const instance = timer(500);
 
     expect(instance.elapsed).toBe(0);
     expect(instance.elapsedSinceLastLoop).toBe(0);

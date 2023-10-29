@@ -1,7 +1,15 @@
+- facevalue carry length doesn't work, and minimum digits needs added back.
+- counter needs ability to format the number with dollar signs, commas, etc.
+- implement array structure parsing syntax for duration formats, and counter number formats.
+- fix divider css. height is fluid. http://localhost:5175/examples/clock.html
+- make alphanumeric face have better defaults. should implement stopAfterChanges, 1 or something by default.
+  
+- probaly should have proper function passing and typing when using stopWhen. need to accept real functions in addition to the params.
 - write CSS-in-JS solution
-- implement the old Divider class functionality.
 - create another theme as an example that multiple themes can work.
 - Clean up any unsed code
 - write test for refs
 - write test for flipclock theme
+- write test for EventEmitter
+- remove scss entirely
 - docs/storyboards

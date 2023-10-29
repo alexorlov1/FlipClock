@@ -1,10 +1,9 @@
-import call from "./helpers/functions";
 
 /**
  * The Timer class uses a requestAnimationFrame loop to build a timer that can
  * start and stop.
  */
-export default class Timer {
+export class Timer {
 
     /**
      * The count increments with each interval.
@@ -118,7 +117,9 @@ export default class Timer {
 
         const loop = () => {
             if (Date.now() - this.lastLoop >= this.interval) {
-                call(fn, this.interval);
+                if(typeof fn === 'function') {
+                    fn(this);
+                }
                 
                 this.$lastLoop = Date.now();
                 this.$count++;
@@ -135,15 +136,24 @@ export default class Timer {
     /**
      * Stops the timer.
      */
-    stop(fn?: Function): Timer {
+    stop(fn?: (timer: Timer) => void): Timer {
         if(this.isRunning && this.$handle) {
             window.cancelAnimationFrame(this.$handle);
 
             this.$handle = undefined;
 
-            call(fn);
+            if(typeof fn === 'function') {
+                fn(this);
+            }
         }
 
         return this;
     }
+}
+
+/**
+ * Instantiate a new `Timer` instance.
+ */
+export function timer(interval: number = 1000) {
+    return new Timer(interval);
 }

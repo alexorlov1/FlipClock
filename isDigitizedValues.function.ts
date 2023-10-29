@@ -1,0 +1,1 @@
+function isDigitizedValues(value: DigitizedValue | DigitizedValues): boolean;

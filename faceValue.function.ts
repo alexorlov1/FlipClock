@@ -1,0 +1,1 @@
+function faceValue<T>(value: T, props: FaceValueProps): FaceValue<T>;

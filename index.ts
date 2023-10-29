@@ -1,30 +1,24 @@
 import './scss/flipclock.scss';
 
-import EventEmitter from './src/EventEmitter';
-// import { Face } from './src/Face';
-import FaceValue from './src/FaceValue';
-import FlipClock from './src/FlipClock';
-import Timer from './src/Timer';
-import VNode from './src/VNode';
-import Card from './src/themes/flipclock/Card';
-import CardItem from './src/themes/flipclock/CardItem';
-import Divider from './src/themes/flipclock/Divider';
-import Group from './src/themes/flipclock/Group';
-import Label from './src/themes/flipclock/Label';
+export * from './src/helpers/charset';
+export * from './src/helpers/date';
+export * from './src/helpers/dictionary';
+export * from './src/helpers/digitizer';
+export * from './src/helpers/dom';
+export * from './src/helpers/duration';
+export * from './src/helpers/functions';
+export * from './src/helpers/ref';
+export * from './src/helpers/sequencer';
+export * from './src/helpers/signal';
+export * from './src/helpers/structure';
 
+export * from './src/EventEmitter';
+export * from './src/Face';
+export * from './src/FaceValue';
+export * from './src/FlipClock';
+export * from './src/Timer';
 export * from './src/faces';
-export * from './src/types';
-export {
-    Card,
-    CardItem,
-    Divider,
-    EventEmitter,
-    // Face,
-    FaceValue,
-    FlipClock,
-    Group,
-    Label,
-    Timer,
-    VNode
-};
 
+export { theme } from './src/themes/flipclock';
+
+// export * as flipclock from './src/themes/flipclock';

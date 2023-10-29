@@ -1,0 +1,1 @@
+type Signal<T> = [SignalReadFunction<T>, SignalWriteFunction<T>, SignalResetFunction<T>];

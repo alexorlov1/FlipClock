@@ -6,6 +6,11 @@ import { SequencerContext, useSequencer } from '../helpers/sequencer';
 import { watchEffect } from '../helpers/signal';
 import { SequencerOptions } from './../helpers/sequencer';
 
+/**
+ * The `Alphanumeric` face options.
+ * 
+ * @public
+ */
 export type AlphanumericProps = {
     value: FaceValue<string|DigitizedValues>,
     direction?: 'auto' | 'forwards' | 'backwards',
@@ -18,36 +23,50 @@ export type AlphanumericProps = {
  * This face is designed to flip through alphanumeric values similar to a flip
  * board at a train station. The value will incrementally/decrementally flip
  * the digits until it reaches the target.
+ * 
+ * @public
  */
-export default class Alphanumeric implements Face {
+export class Alphanumeric implements Face {
     /**
      * The flip direction. If auto, the direction is automatically determined
      * based on the current value and target value.
+     * 
+     * @public
      */
     public readonly direction: 'auto' | 'forwards' | 'backwards' = 'auto';
 
     /**
      * Override how digits are sequenced.
+     * 
+     * @public
      */
     public readonly sequencer: SequencerContext
 
     /**
      * The number of characters to skip during the incrementing/decrementing.
+     * 
+     * @public
      */
     public readonly skipChars?: number;
 
     /**
      * The face's current value.
+     * 
+     * @public
      */
     public value: FaceValue<string|DigitizedValues>
 
     /**
      * The face's target value.
+     * 
+     * @public
      */
     public targetValue: FaceValue<string|DigitizedValues>
     
     /**
      * Instantiate the clock face.
+     * 
+     * @public
      */
     constructor(props: AlphanumericProps) {
         if (props.skipChars) {
@@ -68,6 +87,8 @@ export default class Alphanumeric implements Face {
     
     /**
      * The sequencer method to call.
+     * 
+     * @public
      */
     get backwards(): boolean {
         if(this.direction === 'backwards') {
@@ -85,8 +106,10 @@ export default class Alphanumeric implements Face {
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
      * clock's `FaceValue`.
+     * 
+     * @public
      */
-    public interval(instance: FlipClock<any>): void {
+    public interval(instance: FlipClock<Alphanumeric>): void {
         this.sequencer.increment(
             this.value, this.targetValue, this.skipChars, this.backwards
         );
@@ -98,8 +121,10 @@ export default class Alphanumeric implements Face {
 
     /**
      * Update the direction before the interval starts.
+     * 
+     * @internal
      */
-    public afterCreate(instance: FlipClock<any>) {
+    public afterCreate(instance: FlipClock<Alphanumeric>) {
         watchEffect(() => {
             if(instance.autoStart && instance.timer.isStopped && this.value.value) {
                 instance.start();
@@ -110,7 +135,9 @@ export default class Alphanumeric implements Face {
 }
 
 /**
- * Instantiate a new instnace of Alphanumeric
+ * Instantiate a new `Alphanumeric` instance.
+ * 
+ * @public
  */
 export function alphanumeric(props: AlphanumericProps) {
     return new Alphanumeric(props);

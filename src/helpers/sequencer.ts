@@ -1,12 +1,12 @@
 import { FaceValue } from "../FaceValue";
 import { CharsetContext, CharsetOptions, useCharset } from "./charset";
-import { DigitizedValue } from "./digitizer";
+import { DigitizedValue, DigitizedValues } from "./digitizer";
 import { MatchArrayStructureOptions, StopPredicateFunction, matchArrayStructure, stopWhen } from './structure';
 
 export type SequencerOptions = {
     charset?: CharsetContext | CharsetOptions,
     matchArray?: MatchArrayStructureOptions,
-    stopWhen?: StopPredicateFunction<[current?: DigitizedValue, target?: DigitizedValue ]>,
+    stopWhen?: StopPredicateFunction<[current?: DigitizedValue, target?: DigitizedValue | DigitizedValues ]>,
     stopAfterChanges?: number,
 }
 
@@ -19,6 +19,12 @@ export type SequencerContext = {
     increment: IncrementFunction,
 }
 
+/**
+ * A composable that creates or uses a charset to increment and decrement
+ * face values.
+ * 
+ * @public
+ */
 export function useSequencer(options?: SequencerOptions): SequencerContext {
     const { charset, next, prev } = (
         options?.charset && 'next' in (options.charset)

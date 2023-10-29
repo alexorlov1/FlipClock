@@ -94,9 +94,9 @@ export function el<T extends keyof HTMLElementTagNameMap>(options: ElementOption
 
     const childrenNodes = children?.filter(
         value => typeof value === 'string' || value instanceof Node
-    ) as (ChildNode|string)[];
+    ) as (ChildNode|string)[] | undefined;
 
-    if(childrenNodes.length) {
+    if(childrenNodes && childrenNodes.length) {
         for(let i = 0; i < childrenNodes.length; i++) {
             const child = childrenNodes[i];
             const childNode = subject.childNodes.item(i);

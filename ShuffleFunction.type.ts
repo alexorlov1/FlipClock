@@ -1,0 +1,1 @@
+type ShuffleFunction = (chars: string[]) => string[];

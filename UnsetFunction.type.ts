@@ -1,0 +1,1 @@
+type UnsetFunction = (key: string | string[]) => void;

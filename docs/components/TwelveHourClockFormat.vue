@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { Clock, FlipClock } from 'flipclock';
+import { clock, flipClock } from 'flipclock';
 // #endregion import
 
 
@@ -10,11 +10,12 @@ const el = ref<Element>();
 
 function run(el: Element) {
     // #region example
-    const face = new Clock({
-        format: 'HH:ss'
+    flipClock({
+        el,
+        face: clock({
+            format: 'HH:ss'
+        })
     });
-
-    const clock = new FlipClock({ el, face });
     // #endregion example
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import 'flipclock/dist/style.css';
+import 'flipclock/style.css';
 
 import DefaultTheme from 'vitepress/theme';
 
