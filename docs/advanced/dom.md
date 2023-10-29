@@ -1,33 +1,93 @@
-# Virtual DOM
+# DOM
 
-The Virtual DOM is used to make updates to the DOM when something changes. FlipClock handles the resursive DOM diff'ing under the hood. This documentation is for developers who wish to build own clock faces and advanced implementations.
+FlipClock.js provides an easy way to update the DOM when values change. It does so without a virtual dom in an effort to keep memory usage as low as possible. The DOM utilities also provide partial or full-hydration. Which means if you use SSR to pre-render your app, FlipClock has to do no rendering once JS re-hydates the page.
 
-## Basic Example
+## Signatures
 
-Use `h` to create a `VNode`. Mount it to the dom. Then create another `VNode` with change in the DOM, and mount it. The will only cause the last item to be redrawn,because the other items are unchanged. FlipClock.js's `h` and `diff` automatically handle the recursion.
+<<< @/types/el.function.ts{TS}
+<<< @/types/ElementOptions.type.ts{TS}
+
+## How it works
+
+FlipClock.js creates regular `Elements` using `document.createElement`, or reuses a qualified element in the DOM. So in the following example, `.some-element-here` would be used to hydrate the element. If the element doesn't exist, or cannot be updated, a new element will replace the `Element` passed to the `el` attribute.
 
 ```ts
-import { h } from 'flipclock';
+import { el } from 'flipclock';
 
-const el = document.createElement('div');
-
-const a = h('ul', [
-    h('li', 'Item 1'),
-    h('li', 'Item 2'),
-    h('li', 'Item 2'),
-]);
-
-a.mount(el);
-
-const b = h('ul', [
-    h('li', 'Item 1'),
-    h('li', 'Item 2'),
-    h('li', 'Item 3'),
-]);
-
-b.mount(el);
+const div: HTMLDivElement = el({
+    el: document.querySelector('.some-element-here')
+    tagName: 'div',
+    class: 'some-class'
+    children: [
+        'test'
+    ]
+}); // '<div class="some-class">test</div>'
 ```
 
-::: info
-This should go without saying, but this syntax and concept was heavily inspired by Vue. It however does not use any dependencies and is extremely lightweight. The purpose is to efficiently re-render the DOM without any excess overhead and re-rendering unecessary nodes.
+Continuing from the last example, let's update the `div` variable with some new children. Since we are replacing a `HTMLDivElement` element with another `HTMLDivElement`, the element will not be removed from the DOM. Rather, it will update the existing element recursively until it matches. The same pattern applies to children.
+
+```ts
+el({
+    el: div
+    tagName: 'div',
+    children: parent => [
+        el({
+            el: parent.children.items(0),
+            tagName: 'b',
+            children: 'I am bold text.'
+        })
+    ]
+}); // '<div><b>I am bold text</b></div>'
+```
+
+Lets update the bold text. This will DOM update will not change anything other than the child node's text content.
+
+```ts
+el({
+    el: div
+    tagName: 'div',
+    children: parent => [
+        el({
+            el: parent.children.items(0),
+            tagName: 'b',
+            children: 'I am bold text (updated).'
+        })
+    ]
+}); // '<div><b>I am bold text (updated)</b></div>'
+
+// Notice this is the same DIV in memory we created
+// in the first step of this example.
+console.log(div);
+```
+
+::: tip
+Your implementation must be correct to not constantly create new DOM elements. So if you find your DOM constantly adding new nodes, check your implementation against the examples in the repo directory `src/themes/flipclock/index.ts`
 :::
+
+## Real Example
+
+The main place to use this would be when creating your own themes. Consider the following example, this is how the signature theme renders groups of digits.
+
+``` ts
+export function group(options: FlipClockGroupOptions): Element {
+    return el({
+        el: options.el,
+        tagName: 'div',
+        class: 'flip-clock-group',
+        children: parent => [
+            !!options.label && el({
+                el: parent.querySelector('.flip-clock-label'),
+                tagName: 'div',
+                class: 'flip-clock-label',
+                children: [ options.label ]
+            }),
+            el({
+                el: parent.querySelector('.flip-clock-group-items'),
+                tagName: 'div',
+                class: 'flip-clock-group-items',
+                children: options.children
+            })
+        ]
+    })
+}
+```

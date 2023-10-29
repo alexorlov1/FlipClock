@@ -1,0 +1,1 @@
+type ComputedRef<T> = Readonly<Ref<T>>;

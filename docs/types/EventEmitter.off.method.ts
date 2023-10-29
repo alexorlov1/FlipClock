@@ -1,0 +1,1 @@
+off<K extends keyof Required<T>>(key: K): void;

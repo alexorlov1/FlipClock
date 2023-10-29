@@ -1,0 +1,1 @@
+function render(options: ClockOptions): HTMLDivElement;

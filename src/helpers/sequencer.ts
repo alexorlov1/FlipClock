@@ -1,22 +1,29 @@
 import { FaceValue } from "../FaceValue";
-import { CharsetContext, CharsetOptions, useCharset } from "./charset";
+import { UseCharset, UseCharsetOptions, useCharset } from "./charset";
 import { DigitizedValue, DigitizedValues } from "./digitizer";
 import { MatchArrayStructureOptions, StopPredicateFunction, matchArrayStructure, stopWhen } from './structure';
 
+/** 
+ * The options for `useSequencer()`.
+ * 
+ * @public
+ */
 export type SequencerOptions = {
-    charset?: CharsetContext | CharsetOptions,
+    charset?: UseCharset | UseCharsetOptions,
     matchArray?: MatchArrayStructureOptions,
     stopWhen?: StopPredicateFunction<[current?: DigitizedValue, target?: DigitizedValue | DigitizedValues ]>,
     stopAfterChanges?: number,
 }
 
-export type DecrementFunction = (current: FaceValue<any>, target: FaceValue<any>, count?: number, backwards?: boolean) => FaceValue<any>
-export type IncrementFunction = (current: FaceValue<any>, target: FaceValue<any>, count?: number, backwards?: boolean) => FaceValue<any>
-
-export type SequencerContext = {
+/**
+ * The return type for `useSequencer()`.
+ * 
+ * @public
+ */
+export type UseSequencer = {
     charset: string[],
-    decrement: DecrementFunction,
-    increment: IncrementFunction,
+    decrement: (current: FaceValue<any>, target: FaceValue<any>, count?: number, backwards?: boolean) => FaceValue<any>,
+    increment: (current: FaceValue<any>, target: FaceValue<any>, count?: number, backwards?: boolean) => FaceValue<any>,
 }
 
 /**
@@ -25,17 +32,19 @@ export type SequencerContext = {
  * 
  * @public
  */
-export function useSequencer(options?: SequencerOptions): SequencerContext {
+export function useSequencer(options?: SequencerOptions): UseSequencer {
     const { charset, next, prev } = (
         options?.charset && 'next' in (options.charset)
             ? options.charset
-            : useCharset(options?.charset as CharsetOptions)
-    ) as CharsetContext;
+            : useCharset(options?.charset as UseCharsetOptions)
+    ) as UseCharset;
     
     /**
      * Decrement the current face towards the target value. The count determines
      * how many digits are skipped. If the array structures differ, they will be
      * matched.
+     * 
+     * @public
      */
     function decrement(current: FaceValue<any>, target: FaceValue<any>, count: number = 1, backwards: boolean = false): FaceValue<any> {
         const walkerOptions: MatchArrayStructureOptions = {
@@ -72,6 +81,8 @@ export function useSequencer(options?: SequencerOptions): SequencerContext {
      * Increment the current face towards the target value. The count determines
      * how many digits are skipped. If the array structures differ, they will be
      * matched.
+     * 
+     * @public
      */
     function increment(current: FaceValue<any>, target: FaceValue<any>, count: number = 1, backwards: boolean = false): FaceValue<any> {
         const walkerOptions: MatchArrayStructureOptions = {

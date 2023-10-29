@@ -1,1 +1,0 @@
-function useDurationFormats(options?: DurationFormatOptions): UseDurationFormats;

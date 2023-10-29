@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { counter, faceValue, flipClock } from 'flipclock';
+import { counter, faceValue, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -13,7 +13,8 @@ function run(el: Element) {
         el,
         face: counter({
             value: faceValue(0)
-        })
+        }),
+        theme: theme()
     });
     // #endregion example
 }

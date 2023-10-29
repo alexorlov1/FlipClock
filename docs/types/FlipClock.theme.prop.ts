@@ -1,0 +1,1 @@
+readonly theme: Theme<T>;

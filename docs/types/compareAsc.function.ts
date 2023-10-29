@@ -1,0 +1,1 @@
+function compareAsc(left: Date, right: Date): number;

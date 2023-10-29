@@ -1,1 +1,0 @@
-type DurationFlagFormats = Record<string, DurationFlagFormatter>;

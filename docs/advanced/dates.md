@@ -1,40 +1,62 @@
-# Date & Time Formatting
+# Dates
 
-FlipClock.js provides basic date and time formatting. Use the following formatting strings on clock faces that support it.
+Format a `Date` into a `string` or `DigitizedValues` using a format string. You can also define your own format flags to either override the defaults formats or add more.
 
-`YY` - Outputs a 2 digit year `23` \
-`YYYY` - Outputs a 4 digit year `2023`
+## Signatures
 
-`M` - Outputs a 1 digit month `1` \
-`MM` - Outputs a 2 digit year `01`
+<<< @/types/useDateFormats.function.ts{TS}
+<<< @/types/UseDateFormatOptions.type.ts{TS}
+<<< @/types/DateFlagFormatFunction.type.ts{TS}
 
-`D` - Outputs a 1 digit day `1` \
-`DD` - Outputs a 2 digit day `01`
+## Returns
 
-`H` - Outputs a 1 digit 24-hour time `1` \
-`HH` - Outputs a 2 digit 24-hour time `01`
+<<< @/types/UseDateFormats.type.ts{TS}
 
-`h` - Outputs a 1 digit 12-hour time `1` \
-`hh` - Outputs a 2 digit 12-hour time `01`
+## Basic Example
 
+`format()` returns a string, while `parse()` returns a digitized array.
 
-`m` - Outputs a 1 digit minute `1` \
-`mm` - Outputs a 2 digit minute `01`
+```ts
+const { format, parse } = useDateFormats();
 
-`s` - Outputs a 1 digit second `1` \
-`ss` - Outputs a 2 digit second `01`
-
-`v` - Outputs a 1 digit millisecond `1` \
-`vv` - Outputs a 2 digit millisecond `01` \
-`vvv` - Outputs a 3 digit millisecond `001` \
-`vvvv` - Outputs a 4 digit millisecond `0001`
-
-### Special Characters
-
-` `&nbsp;- A space notates a new group. Groups can be used to group similar formats. This mostly has to do with how the DOM structure is rendered.
-
-*NOTE, any character character will be output as a string literal.*
+format(new Date('2024-01-01'), 'DD, MM YYYY')); // returns `01, 01 2024`
+parse(new Date('2024-01-01'), '[DD], [MM] [YYYY]')); // returns `[['0', '1'],',',['0', '1'],' ',['2', '0', '2', '4']]`
+```
 
 ::: tip
-It is not the goal of FlipClock.js to provide comprehensive date formatting, it does provide basic date and time parsing that should be familiar to libraries like moment.js. If you wish to use [moment.js](https://momentjs.com/) or a similar library, you are free to do so.
+These are just a few examples and far from complete. If you want to see a feature-complete example, check `tests/helpers/date.spec.ts` in the repo.
+:::
+
+## Available Formats
+
+| Format | Description                 | Outputs   |
+| ------ | --------------------------- | --------- |
+| `Q`    | The quarter year (1-4)      | `1`       |
+| `YYYY` | 4 digit year                | `2024`    |
+| `YY`   | 2 digit year                | `24`      |
+| `M`    | 1 digit month               | `1`       |
+| `MM`   | 2 digit month               | `01`      |
+| `MMM`  | Abbreviated month           | `Jan`     |
+| `MMMM` | The full month              | `January` |
+| `D`    | 1 digit day of the month    | `1`       |
+| `DD`   | 2 digit day of the month    | `01`      |
+| `DDD`  | Abbreviated day of the week | `Mon`     |
+| `DDDD` | Full day of the week        | `Monday`  |
+| `H`    | 1 digit hour (1-24)         | `1`       |
+| `Hh`   | 2 digit hour (01-24)        | `01`      |
+| `h`    | 1 digit hour (1-12)         | `1`       |
+| `hh`   | 1 digit hour (01-24)        | `01`      |
+| `m`    | 1 digit minute              | `1`       |
+| `mm`   | 2 digit minute              | `01`      |
+| `s`    | 1 digit second              | `1`       |
+| `ss`   | 2 digit second              | `01`      |
+| `v`    | 1 digit millisecond         | `1`       |
+| `vv`   | 2 digit millisecond         | `01`      |
+| `vvv`  | 1 digit millisecond         | `001`     |
+| `vvvv` | 2 digit millisecond         | `0001`    |
+| `A`    | "AM" or "PM"                | `AM`      |
+| `a`    | "am" or "pm"                | `am`      |
+
+::: tip
+For more advanced date formatting, we recommend using [date-fns](https://date-fns.org/) or [dayjs](https://day.js.org/). You can utilize and date formatting function by overriding the default formatter.
 :::

@@ -1,25 +1,40 @@
+/**
+ * A single digitized value
+ * 
+ * @public
+ */
+export type DigitizedValue = string;
 
-export type DigitizedValue = string
-export type DigitizedValues = (DigitizedValue | DigitizedValues)[]
-export type DigitizeFunction = (value: any) => DigitizedValues
-export type UndigitizeFunction = (value: DigitizedValues) => string | DigitizedValues
-export type IsDigitizedFunction = (value: any) => boolean
-export type PadFunction = (value: DigitizedValues, minimumDigits: number) => DigitizedValues;
+/**
+ * An array of digitized values.
+ * 
+ * @public
+ */
+export type DigitizedValues = (DigitizedValue | DigitizedValues)[];
 
 /**
  * The default empty character for digitization.
+ * 
+ * @public
  */
-export const EMPTY_CHAR = ' ';
+export const EMPTY_CHAR = ' ' as const;
 
+/**
+ * The return type for `useDigitizer()`.
+ * 
+ * @public
+ */
 export type UseDigitizer = {
-    digitize: DigitizeFunction
-    undigitize: UndigitizeFunction
-    isDigitized: IsDigitizedFunction
+    digitize: (value: any) => DigitizedValues;
+    undigitize: (value: DigitizedValues) => string | DigitizedValues;
+    isDigitized: (value: any) => boolean;
 }
 
 /**
  * Create a digiter that can be used to convert a string into arrays of
  * individual characters.
+ * 
+ * @public
  */
 export function useDigitizer(): UseDigitizer {
     /**

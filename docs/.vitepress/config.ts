@@ -25,9 +25,9 @@ export default defineConfig({
       {
         text: 'Core', items: [
           { text: 'FlipClock', link: '/core/flipclock' },
-          { text: 'Face', link: '/examples/face' },
-          { text: 'FaceValue', link: '/examples/face-value' },
-          { text: 'Timer', link: '/examples/timer' },
+          { text: 'FaceValue', link: '/core/face-value' },
+          { text: 'Hooks', link: '/core/hooks' },
+          { text: 'Timer', link: '/core/timer' },
         ]
       },
       {
@@ -36,13 +36,13 @@ export default defineConfig({
           { text: 'Counter', link: '/faces/counter' },
           { text: 'Elapsed Time', link: '/faces/elapsed-time' },
           { text: 'Alphanumeric', link: '/faces/alphanumeric' },
-          { text: 'Build your own theme', link: '/themes/flip-clock' }
+          { text: 'Build your own face', link: '/faces/build-your-own-face' }
         ]
       },
       {
         text: 'Themes', items: [
-          { text: 'FlipClock', link: '/themes/flip-clock' },
-          { text: 'Build your own theme', link: '/themes/flip-clock' }
+          { text: 'FlipClock', link: '/themes/flipclock' },
+          { text: 'Build your own theme', link: '/themes/build-your-own-theme' }
         ]
       },
       {
@@ -50,11 +50,11 @@ export default defineConfig({
           { text: 'Charsets', link: '/advanced/charsets'},
           { text: 'Dates', link: '/advanced/dates' },
           { text: 'Dictionaries', link: '/advanced/dictionaries'},
+          { text: 'Digitizer', link: '/advanced/digitizer'},
           { text: 'DOM', link: '/advanced/dom'},
           { text: 'Durations', link: '/advanced/Durations'},
-          { text: 'Event Emitters', link: '/advanced/emitters'},
           { text: 'Reactivity', link: '/advanced/reactivity'},
-          { text: 'Sequences', link: '/advanced/sequences'},
+          { text: 'Sequencer', link: '/advanced/sequencer'},
         ]
       },
       {

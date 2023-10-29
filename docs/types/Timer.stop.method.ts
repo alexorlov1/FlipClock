@@ -1,0 +1,1 @@
+stop(fn?: (timer: Timer) => void): Timer;

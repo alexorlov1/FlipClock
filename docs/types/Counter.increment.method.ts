@@ -1,0 +1,1 @@
+increment(value?: number): void;

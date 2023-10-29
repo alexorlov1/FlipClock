@@ -1,1 +1,0 @@
-type IsBlacklistFunction = (value: DigitizedValue) => boolean;

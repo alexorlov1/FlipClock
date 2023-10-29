@@ -1,0 +1,1 @@
+type ComputedGetter<T> = () => T;

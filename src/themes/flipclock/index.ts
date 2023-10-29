@@ -1,7 +1,7 @@
-import { FaceValue } from "../../FaceValue";
-import { FlipClock } from "../../FlipClock";
-import { DigitizedValue, DigitizedValues } from "../../helpers/digitizer";
-import { HTMLClassAttribute, classes, el } from "../../helpers/dom";
+import { type FaceValue } from "../../FaceValue";
+import { type FlipClock } from "../../FlipClock";
+import { type DigitizedValue, type DigitizedValues } from "../../helpers/digitizer";
+import { classes, el, type HTMLClassAttribute } from "../../helpers/dom";
 import { debounce } from "../../helpers/functions";
 
 /**
@@ -150,6 +150,7 @@ export function group(options: FlipClockGroupOptions): Element {
             !!options.label && el({
                 el: parent.querySelector('.flip-clock-label'),
                 tagName: 'div',
+                class: 'flip-clock-label',
                 children: [ options.label ]
             }),
             el({

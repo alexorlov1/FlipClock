@@ -1,0 +1,1 @@
+function useSequencer(options?: SequencerOptions): UseSequencer;

@@ -1,1 +1,0 @@
-function useSequencer(options?: SequencerOptions): SequencerContext;

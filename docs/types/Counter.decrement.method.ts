@@ -1,0 +1,1 @@
+decrement(value?: number): void;

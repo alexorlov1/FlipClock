@@ -1,0 +1,1 @@
+readonly direction: 'auto' | 'forwards' | 'backwards';

@@ -1,1 +1,0 @@
-type UndigitizeFunction = (value: DigitizedValues) => string | DigitizedValues;

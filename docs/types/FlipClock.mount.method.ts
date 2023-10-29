@@ -1,0 +1,1 @@
+mount(el: Element): this;

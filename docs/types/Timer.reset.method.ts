@@ -1,0 +1,1 @@
+reset(fn?: (timer: Timer) => void): Timer;

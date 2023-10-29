@@ -1,0 +1,1 @@
+function divider(options: DividerOptions): HTMLDivElement;

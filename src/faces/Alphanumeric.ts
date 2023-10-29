@@ -2,7 +2,7 @@ import { Face } from '../Face';
 import { FaceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
 import { DigitizedValues } from '../helpers/digitizer';
-import { SequencerContext, useSequencer } from '../helpers/sequencer';
+import { UseSequencer, useSequencer } from '../helpers/sequencer';
 import { watchEffect } from '../helpers/signal';
 import { SequencerOptions } from './../helpers/sequencer';
 
@@ -15,7 +15,7 @@ export type AlphanumericProps = {
     value: FaceValue<string|DigitizedValues>,
     direction?: 'auto' | 'forwards' | 'backwards',
     targetValue: FaceValue<string|DigitizedValues>,
-    sequencer?: SequencerContext | SequencerOptions
+    sequencer?: UseSequencer | SequencerOptions
     skipChars?: number,
 }
 
@@ -40,7 +40,7 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    public readonly sequencer: SequencerContext
+    public readonly sequencer: UseSequencer
 
     /**
      * The number of characters to skip during the incrementing/decrementing.

@@ -1,39 +1,50 @@
-
 /**
  * The Timer class uses a requestAnimationFrame loop to build a timer that can
  * start and stop.
+ * 
+ * @public
  */
 export class Timer {
 
     /**
      * The count increments with each interval.
+     * 
+     * @protected
      */
     protected $count: number = 0;
 
     /**
      * The requestAnimationFrame handle number.
+     * 
+     * @protected
      */
     protected $handle?: number;
 
     /**
      * The number of milliseconds that define an interval.
      * 
-     * @readonly
+     * @public
      */
     public readonly interval: number;
 
     /**
      * The timestamp of the last loop.
+     * 
+     * @protected
      */
     protected $lastLoop?: number;
 
     /**
      * The date the timer starts.
+     * 
+     * @protected
      */
     protected $startDate?: Date;
 
     /**
      * Create a new `Timer` instance.
+     * 
+     * @public
      */
     constructor(interval: number = 1000) {
         this.interval = interval;
@@ -41,6 +52,8 @@ export class Timer {
 
     /**
      * Get the number of times the timer has ticked.
+     * 
+     * @public
      */
     get count(): number {
         return this.$count;
@@ -48,6 +61,8 @@ export class Timer {
 
     /**
      * The `elapsed` attribute.
+     * 
+     * @public
      */
     get elapsed(): number {
         if(!this.$startDate) {
@@ -59,6 +74,8 @@ export class Timer {
 
     /**
      * The `elapsedSinceLastLoop` attribute.
+     * 
+     * @public
      */
     get elapsedSinceLastLoop(): number {
         if(!this.lastLoop) {
@@ -70,6 +87,8 @@ export class Timer {
 
     /**
      * Determines if the Timer is currently running.
+     * 
+     * @public
      */
     get isRunning(): boolean {
         return this.$handle !== undefined;
@@ -77,6 +96,8 @@ export class Timer {
 
     /**
      * Determines if the Timer is currently stopped.
+     * 
+     * @public
      */
     get isStopped(): boolean {
         return this.$handle === undefined;
@@ -84,6 +105,8 @@ export class Timer {
 
     /**
      * Get the last timestamp the timer looped.
+     * 
+     * @public
      */
     get lastLoop(): number {
         return this.$lastLoop || 0;
@@ -91,6 +114,8 @@ export class Timer {
 
     /**
      * Get the date object when the timer started.
+     * 
+     * @public
      */
     get started(): Date|undefined {
         return this.$startDate;
@@ -98,6 +123,8 @@ export class Timer {
 
     /**
      * Resets the timer. If a callback is provided, re-start the clock.
+     * 
+     * @public
      */
     reset(fn?: (timer: Timer) => void): Timer {
         this.stop(() => {
@@ -111,6 +138,8 @@ export class Timer {
 
     /**
      * Starts the timer.
+     * 
+     * @public
      */
     start(fn?: (timer: Timer) => void): Timer {
         this.$startDate = new Date;
@@ -135,6 +164,8 @@ export class Timer {
 
     /**
      * Stops the timer.
+     * 
+     * @public
      */
     stop(fn?: (timer: Timer) => void): Timer {
         if(this.isRunning && this.$handle) {

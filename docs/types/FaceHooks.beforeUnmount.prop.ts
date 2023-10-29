@@ -1,0 +1,1 @@
+beforeUnmount?: (instance: FlipClock<T>) => void;

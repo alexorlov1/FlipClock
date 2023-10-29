@@ -3,7 +3,7 @@ import { DigitizedValues } from '../..';
 import { Face } from '../Face';
 import { FaceValue, faceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
-import { DateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/date';
+import { UseDateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/date';
 
 /**
  * The `Clock` face options.
@@ -13,7 +13,7 @@ import { DateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/da
 export type ClockProps = {
     date?: Date,
     format?: string,
-    formatter?: UseDateFormats | DateFormatOptions,
+    formatter?: UseDateFormats | UseDateFormatOptions,
 }
 
 /**
@@ -61,7 +61,7 @@ export class Clock implements Face {
         this.date = props?.date
         this.formatter = props?.formatter && 'format' in props.formatter
             ? props.formatter
-            : useDateFormats(props?.formatter as DateFormatOptions);
+            : useDateFormats(props?.formatter as UseDateFormatOptions);
 
         if(props?.format) {
             this.format = props.format;

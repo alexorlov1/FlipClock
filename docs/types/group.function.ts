@@ -1,0 +1,1 @@
+function group(options: FlipClockGroupOptions): Element;

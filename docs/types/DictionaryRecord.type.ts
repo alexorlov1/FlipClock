@@ -1,0 +1,1 @@
+type DictionaryRecord = Record<string, string | Translator>;

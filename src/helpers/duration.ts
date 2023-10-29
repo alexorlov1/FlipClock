@@ -1,6 +1,11 @@
 import { add, differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInMonths, differenceInSeconds, differenceInWeeks, differenceInYears, pad } from "./date";
-import { DefineFunction, Translator, UnsetFunction, useDefinitionMap } from "./dictionary";
+import { DefineFunction, Translator, UnsetFunction, UseDictionary, useDefinitionMap } from "./dictionary";
 
+/**
+ * The time intervals between two dates.
+ * 
+ * @public
+ */
 export type Duration = {
     /**
      * The number of years passed.
@@ -43,19 +48,35 @@ export type Duration = {
     milliseconds?: number,
 }
 
-export type DurationFormatter = (date: Duration, format: string) => string;
-
+/**
+ * The duration flag format function.
+ * 
+ * @public
+ */
 export type DurationFlagFormatter = (duration: Duration, length: number) => string;
 
+/**
+ * The duration map definition.
+ * 
+ * @public
+ */
 export type DurationMapDefinition = [keyof Duration|(keyof Duration)[], DurationFlagFormatter]
 
-export type DurationFlagFormats = Record<string, DurationFlagFormatter>;
-
-export type DurationFormatOptions = {
-    translate?: Translator,
-    formats?: DurationFlagFormats,
+/**
+ * The options for `useDurationFormats()`.
+ * 
+ * @public
+ */
+export type UseDurationFormatOptions = {
+    translate?: Translator | UseDictionary,
+    formats?: Record<string, DurationFlagFormatter>,
 }
 
+/**
+ * The return type for `useDurationFormats()`.
+ * 
+ * @public
+ */
 export type UseDurationFormats = {
     map: Map<string, DurationMapDefinition>
     define: DefineFunction<DurationMapDefinition>
@@ -69,13 +90,13 @@ export type UseDurationFormats = {
  * 
  * @public 
  */
-export function useDurationFormats(options?: DurationFormatOptions): UseDurationFormats {
+export function useDurationFormats(options?: UseDurationFormatOptions): UseDurationFormats {
     const { map, define, unset } = useDefinitionMap(Object.entries<DurationMapDefinition>(
         {
             'Y': ['years', ({ years }, length) => pad(years, length)],
             'M': ['months', ({ months }, length) => pad(months, length)],
-            'w': ['weeks', ({ weeks }, length) => pad(weeks, length)],
-            'd': ['days', ({ days }, length) => pad(days, length)],
+            'W': ['weeks', ({ weeks }, length) => pad(weeks, length)],
+            'D': ['days', ({ days }, length) => pad(days, length)],
             'h': ['hours', ({ hours }, length) => pad(hours, length)],
             'm': ['minutes', ({ minutes }, length) => pad(minutes, length)],
             's': ['seconds', ({ seconds }, length) => pad(seconds, length)],
@@ -118,6 +139,9 @@ export function useDurationFormats(options?: DurationFormatOptions): UseDuration
         ],
     };
 
+    const translate = typeof options?.translate === 'function'
+        ? options.translate
+        : options?.translate?.translate;
   
     function format(start: Date, end: Date, format: string) {
         const flagPattern: RegExp = new RegExp(
@@ -147,7 +171,7 @@ export function useDurationFormats(options?: DurationFormatOptions): UseDuration
 
             const str = formatter[1](diff, key.length);
 
-            return options?.translate?.(str) ?? str;
+            return translate?.(str) ?? str;
         });
     }
 

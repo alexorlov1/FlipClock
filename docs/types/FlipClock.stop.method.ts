@@ -1,0 +1,1 @@
+stop(fn?: (instance: FlipClock<T>) => void): this;

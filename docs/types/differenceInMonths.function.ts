@@ -1,0 +1,1 @@
+function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number;

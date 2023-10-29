@@ -19,6 +19,4 @@ export * from './src/FlipClock';
 export * from './src/Timer';
 export * from './src/faces';
 
-export { theme } from './src/themes/flipclock';
-
-// export * as flipclock from './src/themes/flipclock';
+export * from './src/themes/flipclock';

@@ -11,6 +11,8 @@ export type Event<T, K extends keyof T> = {
 
 /**
  * The callback from the event emitter.
+ * 
+ * @public
  */
 export type EventEmitterCallback<T, K extends keyof Required<T>> = (...args: Required<T>[K][]) => void
 

@@ -2,7 +2,7 @@ import { EventEmitter } from "./EventEmitter";
 import { Face, FaceHooks } from './Face';
 import { Timer } from "./Timer";
 import { watchEffect } from "./helpers/signal";
-import { theme } from './themes/flipclock/index';
+// import { theme } from './themes/flipclock/index';
 
 export type Theme<T extends Face<T>> = {
     render: (instance: FlipClock<T>) => void
@@ -11,7 +11,7 @@ export type Theme<T extends Face<T>> = {
 export type FlipClockProps<T extends Face<T>> = {
     autoStart?: boolean,
     face: T
-    theme?: Theme<T>
+    theme: Theme<T>
     timer?: Timer | number,
     el?: Element | null,
 }
@@ -65,7 +65,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
         super();
 
         this.face = props.face;
-        this.theme = props.theme ?? theme();
+        this.theme = props.theme;
         
         if(typeof props.autoStart === 'boolean') {
             this.autoStart = props.autoStart;
@@ -213,7 +213,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
 }
 
 /**
- * Instantiate a new FlipClock instance.
+ * Instantiate a new `FlipClock` instance.
  */
 export function flipClock<T extends Face<T>>(props: FlipClockProps<T>): FlipClock<T> {
     return new FlipClock<T>(props);

@@ -1,0 +1,1 @@
+emit<K extends keyof Required<T>>(key: K, ...args: Required<T>[K] extends (...args: infer P) => void ? P : any[]): void;

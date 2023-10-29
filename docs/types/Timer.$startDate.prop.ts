@@ -1,0 +1,1 @@
+protected $startDate?: Date;

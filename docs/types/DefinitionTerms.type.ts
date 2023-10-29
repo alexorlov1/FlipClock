@@ -1,0 +1,1 @@
+type DefinitionTerms = Record<string, string | Translator>;

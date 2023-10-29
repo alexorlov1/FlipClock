@@ -1,1 +1,0 @@
-function useCharset(options?: CharsetOptions): CharsetContext;

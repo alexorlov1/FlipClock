@@ -1,0 +1,1 @@
+type DefineFunction<V> = (key: string | Record<string, V>, value?: V) => void;

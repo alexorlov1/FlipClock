@@ -1,0 +1,1 @@
+interval(instance: FlipClock<Counter>): void;

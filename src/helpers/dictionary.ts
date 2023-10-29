@@ -16,12 +16,12 @@ export type UseDefinitionMap<V> = {
 
 /**
  * A definition map is a reusable interface to create key/value pairs.
+ * 
+ * @public
  */
 export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
     const map = new Map(items);
 
-    // function define(key: Record<string,V>): void
-    // function define(key: string, value: V): void
     function define(key: string | Record<string, V>, value?: V): void {
         if(typeof key === 'string' && value) {
             map.set(key, value);
@@ -33,8 +33,6 @@ export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
         }        
     }
 
-    // function unset(keys: string): void
-    // function unset(keys: string[]): void
     function unset(keys: string|string[]): void {
         if (Array.isArray(keys)) {
             for(const key of keys) {
@@ -52,10 +50,21 @@ export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
 }
 
 /**
- * Create a new date string formatter.
+ * The return type for `useDictionary()`.
+ * 
+ * @public
  */
-export function useDictionary(definitions: DefinitionTerms = {}) {
-    const { map, define, unset } = useDefinitionMap(Object.entries(definitions));
+export type UseDictionary = UseDefinitionMap<string|Translator> & {
+    translate: Translator
+}
+
+/**
+ * Use the provided terms to create a reusable translation dictionary.
+ * 
+ * @public
+ */
+export function useDictionary(terms: DefinitionTerms = {}): UseDictionary {
+    const { map, define, unset } = useDefinitionMap(Object.entries(terms));
     
     function translate(key: string): string {
         const term = map.get(key);

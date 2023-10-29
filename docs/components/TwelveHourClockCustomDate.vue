@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { clock, flipClock } from 'flipclock';
+import { clock, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -23,7 +23,8 @@ function run(el: Element) {
         face: clock({
             date,
             format: 'MMM YYYY hh:mm:ss A'
-        })
+        }),
+        theme: theme()
     });
     // #endregion example
 }
@@ -38,7 +39,7 @@ onMounted(() => el.value && run(el.value));
 </template>
 
 <style scoped>
-* >>> .flip-clock .flip-clock-card {
+*:deep(.flip-clock .flip-clock-card) {
     font-size: 8px;
     border-radius: 2px;
 }

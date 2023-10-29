@@ -19,6 +19,6 @@
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
     },
-    "include": ["index.ts", "src", "demo.ts"]
+    "include": ["index.ts", "src", "demo.ts", ".bin/test.ts"]
   }
   

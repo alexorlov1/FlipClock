@@ -1,0 +1,1 @@
+on<K extends keyof Required<T>>(key: K, fn: EventEmitterCallback<T, K>): () => void;

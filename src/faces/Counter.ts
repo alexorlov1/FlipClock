@@ -25,28 +25,28 @@ export class Counter implements Face {
     /**
      * Should the face count down instead of up.
      * 
-     * @internal
+     * @public
      */
     public countdown: boolean = false;
 
     /**
      * The number to increment/decrement in the interval.
      * 
-     * @internal
+     * @public
      */
     public step: number = 1;
 
     /**
      * The target value determines when the counter should stop.
      * 
-     * @internal
+     * @public
      */
     public targetValue?: FaceValue<number>;
 
     /**
      * The current face value.
      * 
-     * @internal
+     * @public
      */
     public value: FaceValue<number>;
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 // #region import
-import { FlipClock, counter, faceValue, flipClock } from 'flipclock';
+import { Counter, FlipClock, counter, faceValue, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
 
-let clock: FlipClock;
+let clock: FlipClock<Counter>;
 
 const el = ref<Element>();
 
@@ -16,7 +16,8 @@ function run(el: Element) {
         autoStart: false,
         face: counter({
             value: faceValue(10)
-        })
+        }),
+        theme: theme()
     });
     // #endregion example
 }

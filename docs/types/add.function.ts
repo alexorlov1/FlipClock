@@ -1,0 +1,1 @@
+function add(date: Date, duration: Partial<Duration>): Date;

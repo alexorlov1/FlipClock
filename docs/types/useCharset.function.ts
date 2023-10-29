@@ -1,0 +1,1 @@
+function useCharset(options?: UseCharsetOptions): UseCharset;

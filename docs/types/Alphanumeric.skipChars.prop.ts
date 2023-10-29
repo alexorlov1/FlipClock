@@ -1,0 +1,1 @@
+readonly skipChars?: number;

@@ -1,1 +1,0 @@
-type DurationFormatter = (date: Duration, format: string) => string;

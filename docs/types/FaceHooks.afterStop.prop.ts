@@ -1,0 +1,1 @@
+afterStop?: (instance: FlipClock<T>) => void;

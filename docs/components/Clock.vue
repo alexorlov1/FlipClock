@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { clock, flipClock } from 'flipclock';
+import { clock, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -11,7 +11,8 @@ function run(el: Element) {
     // #region example
     flipClock({
         el,
-        face: clock()
+        face: clock(),
+        theme: theme()
     })
     // #endregion example
 }

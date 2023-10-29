@@ -1,0 +1,1 @@
+function cardItem(options: CardItemOptions): Element;

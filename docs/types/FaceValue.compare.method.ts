@@ -1,0 +1,1 @@
+compare(subject?: FaceValue<any>): boolean;

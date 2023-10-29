@@ -1,1 +1,0 @@
-function ref<T>(value?: T): Ref<T | undefined>;

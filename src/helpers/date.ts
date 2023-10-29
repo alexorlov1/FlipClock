@@ -1,30 +1,40 @@
-import { DefineFunction, Translator, UnsetFunction, useDefinitionMap } from "./dictionary";
+import { Translator, UseDefinitionMap, UseDictionary, useDefinitionMap } from "./dictionary";
 import { DigitizedValues, UseDigitizer, useDigitizer } from "./digitizer";
 import { Duration } from "./duration";
 import { ParsedString, parse as p } from "./parser";
 
 /**
  * The number of days in a week.
+ * 
+ * @public
  */
 export const daysInWeek: number = 7
 
 /**
  * The number of milliseconds in 1 day.
+ * 
+ * @public
  */
 export const millisecondsInDay: number = 86400000;
 
 /**
- * The number of milliseconds in 1 hour
+ * The number of milliseconds in 1 hour.
+ * 
+ * @public
  */
 export const millisecondsInHour: number = 3600000;
 
 /**
- * The number of milliseconds in 1 minute
+ * The number of milliseconds in 1 minute.
+ * 
+ * @public
  */
 export const millisecondsInMinute: number = 60000;
 
 /**
  * The proper names of the days in English.
+ * 
+ * @public
  */
 export const days = [
     'Sunday',
@@ -38,6 +48,8 @@ export const days = [
 
 /**
  * The abbreviated names of the days in English.
+ * 
+ * @public
  */
 export const dayAbbreviations = [
     'Sun',
@@ -52,6 +64,8 @@ export const dayAbbreviations = [
 
 /**
  * The proper names of the months in English.
+ * 
+ * @public
  */
 export const months = [
     'January',
@@ -70,6 +84,8 @@ export const months = [
 
 /**
  * The abbreviated names of the months in English.
+ * 
+ * @public
  */
 export const monthAbbreviations = [
     'Jan',
@@ -86,31 +102,40 @@ export const monthAbbreviations = [
     'Dec'
 ];
 
-export type DateFormatFunction = (date: Date, format: string) => string;
-export type DateParseFunction = (date: Date, format: string) => DigitizedValues;
-
+/**
+ * Formats a date into a string.
+ * 
+ * @public
+ */
 export type DateFlagFormatFunction = (date: Date) => string;
 
-export type DateFormatOptions = {
+/**
+ * The options for `useDateFormats()`.
+ * 
+ * @public
+ */
+export type UseDateFormatOptions = {
     digitizer?: UseDigitizer,
-    translate?: Translator,
+    translate?: Translator | UseDictionary,
     formats?: Record<string, DateFlagFormatFunction>,
 }
 
-export type DateMapDefinition = Map<string, DateFlagFormatFunction>;
-
-export type UseDateFormats = {
-    map: DateMapDefinition,
-    define: DefineFunction<DateFlagFormatFunction>
-    format: DateFormatFunction,
-    parse: DateParseFunction,
-    unset: UnsetFunction
+/**
+ * The return type for `useDateFormats()`.
+ * 
+ * @public
+ */
+export type UseDateFormats = UseDefinitionMap<DateFlagFormatFunction> & {
+    format: (date: Date, format: string) => string,
+    parse: (date: Date, format: string) => DigitizedValues,
 }
 
 /**
  * Create a new date string formatter.
+ * 
+ * @public
  */
-export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
+export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  {
     const { map, define, unset } = useDefinitionMap<DateFlagFormatFunction>(Object.entries(
         Object.assign({
             A: (date: Date) => date.getHours() < 12 ? 'AM' : 'PM',
@@ -141,9 +166,18 @@ export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
         }, options?.formats)
     ));
 
+    const translate = typeof options?.translate === 'function'
+        ? options.translate
+        : options?.translate?.translate;
+
     const { digitize } = options?.digitizer ?? useDigitizer();
     
-    function format(date: Date, str: string) {
+    /**
+     * Formats a date using a format string.
+     * 
+     * @public
+     */
+    function format(date: Date, str: string): string {
         const flagPattern: RegExp = new RegExp([...sort(map)].join('|'), 'g');
         
         return str.replace(flagPattern, key => {
@@ -155,11 +189,16 @@ export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
 
             const str = formatter(date);
 
-            return options?.translate?.(str) ?? str;
+            return translate?.(str) ?? str;
         });
     }
 
-    function parse(date: Date, str: string) {
+    /**
+     * Parse a date using the format string but `DigitizedValues`.
+     * 
+     * @public
+     */
+    function parse(date: Date, str: string): DigitizedValues {
         function recurse(array: string): string
         function recurse(array: ParsedString): DigitizedValues
         function recurse(array: ParsedString | string): DigitizedValues | string {
@@ -191,6 +230,8 @@ export function useDateFormats(options?: DateFormatOptions): UseDateFormats  {
 
 /**
  * So an array based on the index position of another.
+ * 
+ * @public
  */
 export function sort(map: Map<string,unknown>) {
     return Array.from(map.keys()).sort((a, b) => {
@@ -208,6 +249,8 @@ export function sort(map: Map<string,unknown>) {
 
 /**
  * Left pad another value with zero if its less then the given length.
+ * 
+ * @public
  */
 export function pad(value: string|number|undefined, length: number): string {
     if(value === undefined) {
@@ -227,6 +270,8 @@ export function pad(value: string|number|undefined, length: number): string {
 
 /**
  * Add the duration to the given date.
+ * 
+ * @public
  */
 export function add(date: Date, duration: Partial<Duration>): Date {
     const {
@@ -256,6 +301,8 @@ export function add(date: Date, duration: Partial<Duration>): Date {
 
 /**
  * Add x days to the given date.
+ * 
+ * @public
  */
 export function addDays(date: Date, amount: number): Date {
     // If amount is NaN, then just return the date.
@@ -275,6 +322,8 @@ export function addDays(date: Date, amount: number): Date {
 
 /**
  * Add x months to the given date.
+ * 
+ * @public
  */
 export function addMonths(date: Date, amount: number): Date {
     // If amount is NaN, then just reutrn the date.
@@ -326,6 +375,8 @@ export function addMonths(date: Date, amount: number): Date {
 
 /**
  * Compare two dates and return a number. This method is used with sort().
+ * 
+ * @public
  */
 export function compareAsc(left: Date, right: Date): number {
     const diff = left.getTime() - right.getTime()
@@ -341,6 +392,8 @@ export function compareAsc(left: Date, right: Date): number {
 
 /**
  * Set the date to the end of the relative day.
+ * 
+ * @public
  */
 export function endOfDay(date: Date): Date {
     date.setHours(23, 59, 59, 999)
@@ -349,6 +402,8 @@ export function endOfDay(date: Date): Date {
 
 /**
  * Set the date to the end of the relative month.
+ * 
+ * @public
  */
 export function endOfMonth(date: Date): Date {
     const month = date.getMonth()
@@ -359,6 +414,8 @@ export function endOfMonth(date: Date): Date {
 
 /**
  * Determines if the given date is the last day of the month.
+ * 
+ * @public
  */
 export function isLastDayOfMonth(dirtyDate: Date): boolean {
     const date = new Date(dirtyDate);
@@ -368,6 +425,8 @@ export function isLastDayOfMonth(dirtyDate: Date): boolean {
 
 /**
  * Calculates the difference between two given dates in calendar years.
+ * 
+ * @public
  */
 export function differenceInCalendarYears(left: Date, right: Date): number {
     return left.getFullYear() - right.getFullYear()
@@ -375,6 +434,8 @@ export function differenceInCalendarYears(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in calendar years.
+ * 
+ * @public
  */
 export function differenceInCalendarMonths(left: Date, right: Date): number {
     const yearDiff = left.getFullYear() - right.getFullYear()
@@ -384,6 +445,8 @@ export function differenceInCalendarMonths(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
 export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
@@ -407,6 +470,8 @@ export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
 
 /**
  * Calculates the difference between two given dates in months.
+ * 
+ * @public
  */
 export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
@@ -444,6 +509,8 @@ export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
 
 /**
  * Calculates the difference between two given dates in weeks.
+ * 
+ * @public
  */
 export function differenceInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
     return Math.floor(differenceInDays(dirtyLeft, dirtyRight) / daysInWeek);
@@ -451,6 +518,8 @@ export function differenceInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
 export function differenceInDays(left: Date, right: Date): number {
     return Math.floor(differenceInMilliseconds(left, right) / millisecondsInDay);
@@ -458,6 +527,8 @@ export function differenceInDays(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
 export function differenceInHours(left: Date, right: Date): number {
     return Math.floor(differenceInMilliseconds(left, right) / millisecondsInHour);
@@ -465,6 +536,8 @@ export function differenceInHours(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
 export function differenceInMinutes(left: Date, right: Date): number {
     return Math.floor(differenceInMilliseconds(left, right) / millisecondsInMinute);
@@ -472,6 +545,8 @@ export function differenceInMinutes(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
  export function differenceInSeconds(left: Date, right: Date): number {
     return Math.floor(differenceInMilliseconds(left, right) / 1000);
@@ -479,6 +554,8 @@ export function differenceInMinutes(left: Date, right: Date): number {
 
 /**
  * Calculates the difference between two given dates in years.
+ * 
+ * @public
  */
 export function differenceInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number {
     return new Date(dirtyLeft).getTime() - new Date(dirtyRight).getTime();
@@ -486,6 +563,8 @@ export function differenceInMilliseconds(dirtyLeft: Date, dirtyRight: Date): num
 
 /**
  * Get the twelve hour format of the current date.
+ * 
+ * @public
  */
 export function getTwelveHourFormat(date: Date): string {
     const mod: number = date.getHours() % 12;

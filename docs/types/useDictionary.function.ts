@@ -1,0 +1,1 @@
+function useDictionary(terms?: DefinitionTerms): UseDictionary;

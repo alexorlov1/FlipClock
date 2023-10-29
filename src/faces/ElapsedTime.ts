@@ -94,7 +94,9 @@ export class ElapsedTime implements Face {
      * @public
      */
     public interval(): void {
-        this.value.value = this.formatter.format(this.span.start, this.span.end, this.format);
+        this.value.value = this.formatter.format(
+            this.span.start, this.span.end, this.format
+        );
     }
 }
 

@@ -1,8 +1,17 @@
+- remove `value` property from Face interface, and have pass that as a prop to render. Have the face responsible for returning the value in interval or something.
 - facevalue carry length doesn't work, and minimum digits needs added back.
 - counter needs ability to format the number with dollar signs, commas, etc.
-- implement array structure parsing syntax for duration formats, and counter number formats.
 - fix divider css. height is fluid. http://localhost:5175/examples/clock.html
 - make alphanumeric face have better defaults. should implement stopAfterChanges, 1 or something by default.
+- elapsedtime needs a stop at. the loop with never stop.
+- implement array structure parsing syntax for duration formats, and counter number formats.
+- explore concept of array structure formatting for digitized values baked in.
+  
+- document example for
+  - clock with dictionary translations
+  - alphanumeric with limited charset
+  - array structure format
+  - building your own theme
   
 - probaly should have proper function passing and typing when using stopWhen. need to accept real functions in addition to the params.
 - write CSS-in-JS solution

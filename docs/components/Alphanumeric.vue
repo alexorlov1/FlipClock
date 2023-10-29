@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // #region import
-import { alphanumeric, faceValue, flipClock } from 'flipclock';
+import { alphanumeric, faceValue, flipClock, theme } from 'flipclock';
 // #endregion import
 
 import { onMounted, ref } from 'vue';
@@ -15,7 +15,8 @@ function run(el: Element) {
         face: alphanumeric({
             value: faceValue(''),
             targetValue: faceValue('hello world')
-        })
+        }),
+        theme: theme()
     });
     // #endregion example
 }

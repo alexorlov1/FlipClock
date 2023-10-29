@@ -2,6 +2,8 @@ import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from './digitizer';
 
 /**
  * Get a range of numbers using the given size and starting point.
+ * 
+ * @public
  */
 export function range(startAt: number = 0, size: number): number[] {
     return Array.from(Array(size).keys()).map(i => i + startAt);
@@ -9,6 +11,8 @@ export function range(startAt: number = 0, size: number): number[] {
 
 /**
  * Generates a random array of characters using the given range.
+ * 
+ * @public
  */
 export function characterRange(startChar: string, endChar: string): string[] {
     const nums = range(
@@ -20,6 +24,8 @@ export function characterRange(startChar: string, endChar: string): string[] {
 
 /**
  * Shuffles array in place.
+ * 
+ * @public
  */
 export function fisherYatesShuffle(chars: string[]): string[] {
     const newArr: string[] = [];
@@ -37,6 +43,8 @@ export function fisherYatesShuffle(chars: string[]): string[] {
 
 /**
  * Get the default character set.
+ * 
+ * @public
  */
 export function defaultCharset(): string[] {
     return [
@@ -47,41 +55,40 @@ export function defaultCharset(): string[] {
     ];
 }
 
-export type CreateCharset = (shuffle?: boolean) => string[]
-
-export type ShuffleFunction = (chars: string[]) => string[]
-
-export type CharsetOptions = {
-    whitelist?: string[]
-    blacklist?: string[],
-    charset?: CreateCharset,
-    emptyChar?: string,
-    shuffle?: boolean|ShuffleFunction
-}
-
-export type CharsetCache = Map<string, string[]>;
-
-
-export type ChunkFunction = (value: DigitizedValue | undefined, size: number) => string[];
-export type IsBlacklistFunction = (value: DigitizedValue) => boolean;
-export type IsWhitelistFunction = (value: DigitizedValue) => boolean;
-export type NextFunction = (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined;
-export type PrevFunction = (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined;
-
-export type CharsetContext = {
-    charset: string[],
-    emptyChar: string,
-    chunk: ChunkFunction,
-    isBlacklisted: IsBlacklistFunction,
-    isWhitelisted: IsWhitelistFunction,
-    next: NextFunction,
-    prev: PrevFunction
+/**
+ * The options for `useCharset()`.
+ * 
+ * @public
+ */
+export type UseCharsetOptions = {
+    blacklist?: string[];
+    charset?: (shuffle?: boolean) => string[];
+    emptyChar?: string;
+    shuffle?: ((chars: string[]) => string[]) | boolean;
+    whitelist?: string[];
 }
 
 /**
- * Use a character set to define what characters show up in the sequence.
+ * The return type for `useCharset()`.
+ * 
+ * @public
  */
-export function useCharset(options: CharsetOptions = {}): CharsetContext {
+export type UseCharset = {
+    charset: string[],
+    emptyChar: string,
+    chunk: (value: DigitizedValue | undefined, size: number) => string[],
+    isBlacklisted: (value: DigitizedValue) => boolean,
+    isWhitelisted: (value: DigitizedValue) => boolean,
+    next: (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined,
+    prev: (value?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count?: number) => DigitizedValue | undefined
+}
+
+/**
+ * A composable that uses a set of characters to create a charset.
+ * 
+ * @public
+ */
+export function useCharset(options: UseCharsetOptions = {}): UseCharset {
     const blacklist = options.blacklist || [];
     const whitelist = options.whitelist || [];
     const emptyChar = options.emptyChar || EMPTY_CHAR;
@@ -94,7 +101,7 @@ export function useCharset(options: CharsetOptions = {}): CharsetContext {
      * Creates a charset and shuffles it if required.
      */
     function createCharset(): string[] {
-        const fn: CreateCharset = options?.charset || defaultCharset;
+        const fn = options?.charset || defaultCharset;
 
         return shuffle ? shuffle(fn()) : fn();
     };

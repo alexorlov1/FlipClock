@@ -1,3 +1,0 @@
-type FaceValueProps = {
-    digitizer?: UseDigitizer;
-};
