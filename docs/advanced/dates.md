@@ -14,13 +14,10 @@ Format a `Date` into a `string` or `DigitizedValues` using a format string. You 
 
 ## Basic Example
 
-`format()` returns a string, while `parse()` returns a digitized array.
-
 ```ts
 const { format, parse } = useDateFormats();
 
 format(new Date('2024-01-01'), 'DD, MM YYYY')); // returns `01, 01 2024`
-parse(new Date('2024-01-01'), '[DD], [MM] [YYYY]')); // returns `[['0', '1'],',',['0', '1'],' ',['2', '0', '2', '4']]`
 ```
 
 ::: tip

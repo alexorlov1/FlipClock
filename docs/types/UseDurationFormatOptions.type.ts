@@ -1,4 +1,4 @@
 type UseDurationFormatOptions = {
-    translate?: Translator;
+    translate?: Translator | UseDictionary;
     formats?: Record<string, DurationFlagFormatter>;
 };

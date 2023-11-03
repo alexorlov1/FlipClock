@@ -1,4 +1,4 @@
-import { type FaceValue } from "../../FaceValue";
+import { type FaceValue } from '../../FaceValue';
 import { type FlipClock } from "../../FlipClock";
 import { type DigitizedValue, type DigitizedValues } from "../../helpers/digitizer";
 import { classes, el, type HTMLClassAttribute } from "../../helpers/dom";
@@ -30,7 +30,7 @@ export function theme(options: FlipClockThemeOptions = {}) {
             el: instance.el,
             labels: options.labels,
             dividers: options.dividers,
-            value: instance.face.value,
+            value: instance.face.faceValue(),
         })
     }
 }

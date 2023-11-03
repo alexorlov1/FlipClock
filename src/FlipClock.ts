@@ -2,7 +2,6 @@ import { EventEmitter } from "./EventEmitter";
 import { Face, FaceHooks } from './Face';
 import { Timer } from "./Timer";
 import { watchEffect } from "./helpers/signal";
-// import { theme } from './themes/flipclock/index';
 
 export type Theme<T extends Face<T>> = {
     render: (instance: FlipClock<T>) => void

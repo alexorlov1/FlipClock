@@ -1,1 +1,1 @@
-value: FaceValue<string | DigitizedValues>;
+readonly value: FaceValue<string | DigitizedValues>;

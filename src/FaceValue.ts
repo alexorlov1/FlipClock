@@ -1,6 +1,6 @@
 import { DigitizedValues, UseDigitizer, useDigitizer } from "./helpers/digitizer";
 import { Ref, ref } from "./helpers/ref";
-import { watchEffect } from "./helpers/signal";
+import { count } from "./helpers/structure";
 
 /**
  * The `FaceValue` face options.
@@ -19,16 +19,6 @@ export type FaceValueProps = {
  * @public
  */
 export class FaceValue<T> {
-
-    /**
-     * The carry length is carry over when the instance it copied. The minimum
-     * number of digits could be 5. But say the string had 7 digits, the minimum
-     * required would still be maintained, but the carry can take priority to
-     * ensure no face value ever shrinks in the total number of digits.
-     * 
-     * @public
-     */
-    protected $carryLength: number
 
     /**
      * Parameters that are passed to the digiter.
@@ -51,24 +41,8 @@ export class FaceValue<T> {
      */
     constructor(value: T, props?: FaceValueProps) {
         this.digitizer = props?.digitizer || useDigitizer();
-        
         this.$value = ref(value);
-        this.$carryLength = this.digits.length;
-
-        watchEffect(() => {
-            this.$carryLength = this.digits.length;
-        });
     }
-
-    /**
-     * The carry length.
-     * 
-     * @public
-     */
-    get carryLength() {
-        return this.$carryLength;
-    }
-
     /**
      * The digitized value.
      * 
@@ -88,25 +62,12 @@ export class FaceValue<T> {
     }
 
     /**
-     * Get the minimum length.
-     * 
-     * @public
-     */
-    get minimumLength() {
-        return Math.max(
-            this.carryLength || 0,
-            this.digits?.flat().length || 0
-        )
-    }
-
-    /**
      * Get the length of the flattened digitized array.
      * 
      * @public
      */
     get length() {
-        // @ts-ignore
-        return this.digits.flat(Infinity).length;
+        return count(this.digits);
     }
 
     /**

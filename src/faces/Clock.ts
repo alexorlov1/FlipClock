@@ -1,9 +1,11 @@
+import { Ref } from './../helpers/ref';
 
-import { DigitizedValues } from '../..';
 import { Face } from '../Face';
 import { FaceValue, faceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
 import { UseDateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/date';
+import { ref } from '../helpers/ref';
+import { watchEffect } from '../helpers/signal';
 
 /**
  * The `Clock` face options.
@@ -29,15 +31,15 @@ export class Clock implements Face {
      * 
      * @public
      */
-    date?: Date
+    public readonly date: Ref<Date|undefined>
 
     /**
      * The current formatted value.
      * 
      * @public
      */
-    value: FaceValue<DigitizedValues>
-    
+    public readonly value: FaceValue<string>
+
     /**
      * The format string.
      * 
@@ -58,16 +60,33 @@ export class Clock implements Face {
      * @public
      */
     constructor(props?: ClockProps) {
-        this.date = props?.date
+        this.date = ref(props?.date);
         this.formatter = props?.formatter && 'format' in props.formatter
             ? props.formatter
             : useDateFormats(props?.formatter as UseDateFormatOptions);
 
-        if(props?.format) {
+        if (props?.format) {
             this.format = props.format;
         }
 
-        this.value = faceValue(this.formatter.parse(new Date, this.format));
+        const format = () => {
+            return this.formatter.format(this.date?.value ?? new Date, this.format)
+        }
+
+        this.value = faceValue('');
+
+        watchEffect(() => {
+            this.value.value = format();
+        });
+    }
+
+    /**
+     * The face's current value.
+     * 
+     * @public
+     */
+    faceValue(): FaceValue<string> {
+        return this.value;
     }
 
     /**
@@ -76,15 +95,15 @@ export class Clock implements Face {
      * @public
      */
     public interval(instance: FlipClock<any>): void {
-        if(!this.date) {
-            this.value.value = this.formatter.parse(new Date, this.format)
+        if (!this.date?.value) {
+            this.value.value = this.formatter.format(new Date, this.format)
         }
         else {
             const date = new Date;
 
-            date.setTime(this.date.getTime() + instance.timer.elapsed);
+            date.setTime(this.date.value.getTime() + instance.timer.elapsed);
 
-            this.value.value = this.formatter.parse(date, this.format);
+            this.value.value = this.formatter.format(date, this.format);
         }
     }
 }

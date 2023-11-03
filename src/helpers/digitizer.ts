@@ -1,3 +1,5 @@
+import { parse } from "./parser";
+
 /**
  * A single digitized value
  * 
@@ -26,7 +28,7 @@ export const EMPTY_CHAR = ' ' as const;
  */
 export type UseDigitizer = {
     digitize: (value: any) => DigitizedValues;
-    undigitize: (value: DigitizedValues) => string | DigitizedValues;
+    undigitize: (value: DigitizedValues) => DigitizedValue;
     isDigitized: (value: any) => boolean;
 }
 
@@ -38,40 +40,48 @@ export type UseDigitizer = {
  */
 export function useDigitizer(): UseDigitizer {
     /**
-     * Recursively digitize a value into an array of individual characters.
+     * Parse a string, number or an array into `DigitizedValues`.
+     * 
+     * @public
      */
-    function digitize(value: number | string | DigitizedValue | DigitizedValues): DigitizedValues {
-        function stringify(value: undefined | number | string | DigitizedValue | DigitizedValues): DigitizedValue | DigitizedValues {
-            if(value === undefined) {
-                return '';
-            }
-
-            if (!(typeof value === 'string')) {
-                return stringify(value.toString());
-            }
-
-            return value.length === 1 ? value : Array.from(value);
-        }
-        
-        function recurse(value: undefined | number | string | DigitizedValue | DigitizedValues) {
-            if (Array.isArray(value)) {
-                for (let i = 0; i < value.length; i++) {
-                    value[i] = recurse(value[i]);
-                }
-
-                return value;
-            }
-
-            return stringify(value);
+    function digitize(value?: number | string | DigitizedValue | DigitizedValues): DigitizedValues {
+        if(value === undefined) {
+            return [];
         }
 
-        return Array.from(recurse(value));
+        if(typeof value === 'string') {
+            return value.match(/\[|\]/) ? parse(value) : Array.from(value);
+        }
+
+        if(typeof value === 'number') {
+            return Array.from(value.toString());
+        }
+
+        for(const item of value) {
+            const index = value.indexOf(item);
+            const response = digitize(item);
+
+            if(response === undefined) {
+                continue;
+            }
+
+            if(typeof item == 'string') {
+                value.splice(index, 1, ...response);
+            }
+            else {
+                value.splice(index, 1, response);
+            }
+        }
+
+        return value.filter(Boolean) ?? [];
     }
 
     /**
      * Recursively undigitize a value into a string or array of strings.
+     * 
+     * @public
      */
-    function undigitize(value: DigitizedValues) {
+    function undigitize(value: DigitizedValues): DigitizedValue {
         function recurse(value: DigitizedValues): DigitizedValues | DigitizedValue {
             const digits: DigitizedValues = [];
             
@@ -98,9 +108,14 @@ export function useDigitizer(): UseDigitizer {
             return (containsArray ? digits : digits[0]);
         }
 
-        return recurse(value);
+        return recurse(value) as DigitizedValue;
     }
     
+    /**
+     * Check if the value is the type `DigitizedValues`.
+     * 
+     * @public
+     */
     function isDigitized(value: any): boolean {
         function recurse(value: any): boolean {
             if (!Array.isArray(value)) {

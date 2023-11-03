@@ -42,7 +42,7 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
             // Loop through the current using the max length of target and
             // current. This recursively interates through the arrays
             // regardless of which is longer.
-            const length = Math.max(target.length, current.length);
+            const length = Math.max((target as DigitizedValues).length, current.length);
           
             for (let i = forwards ? 0 : length - 1; forwards ? i < length : i >= 0; forwards ? i++ : i--) {
                 // If the current value doesn't exist, recurively match the
@@ -79,7 +79,7 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
 
         // If the target is an array of digitized values, then recursively
         // force the current value to be an array of digitized values.
-        if(isDigitizedValues(target)) {
+        if(Array.isArray(target) && !isDigitizedGroup(target)) {
             current = castDigitizedValues(current);
 
             // Loop over the existing digitized value to ensure the digits are
@@ -191,7 +191,7 @@ export function castDigitizedGroup(value?: DigitizedValue | DigitizedValues): Di
 /**
  * Determines if the value is an array of digitized strings.
  */
-export function isDigitizedValues(value: DigitizedValue | DigitizedValues) {
+export function isDigitizedValues(value: DigitizedValue | DigitizedValues): boolean {
     return Array.isArray(value) && !isDigitizedGroup(value);
 }   
 
@@ -211,6 +211,28 @@ export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undef
     }
 
     return false
+}
+
+/**
+ * Counts the digits recursively.
+ * 
+ * @public 
+ */
+export function count(values: DigitizedValues) {
+    function recurse(values: DigitizedValues, count: number = 0) {
+        for(const value of values) {
+            if(Array.isArray(value)) {
+                count += recurse(value, count);
+            }
+            else {
+                count += value.length;
+            }
+        }
+
+        return count;
+    }
+
+    return recurse(values);
 }
 
 

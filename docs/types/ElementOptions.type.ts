@@ -4,7 +4,7 @@ type ElementOptions<T> = {
     class?: HTMLClassAttribute;
     style?: HTMLStyleAttribute;
     attrs?: HTMLAttributes;
-    children?: ElementChildren;
+    children?: (ElementChildElement)[] | ((el: Element) => ElementChildElement[]);
     events?: {
         [K in keyof GlobalEventHandlers]?: GlobalEventHandlers[K];
     };

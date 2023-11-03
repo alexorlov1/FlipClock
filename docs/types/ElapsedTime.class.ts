@@ -45,6 +45,12 @@ class ElapsedTime implements Face {
         end: Date;
     };
     /**
+     * The face's current value.
+     *
+     * @public
+     */
+    faceValue(): FaceValue<string>;
+    /**
      * Format the value with the new elapsed time.
      *
      * @public

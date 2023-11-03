@@ -1,6 +1,6 @@
 type ElapsedTimeProps = {
     end?: Date;
     format: string;
-    formatter?: UseDurationFormats | DurationFormatOptions;
+    formatter?: UseDurationFormats | UseDurationFormatOptions;
     start?: Date;
 };

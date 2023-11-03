@@ -5,13 +5,13 @@ class Clock implements Face {
      *
      * @public
      */
-    date?: Date;
+    readonly date: Ref<Date | undefined>;
     /**
      * The current formatted value.
      *
      * @public
      */
-    value: FaceValue<DigitizedValues>;
+    readonly value: FaceValue<string>;
     /**
      * The format string.
      *
@@ -30,6 +30,12 @@ class Clock implements Face {
      * @public
      */
     constructor(props?: ClockProps);
+    /**
+     * The face's current value.
+     *
+     * @public
+     */
+    faceValue(): FaceValue<string>;
     /**
      * Format the face value to the current date/time.
      *

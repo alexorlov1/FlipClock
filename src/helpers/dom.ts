@@ -1,22 +1,45 @@
-
+/**
+ * HTML class attribute.
+ * 
+ * @public
+ */
 export type HTMLClassAttribute = string | string[] | Record<string,boolean|undefined|null>;
 
+/**
+ * HTML style attribute.
+ * 
+ * @public
+ */
 export type HTMLStyleAttribute = {
     [K in keyof CSSStyleDeclaration]?: string
 } | string;
 
+/**
+ * HTML attributes object.
+ * 
+ * @public
+ */
 export type HTMLAttributes = Record<string,string>
 
+/**
+ * Child element nodes.
+ * 
+ * @public
+ */
 export type ElementChildElement = ChildNode|string|undefined|null|false;
-export type ElementChildren = (ElementChildElement)[] | ((el: Element) => ElementChildElement[]);
 
+/**
+ * The options for `el()`.
+ * 
+ * @public
+ */
 export type ElementOptions<T> = {
     tagName: T,
     el?: ChildNode | Element | null,
     class?: HTMLClassAttribute,
     style?: HTMLStyleAttribute,
     attrs?: HTMLAttributes,
-    children?: ElementChildren,
+    children?: (ElementChildElement)[] | ((el: Element) => ElementChildElement[]),
     events?: {
         [K in keyof GlobalEventHandlers]?: GlobalEventHandlers[K]
     }
@@ -24,6 +47,8 @@ export type ElementOptions<T> = {
 
 /**
  * Create a document element.
+ * 
+ * @public
  */
 export function el<T extends keyof HTMLElementTagNameMap>(options: ElementOptions<T>): HTMLElementTagNameMap[T] {
     const { el, tagName, attrs, class: classAttr, events, style: styleAttr } = options;
@@ -128,6 +153,8 @@ export function el<T extends keyof HTMLElementTagNameMap>(options: ElementOption
 
 /**
  * Derive the class attribute value.
+ * 
+ * @public
  */
 export function classes(values?: HTMLClassAttribute): string {
     if(!values) {
@@ -155,6 +182,8 @@ export function classes(values?: HTMLClassAttribute): string {
 
 /**
  * Derive the style attribute value.
+ * 
+ * @public
  */
 export function style(value: HTMLStyleAttribute): string {
     if(typeof value === 'string') {

@@ -1,1 +1,1 @@
-readonly skipChars?: number;
+skipChars?: number;

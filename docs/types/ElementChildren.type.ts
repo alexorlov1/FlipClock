@@ -1,1 +1,0 @@
-type ElementChildren = (ElementChildElement)[] | ((el: Element) => ElementChildElement[]);

@@ -12,9 +12,9 @@ import { SequencerOptions } from './../helpers/sequencer';
  * @public
  */
 export type AlphanumericProps = {
-    value: FaceValue<string|DigitizedValues>,
+    value: FaceValue<string | DigitizedValues>,
     direction?: 'auto' | 'forwards' | 'backwards',
-    targetValue: FaceValue<string|DigitizedValues>,
+    targetValue?: FaceValue<string | DigitizedValues>,
     sequencer?: UseSequencer | SequencerOptions
     skipChars?: number,
 }
@@ -47,22 +47,22 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    public readonly skipChars?: number;
+    public skipChars?: number;
 
     /**
      * The face's current value.
      * 
      * @public
      */
-    public value: FaceValue<string|DigitizedValues>
+    public readonly value: FaceValue<string | DigitizedValues>
 
     /**
      * The face's target value.
      * 
      * @public
      */
-    public targetValue: FaceValue<string|DigitizedValues>
-    
+    public readonly targetValue: FaceValue<string | DigitizedValues>
+
     /**
      * Instantiate the clock face.
      * 
@@ -82,24 +82,33 @@ export class Alphanumeric implements Face {
             : useSequencer(props.sequencer);
 
         this.value = props.value;
-        this.targetValue = props.targetValue;
+        this.targetValue = props.targetValue ?? this.value.copy();
     }
-    
+
     /**
      * The sequencer method to call.
      * 
      * @public
      */
     get backwards(): boolean {
-        if(this.direction === 'backwards') {
+        if (this.direction === 'backwards') {
             return true;
         }
 
-        if(this.direction === 'forwards') {
+        if (this.direction === 'forwards') {
             return false;
         }
 
         return this.value.length >= (this.targetValue?.length ?? 0)
+    }
+
+    /**
+     * The face's current value.
+     * 
+     * @public
+     */
+    faceValue(): FaceValue<string | DigitizedValues> {
+        return this.value;
     }
 
     /**
@@ -114,7 +123,7 @@ export class Alphanumeric implements Face {
             this.value, this.targetValue, this.skipChars, this.backwards
         );
 
-        if(this.value.compare(this.targetValue)) {
+        if (this.value.compare(this.targetValue)) {
             instance.stop();
         }
     }
@@ -126,7 +135,7 @@ export class Alphanumeric implements Face {
      */
     public afterCreate(instance: FlipClock<Alphanumeric>) {
         watchEffect(() => {
-            if(instance.autoStart && instance.timer.isStopped && this.value.value) {
+            if (instance.autoStart && instance.timer.isStopped && this.value.value) {
                 instance.start();
             }
         });

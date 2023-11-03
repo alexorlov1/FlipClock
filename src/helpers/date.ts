@@ -1,7 +1,6 @@
 import { Translator, UseDefinitionMap, UseDictionary, useDefinitionMap } from "./dictionary";
-import { DigitizedValues, UseDigitizer, useDigitizer } from "./digitizer";
+import { UseDigitizer, useDigitizer } from "./digitizer";
 import { Duration } from "./duration";
-import { ParsedString, parse as p } from "./parser";
 
 /**
  * The number of days in a week.
@@ -126,8 +125,7 @@ export type UseDateFormatOptions = {
  * @public
  */
 export type UseDateFormats = UseDefinitionMap<DateFlagFormatFunction> & {
-    format: (date: Date, format: string) => string,
-    parse: (date: Date, format: string) => DigitizedValues,
+    format: (date: Date, format: string) => string
 }
 
 /**
@@ -193,38 +191,7 @@ export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  
         });
     }
 
-    /**
-     * Parse a date using the format string but `DigitizedValues`.
-     * 
-     * @public
-     */
-    function parse(date: Date, str: string): DigitizedValues {
-        function recurse(array: string): string
-        function recurse(array: ParsedString): DigitizedValues
-        function recurse(array: ParsedString | string): DigitizedValues | string {
-            if(Array.isArray(array)) {
-                for(const item of array) {
-                    const index = array.indexOf(item);
-
-                    if(Array.isArray(item)) {
-                        array.splice(index, 1, recurse(item));
-                    }
-                    else {                        
-                        array.splice(index, 1, ...recurse(item));
-                    }
-                }
-
-                return array;
-            }
-
-            return digitize(array);
-        }
-
-        return recurse(p(format(date, str)))
-    }
-    
-
-    return { map, define, format, parse, unset };
+    return { map, define, format, unset };
 }
 
 

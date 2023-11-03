@@ -57,29 +57,6 @@ test('formatting dates', () => {
     expect(format(date, 'AAA')).toBe('AMAMAM');
 });
 
-test('parsing dates', () => {
-    const { define, parse, unset } = useDateFormats()
-
-    const date = new Date(2000, 0, 1);
-
-    expect(parse(date, '[hh]')).toStrictEqual(['1', '2']);
-    expect(parse(date, '[hh]a')).toStrictEqual([['1', '2'], 'a', 'm']);
-    expect(parse(date, '[hh]:[mm]:[ss] [A]')).toStrictEqual([['1', '2'], ':', ['0', '0'], ':', ['0', '0'], ' ', ['A', 'M']]);
-});
-
-test('parsing invalid format', () => {
-    const { parse } = useDateFormats()
-
-    const date = new Date(2000, 0, 1);
-
-    expect(() => parse(date, '[hh')).toThrow('Expected \"]\" or any character but end of input found.');
-    expect(() => parse(date, 'hh]')).toThrow('Expected \"[\" or end of input but \"]\" found.');
-    expect(() => parse(date, '[[hh]')).toThrow('Expected \"[\", \"]\", or any character but end of input found.');
-    expect(() => parse(date, '[hh]]')).toThrow('Expected \"[\" or end of input but \"]\" found.');
-    expect(() => parse(date, '[hh]:[mm:[ss]')).toThrow('Expected \"]\" but \"[\" found.');
-    expect(() => parse(date, '[hh]:[[[mm]]:[ss]')).toThrow('Expected \"[\", \"]\", or any character but end of input found.');
-});
-
 test('formatting dates with a translator', () => {
     // An english to spanish dictionary
     const { translate } = useDictionary({
@@ -97,7 +74,7 @@ test('formatting dates with a translator', () => {
         'December': 'Diciembre'
     });
 
-    const { define, format, unset } = useDateFormats({
+    const { format } = useDateFormats({
         translate
     })
 

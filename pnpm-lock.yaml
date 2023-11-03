@@ -29,9 +29,15 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^6.9.0
     version: 6.9.0(eslint@8.52.0)(typescript@5.2.2)
+  acorn:
+    specifier: ^8.11.2
+    version: 8.11.2
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.31)
+  csstype:
+    specifier: ^3.1.2
+    version: 3.1.2
   eslint:
     specifier: ^8.52.0
     version: 8.52.0

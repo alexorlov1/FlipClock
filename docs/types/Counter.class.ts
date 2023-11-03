@@ -12,6 +12,12 @@ class Counter implements Face {
      */
     step: number;
     /**
+     * The formatted face value to display on the clock.
+     *
+     * @protected
+     */
+    protected formattedValue: FaceValue<string>;
+    /**
      * The target value determines when the counter should stop.
      *
      * @public
@@ -24,11 +30,35 @@ class Counter implements Face {
      */
     value: FaceValue<number>;
     /**
+     * A format callback. If the `formatter` is defined, this prop is ignored.
+     *
+     * @public
+     */
+    format?: (number: number) => string;
+    /**
+     * An `Intl.NumberFormat` instance used to format the number into a string.
+     *
+     * @public
+     */
+    formatter?: Intl.NumberFormat;
+    /**
      * Instantiate the clock face.
      *
      * @public
      */
     constructor(props: CounterProps);
+    /**
+     * Get the number as a formatted string.
+     *
+     * @public
+     */
+    get formattedString(): string;
+    /**
+    * The face's current value.
+     *
+     * @public
+     */
+    faceValue(): FaceValue<string>;
     /**
      * Substract the face value by the given value.
      *

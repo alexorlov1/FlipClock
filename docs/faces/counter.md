@@ -3,6 +3,7 @@ import Counter from '../components/Counter.vue';
 import Countdown from '../components/Countdown.vue';
 import CountdownStopAt from '../components/CountdownStopAt.vue';
 import CountdownManually from '../components/CountdownManually.vue';
+import CounterWithFormatter from '../components/CounterWithFormatter.vue';
 </script>
 
 # Counter
@@ -47,3 +48,22 @@ Increment and decrement a counter by clicking buttons.
 <<< @/components/CountdownManually.vue#import{TS}
 <<< @/components/CountdownManually.vue#example{TS}
 <<< @/components/CountdownManually.vue#template{TS}
+
+## Formatting Numbers
+
+Format the number using a `Intl.NumberFormat` instance.
+
+<CounterWithFormatter />
+
+<<< @/components/CounterWithFormatter.vue#import{TS}
+<<< @/components/CounterWithFormatter.vue#example{TS}
+
+## Format Callback.
+
+Or use a callback function. Note, `format` is ignored if `formatter` is passed.
+You cannot use a `formatter` and a `format` at the same time.
+
+<CounterWithFormatCallback />
+
+<<< @/components/CounterWithFormatter.vue#import{TS}
+<<< @/components/CounterWithFormatter.vue#example{TS}

@@ -1,4 +1,4 @@
-export type ParsedString = string | ParsedString[];
+import { DigitizedValues } from "./digitizer"
 
 export interface SyntaxError extends Error {
     expected: string,
@@ -10,4 +10,4 @@ export interface SyntaxError extends Error {
     }
 }
 
-export function parse(str: string): ParsedString | never;
+export function parse(str: string): DigitizedValues | never;

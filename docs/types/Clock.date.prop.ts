@@ -1,1 +1,1 @@
-date?: Date;
+readonly date: Ref<Date | undefined>;

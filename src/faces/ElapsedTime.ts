@@ -1,6 +1,6 @@
 import { Face } from '../Face';
 import { FaceValue, faceValue } from '../FaceValue';
-import { DurationFormatOptions, UseDurationFormats, useDurationFormats } from '../helpers/duration';
+import { UseDurationFormatOptions, UseDurationFormats, useDurationFormats } from '../helpers/duration';
 
 /**
  * The `ElapsedTime` face options.
@@ -10,7 +10,7 @@ import { DurationFormatOptions, UseDurationFormats, useDurationFormats } from '.
 export type ElapsedTimeProps = {
     end?: Date,
     format: string,
-    formatter?: UseDurationFormats | DurationFormatOptions,
+    formatter?: UseDurationFormats | UseDurationFormatOptions,
     start?: Date
 }
 
@@ -86,6 +86,15 @@ export class ElapsedTime implements Face {
             start: this.start ?? new Date,
             end: this.end ?? new Date
         }
+    }
+
+    /**
+     * The face's current value.
+     * 
+     * @public
+     */
+    faceValue(): FaceValue<string> {
+        return this.value;
     }
     
     /**

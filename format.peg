@@ -1,17 +1,15 @@
-start = value: (array / string) {
-  if(value.length === 1 && typeof value[0] === 'string') {
-  	return value[0]
-  }
-  
-  if(value.length === 1 && Array.isArray(value[0])) {
-    return value[0]
-  }
+start = (array / string)
 
-  return value;
+array = value: (value: string { return () => value } / "[" value: (string / array) "]" { return value })* {
+	for(const item of value) {
+    	if(typeof item === 'function') {
+        	value.splice(value.indexOf(item), 1, ...item());
+        }
+    }
+    
+    return value;
 }
 
-array = value: (string / "[" value: (string / array) "]" { return [value] })* { return value}
-
-string = value: char+ { return value.flat(1).join('') }
+string = value: char+ { return value.flat(1).filter(Boolean) }
 
 char = !([\[\]]).

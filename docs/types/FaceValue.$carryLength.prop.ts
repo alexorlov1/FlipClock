@@ -1,1 +1,0 @@
-protected $carryLength: number;

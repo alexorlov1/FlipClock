@@ -17,19 +17,19 @@ class Alphanumeric implements Face {
      *
      * @public
      */
-    readonly skipChars?: number;
+    skipChars?: number;
     /**
      * The face's current value.
      *
      * @public
      */
-    value: FaceValue<string | DigitizedValues>;
+    readonly value: FaceValue<string | DigitizedValues>;
     /**
      * The face's target value.
      *
      * @public
      */
-    targetValue: FaceValue<string | DigitizedValues>;
+    readonly targetValue: FaceValue<string | DigitizedValues>;
     /**
      * Instantiate the clock face.
      *
@@ -42,6 +42,12 @@ class Alphanumeric implements Face {
      * @public
      */
     get backwards(): boolean;
+    /**
+     * The face's current value.
+     *
+     * @public
+     */
+    faceValue(): FaceValue<string | DigitizedValues>;
     /**
      * This method is called with every interval, or every time the clock
      * should change, and handles the actual incrementing and decrementing the
