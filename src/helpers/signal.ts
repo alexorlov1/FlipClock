@@ -41,7 +41,7 @@ export function createSignal<T>(initialValue?: T): Signal<T|undefined> {
     const subscribers: Function[] = [];
 
     function read() {
-        if(currentListener) {
+        if (currentListener) {
             subscribers.push(currentListener);
         }
 
@@ -75,3 +75,15 @@ export function watchEffect(callback: () => void) {
     callback();
     currentListener = undefined;
 }
+
+
+type Can<T extends any[]> = {
+    create: boolean
+} & {
+    [K in T[number]]: boolean
+}
+
+const a: Can<['update']> = {
+    create: true,
+    update: true
+};

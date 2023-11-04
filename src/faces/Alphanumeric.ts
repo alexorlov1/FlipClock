@@ -40,7 +40,7 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    public readonly sequencer: UseSequencer
+    public readonly sequencer: UseSequencer;
 
     /**
      * The number of characters to skip during the incrementing/decrementing.
@@ -54,14 +54,14 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    public readonly value: FaceValue<string | DigitizedValues>
+    public readonly value: FaceValue<string | DigitizedValues>;
 
     /**
      * The face's target value.
      * 
      * @public
      */
-    public readonly targetValue: FaceValue<string | DigitizedValues>
+    public readonly targetValue: FaceValue<string | DigitizedValues>;
 
     /**
      * Instantiate the clock face.
@@ -99,7 +99,7 @@ export class Alphanumeric implements Face {
             return false;
         }
 
-        return this.value.length >= (this.targetValue?.length ?? 0)
+        return this.value.length >= (this.targetValue?.length ?? 0);
     }
 
     /**

@@ -95,7 +95,7 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
 
     const shuffle = typeof options.shuffle === 'function'
         ? options.shuffle
-        : options.shuffle ? fisherYatesShuffle : undefined
+        : options.shuffle ? fisherYatesShuffle : undefined;
 
     /**
      * Creates a charset and shuffles it if required.
@@ -120,7 +120,7 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
 
         return String.fromCharCode(
             charCodes.reduce((prev, curr) => {
-                return Math.abs(curr - currentCode) < Math.abs(prev - currentCode) ? curr : prev
+                return Math.abs(curr - currentCode) < Math.abs(prev - currentCode) ? curr : prev;
             })
         );
     }
@@ -131,13 +131,13 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
     function chunk(value?: DigitizedValue, size: number = 1): string[] {
         let chunked = [emptyChar, ...charset, emptyChar, ...charset];
 
-        if(size < 0) {
+        if (size < 0) {
             chunked = chunked.reverse();
         }
 
         let offset = 1;
 
-        if(value === undefined) {
+        if (value === undefined) {
             value = emptyChar;
         }
         else if (!chunked.includes(value)) {
@@ -152,14 +152,14 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
         );
 
         return sequence.splice(0, Math.abs(size));
-    }   
+    }
 
     /**
      * Get the next character in the charset relative to the given value.
      */
     function next(current?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count: number = 1) {
         if (target === undefined && current === emptyChar) {
-            return undefined
+            return undefined;
         }
         else if (typeof target === 'string' && !charset.includes(target)) {
             return target;
@@ -179,12 +179,12 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
             return target;
         }
 
-        if (target === undefined 
-            && current 
+        if (target === undefined
+            && current
             && charset.indexOf(matches[count - 1]) < charset.indexOf(current)) {
             return undefined;
         }
-        
+
         return matches[count - 1];
     }
 
@@ -192,9 +192,9 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
      * Get the prev character in the charset relative to the given value.
      */
     function prev(current?: DigitizedValue, target?: DigitizedValue | DigitizedValues, count: number = 1) {
-        
+
         if (target === undefined && current === emptyChar) {
-            return undefined
+            return undefined;
         }
         else if (typeof target === 'string' && !charset.includes(target)) {
             return target;
@@ -245,5 +245,5 @@ export function useCharset(options: UseCharsetOptions = {}): UseCharset {
         isWhitelisted,
         next,
         prev
-    }
+    };
 }

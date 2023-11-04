@@ -21,5 +21,4 @@ export * from './src/faces';
 
 export * from './src/themes/flipclock';
 export * from './src/themes/flipclock/flipclock.css.js';
-export * from './src/themes/flipclock/test.css.js';
 

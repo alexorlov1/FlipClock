@@ -25,7 +25,7 @@ export class EventEmitter<T> {
     /**
      * @protected
      */
-    protected events: Event<T,any>[] = [];
+    protected events: Event<T, any>[] = [];
 
     /**
      * Emit an event.
@@ -33,8 +33,8 @@ export class EventEmitter<T> {
      * @public
     */
     public emit<K extends keyof Required<T>>(key: K, ...args: Required<T>[K] extends (...args: infer P) => void ? P : any[]) {
-        for(const event of this.events) {
-            if(event.key !== key) {
+        for (const event of this.events) {
+            if (event.key !== key) {
                 continue;
             }
 
@@ -54,13 +54,13 @@ export class EventEmitter<T> {
             });
 
             this.events.splice(index, 1);
-        }
+        };
 
         this.events.push({ key, fn, unwatch });
 
         return unwatch;
     }
-    
+
     /**
      * Listen for an event once.
      * 
@@ -88,7 +88,7 @@ export class EventEmitter<T> {
             }
         }
     }
-    
+
     /**
      * Reset the event bus and remove all watchers.
      * 

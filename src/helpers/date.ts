@@ -1,13 +1,13 @@
-import { Translator, UseDefinitionMap, UseDictionary, useDefinitionMap } from "./dictionary";
-import { UseDigitizer, useDigitizer } from "./digitizer";
-import { Duration } from "./duration";
+import { Translator, UseDefinitionMap, UseDictionary, useDefinitionMap } from './dictionary';
+import { UseDigitizer } from './digitizer';
+import { Duration } from './duration';
 
 /**
  * The number of days in a week.
  * 
  * @public
  */
-export const daysInWeek: number = 7
+export const daysInWeek: number = 7;
 
 /**
  * The number of milliseconds in 1 day.
@@ -133,7 +133,7 @@ export type UseDateFormats = UseDefinitionMap<DateFlagFormatFunction> & {
  * 
  * @public
  */
-export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  {
+export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats {
     const { map, define, unset } = useDefinitionMap<DateFlagFormatFunction>(Object.entries(
         Object.assign({
             A: (date: Date) => date.getHours() < 12 ? 'AM' : 'PM',
@@ -168,8 +168,6 @@ export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  
         ? options.translate
         : options?.translate?.translate;
 
-    const { digitize } = options?.digitizer ?? useDigitizer();
-    
     /**
      * Formats a date using a format string.
      * 
@@ -177,11 +175,11 @@ export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  
      */
     function format(date: Date, str: string): string {
         const flagPattern: RegExp = new RegExp([...sort(map)].join('|'), 'g');
-        
+
         return str.replace(flagPattern, key => {
             const formatter = map.get(key);
 
-            if(!formatter) {
+            if (!formatter) {
                 return key;
             }
 
@@ -200,13 +198,13 @@ export function useDateFormats(options?: UseDateFormatOptions): UseDateFormats  
  * 
  * @public
  */
-export function sort(map: Map<string,unknown>) {
+export function sort(map: Map<string, unknown>) {
     return Array.from(map.keys()).sort((a, b) => {
-        if(a.length < b.length) {
+        if (a.length < b.length) {
             return 1;
         }
 
-        if(a.length > b.length) {
+        if (a.length > b.length) {
             return -1;
         }
 
@@ -219,20 +217,20 @@ export function sort(map: Map<string,unknown>) {
  * 
  * @public
  */
-export function pad(value: string|number|undefined, length: number): string {
-    if(value === undefined) {
+export function pad(value: string | number | undefined, length: number): string {
+    if (value === undefined) {
         return '';
     }
 
-    if(typeof value === 'number') {
+    if (typeof value === 'number') {
         value = value.toString();
     }
-    
-    if(length < value.length) {
+
+    if (length < value.length) {
         return value;
     }
 
-    return Array(length - value.length + 1).join('0') + value;    
+    return Array(length - value.length + 1).join('0') + value;
 }
 
 /**
@@ -250,19 +248,19 @@ export function add(date: Date, duration: Partial<Duration>): Date {
         minutes = 0,
         seconds = 0,
         milliseconds = 0,
-    } = duration || {}
-    
+    } = duration || {};
+
     // Add years and months
-    const dateWithMonths: Date = months || years ? addMonths(date, months + years * 12) : new Date(date.getTime())
-    
+    const dateWithMonths: Date = months || years ? addMonths(date, months + years * 12) : new Date(date.getTime());
+
     // Add weeks and days
-    const dateWithDays: Date = days || weeks ? addDays(dateWithMonths, days + weeks * 7) : dateWithMonths
-    
+    const dateWithDays: Date = days || weeks ? addDays(dateWithMonths, days + weeks * 7) : dateWithMonths;
+
     // Add days, hours, minutes and seconds
-    const minutesToAdd: number = minutes + hours * 60
-    const secondsToAdd: number = seconds + minutesToAdd * 60
+    const minutesToAdd: number = minutes + hours * 60;
+    const secondsToAdd: number = seconds + minutesToAdd * 60;
     const msToAdd: number = (secondsToAdd * 1000) + milliseconds;
-    
+
     return new Date(dateWithDays.getTime() + msToAdd);
 }
 
@@ -273,18 +271,18 @@ export function add(date: Date, duration: Partial<Duration>): Date {
  */
 export function addDays(date: Date, amount: number): Date {
     // If amount is NaN, then just return the date.
-    if(isNaN(amount)) {
-        return date
+    if (isNaN(amount)) {
+        return date;
     }
 
     // If 0 days, no-op to avoid changing times in the hour before end of DST
-    if(!amount) {
-        return date
+    if (!amount) {
+        return date;
     }
 
-    date.setDate(date.getDate() + amount)
+    date.setDate(date.getDate() + amount);
 
-    return date
+    return date;
 }
 
 /**
@@ -294,17 +292,17 @@ export function addDays(date: Date, amount: number): Date {
  */
 export function addMonths(date: Date, amount: number): Date {
     // If amount is NaN, then just reutrn the date.
-    if(isNaN(amount)) {
-        return date
+    if (isNaN(amount)) {
+        return date;
     }
 
     // If 0 months, no-op to avoid changing times in the hour before end of DST
     if (!amount) {
-      return date
+        return date;
     }
 
-    const dayOfMonth = date.getDate()
-  
+    const dayOfMonth = date.getDate();
+
     // The JS Date object supports date math by accepting out-of-bounds values for
     // month, day, etc. For example, new Date(2020, 0, 0) returns 31 Dec 2019 and
     // new Date(2020, 13, 1) returns 1 Feb 2021.  This is *almost* the behavior we
@@ -313,15 +311,15 @@ export function addMonths(date: Date, amount: number): Date {
     // we'll default to the end of the desired month by adding 1 to the desired
     // month and using a date of 0 to back up one day to the end of the desired
     // month.
-    const endOfDesiredMonth = new Date(date.getTime())
-    endOfDesiredMonth.setMonth(date.getMonth() + amount + 1, 0)
-    
-    const daysInMonth = endOfDesiredMonth.getDate()
+    const endOfDesiredMonth = new Date(date.getTime());
+    endOfDesiredMonth.setMonth(date.getMonth() + amount + 1, 0);
+
+    const daysInMonth = endOfDesiredMonth.getDate();
 
     if (dayOfMonth >= daysInMonth) {
-      // If we're already at the end of the month, then this is the correct date
-      // and we're done.
-      return endOfDesiredMonth
+        // If we're already at the end of the month, then this is the correct date
+        // and we're done.
+        return endOfDesiredMonth;
     }
 
     // Otherwise, we now know that setting the original day-of-month value won't
@@ -332,12 +330,12 @@ export function addMonths(date: Date, amount: number): Date {
     // repeated next to a DST transition.  So we use `date` instead which is
     // guaranteed to still have the original time.
     date.setFullYear(
-      endOfDesiredMonth.getFullYear(),
-      endOfDesiredMonth.getMonth(),
-      dayOfMonth
-    )
-    
-    return date
+        endOfDesiredMonth.getFullYear(),
+        endOfDesiredMonth.getMonth(),
+        dayOfMonth
+    );
+
+    return date;
 }
 
 /**
@@ -346,14 +344,14 @@ export function addMonths(date: Date, amount: number): Date {
  * @public
  */
 export function compareAsc(left: Date, right: Date): number {
-    const diff = left.getTime() - right.getTime()
-  
+    const diff = left.getTime() - right.getTime();
+
     if (diff < 0) {
-        return -1
+        return -1;
     } else if (diff > 0) {
-        return 1
+        return 1;
     } else {
-        return diff
+        return diff;
     }
 }
 
@@ -363,8 +361,8 @@ export function compareAsc(left: Date, right: Date): number {
  * @public
  */
 export function endOfDay(date: Date): Date {
-    date.setHours(23, 59, 59, 999)
-    return date
+    date.setHours(23, 59, 59, 999);
+    return date;
 }
 
 /**
@@ -373,10 +371,10 @@ export function endOfDay(date: Date): Date {
  * @public
  */
 export function endOfMonth(date: Date): Date {
-    const month = date.getMonth()
-    date.setFullYear(date.getFullYear(), month + 1, 0)
-    date.setHours(23, 59, 59, 999)
-    return date
+    const month = date.getMonth();
+    date.setFullYear(date.getFullYear(), month + 1, 0);
+    date.setHours(23, 59, 59, 999);
+    return date;
 }
 
 /**
@@ -387,7 +385,7 @@ export function endOfMonth(date: Date): Date {
 export function isLastDayOfMonth(dirtyDate: Date): boolean {
     const date = new Date(dirtyDate);
 
-    return endOfDay(date).getTime() === endOfMonth(date).getTime()
+    return endOfDay(date).getTime() === endOfMonth(date).getTime();
 }
 
 /**
@@ -396,7 +394,7 @@ export function isLastDayOfMonth(dirtyDate: Date): boolean {
  * @public
  */
 export function differenceInCalendarYears(left: Date, right: Date): number {
-    return left.getFullYear() - right.getFullYear()
+    return left.getFullYear() - right.getFullYear();
 }
 
 /**
@@ -405,9 +403,9 @@ export function differenceInCalendarYears(left: Date, right: Date): number {
  * @public
  */
 export function differenceInCalendarMonths(left: Date, right: Date): number {
-    const yearDiff = left.getFullYear() - right.getFullYear()
-    const monthDiff = left.getMonth() - right.getMonth()
-    return yearDiff * 12 + monthDiff
+    const yearDiff = left.getFullYear() - right.getFullYear();
+    const monthDiff = left.getMonth() - right.getMonth();
+    return yearDiff * 12 + monthDiff;
 }
 
 /**
@@ -418,21 +416,21 @@ export function differenceInCalendarMonths(left: Date, right: Date): number {
 export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
     const right: Date = new Date(dirtyRight);
-    const sign = compareAsc(left, right)
-    const difference = Math.abs(differenceInCalendarYears(left, right))
-  
+    const sign = compareAsc(left, right);
+    const difference = Math.abs(differenceInCalendarYears(left, right));
+
     // Set both dates to a valid leap year for accurate comparison when dealing
     // with leap days
-    left.setFullYear(1584)
-    right.setFullYear(1584)
-  
+    left.setFullYear(1584);
+    right.setFullYear(1584);
+
     // Math.abs(diff in full years - diff in calendar years) === 1 if last calendar year is not full
     // If so, result must be decreased by 1 in absolute value
-    const isLastYearNotFull = compareAsc(left, right) === -sign
-    const result = sign * (difference - Number(isLastYearNotFull))
+    const isLastYearNotFull = compareAsc(left, right) === -sign;
+    const result = sign * (difference - Number(isLastYearNotFull));
 
     // Prevent negative zero
-    return result === 0 ? 0 : result
+    return result === 0 ? 0 : result;
 }
 
 /**
@@ -443,35 +441,35 @@ export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
 export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
     const right: Date = new Date(dirtyRight);
-    const sign = compareAsc(left, right)
-    const difference = Math.abs(differenceInCalendarMonths(left, right))
+    const sign = compareAsc(left, right);
+    const difference = Math.abs(differenceInCalendarMonths(left, right));
 
     // Check for the difference of less than month
-    if(difference < 1) {
+    if (difference < 1) {
         return 0;
     }
 
-    if(left.getMonth() === 1 && left.getDate() > 27) {
+    if (left.getMonth() === 1 && left.getDate() > 27) {
         // This will check if the date is end of Feb and assign a higher end of month date
         // to compare it with Jan
-        left.setDate(30)
+        left.setDate(30);
     }
 
-    left.setMonth(left.getMonth() - sign * difference)
+    left.setMonth(left.getMonth() - sign * difference);
 
     // Math.abs(diff in full months - diff in calendar months) === 1 if last calendar month is not full
     // If so, result must be decreased by 1 in absolute value
-    let isLastMonthNotFull = compareAsc(left, right) === -sign
+    let isLastMonthNotFull = compareAsc(left, right) === -sign;
 
     // Check for cases of one full calendar month
-    if(isLastDayOfMonth(left) && difference === 1 && compareAsc(left, right) === 1) {
-        isLastMonthNotFull = false
+    if (isLastDayOfMonth(left) && difference === 1 && compareAsc(left, right) === 1) {
+        isLastMonthNotFull = false;
     }
 
-    const result = sign * (difference - Number(isLastMonthNotFull))
-    
+    const result = sign * (difference - Number(isLastMonthNotFull));
+
     // Prevent negative zero
-    return result === 0 ? 0 : result
+    return result === 0 ? 0 : result;
 }
 
 /**
@@ -515,7 +513,7 @@ export function differenceInMinutes(left: Date, right: Date): number {
  * 
  * @public
  */
- export function differenceInSeconds(left: Date, right: Date): number {
+export function differenceInSeconds(left: Date, right: Date): number {
     return Math.floor(differenceInMilliseconds(left, right) / 1000);
 }
 

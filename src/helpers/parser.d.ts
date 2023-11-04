@@ -1,4 +1,4 @@
-import { DigitizedValues } from "./digitizer"
+import { DigitizedValues } from './digitizer';
 
 export interface SyntaxError extends Error {
     expected: string,

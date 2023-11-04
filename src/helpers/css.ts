@@ -1,6 +1,15 @@
 import { Properties } from 'csstype';
 
 /**
+ * A CSS-in-JS style object.
+ * 
+ * @public
+ */
+export interface CSSProperties extends Properties {
+    [key: string]: CSSProperties | string | number | undefined | null;
+}
+
+/**
  * Get the FlipClock stylesheet or create and append a new one.
  * 
  * @public
@@ -8,10 +17,10 @@ import { Properties } from 'csstype';
 export function sheet(): HTMLStyleElement {
     const existing = document.querySelector('style#__flipclock__');
 
-    if(existing && existing instanceof HTMLStyleElement) {
+    if (existing && existing instanceof HTMLStyleElement) {
         return existing as HTMLStyleElement;
     }
-    else if(existing) {
+    else if (existing) {
         existing.remove();
     }
 
@@ -27,25 +36,25 @@ export function sheet(): HTMLStyleElement {
 /**
  * @internal
  */
-const cachedStringifiedCss: Record<string,string> = {}
+const cachedStringifiedCss: Record<string, string> = {};
 
 /**
  * @internal
  */
-const cachedHashedCss: Record<string,string> = {};
+const cachedHashedCss: Record<string, string> = {};
 
 /**
- * Convert a `CSSAttribute` into a class name and append the css to the style
+ * Convert a `CSSProperties` into a class name and append the css to the style
  * element in the document head.
  * 
  * @public
  */
-export function css(value: CSSAttribute) {
+export function css(value: CSSProperties) {
     const stringified = stringify(value);
 
     let hash: string;
 
-    if(cachedStringifiedCss[stringified]) {
+    if (cachedStringifiedCss[stringified]) {
         hash = cachedStringifiedCss[stringified];
     }
     else {
@@ -53,8 +62,8 @@ export function css(value: CSSAttribute) {
 
         cachedStringifiedCss[stringified] = hash;
     }
-    
-    if(!cachedHashedCss[hash]) {
+
+    if (!cachedHashedCss[hash]) {
         cachedHashedCss[hash] = parse(value, `.${hash}`);
     }
 
@@ -95,25 +104,16 @@ export function css(value: CSSAttribute) {
  */
 
 /**
- * A CSS-in-JS style object.
- * 
- * @public
- */
-export interface CSSAttribute extends Properties {
-    [key: string]: CSSAttribute | string | number | undefined | null;
-}
-
-/**
  * Convert a css style string into a object.
  * 
  * @public 
  */
 export function astish(val: string): object {
-    const newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
+    const newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?)(?:;|\n)|([^;}{]*?) *{)|(}\s*)/g;
     const ruleClean = /\/\*[^]*?\*\/|  +/g;
     const ruleNewline = /\n+/g;
     const empty = ' ';
-    
+
     let tree: any = [{}];
     let block, left;
 
@@ -130,6 +130,31 @@ export function astish(val: string): object {
 
     return tree[0];
 };
+
+export function props(values: CSSProperties) {
+    for (const i in values) {
+        const value = values[i];
+
+        if (value && typeof value === 'object') {
+            values[i] = props(value);
+        }
+        else if (!i.match(/^-/)) {
+            values = Object.fromEntries(
+                Object.entries(values).map(([key, value]) => {
+                    if (key !== i) {
+                        return [key, value];
+                    }
+                    
+                    return [key.toLowerCase().replace(
+                        /[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase()
+                    ), value];
+                })
+            );
+        }
+    }
+
+    return values;
+}
 
 /**
  * Parses the object into css, scoped, blocks.
@@ -163,16 +188,16 @@ export function parse(obj: any, selector?: string): string {
                 val,
                 selector
                     ? // Go over the selector and replace the matching multiple selectors if any
-                      selector.replace(/([^,])+/g, (sel) => {
-                          // Return the current selector with the key matching multiple selectors if any
-                          return key.replace(/(^:.*)|([^,])+/g, (k) => {
-                              // If the current `k`(key) has a nested selector replace it
-                              if (/&/.test(k)) return k.replace(/&/g, sel);
+                    selector.replace(/([^,])+/g, (sel) => {
+                        // Return the current selector with the key matching multiple selectors if any
+                        return key.replace(/(^:.*)|([^,])+/g, (k) => {
+                            // If the current `k`(key) has a nested selector replace it
+                            if (/&/.test(k)) return k.replace(/&/g, sel);
 
-                              // If there's a current selector concat it
-                              return sel ? sel + ' ' + k : k;
-                          });
-                      })
+                            // If there's a current selector concat it
+                            return sel ? sel + ' ' + k : k;
+                        });
+                    })
                     : key
             );
         } else if (val != undefined) {
@@ -183,9 +208,9 @@ export function parse(obj: any, selector?: string): string {
             current += parse.p
                 ? // We have a prefixer and we need to run this through that
                 // @ts-ignore
-                  parse.p(key, val)
+                parse.p(key, val)
                 : // Nope no prefixer just append it
-                  key + ':' + val + ';';
+                key + ':' + val + ';';
         }
     }
 

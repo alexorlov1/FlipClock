@@ -1,6 +1,6 @@
-import { FaceValue } from "../FaceValue";
-import { UseCharset, UseCharsetOptions, useCharset } from "./charset";
-import { DigitizedValue, DigitizedValues } from "./digitizer";
+import { FaceValue } from '../FaceValue';
+import { UseCharset, UseCharsetOptions, useCharset } from './charset';
+import { DigitizedValue, DigitizedValues } from './digitizer';
 import { MatchArrayStructureOptions, StopPredicateFunction, matchArrayStructure, stopWhen } from './structure';
 
 /** 
@@ -56,17 +56,17 @@ export function useSequencer(options?: SequencerOptions): UseSequencer {
             target.digits,
             walkerOptions,
             stopWhen((changes, current, target) => {
-                if(options?.stopWhen) {
+                if (options?.stopWhen) {
                     return options.stopWhen(changes, current, target);
                 }
 
-                if(options?.stopAfterChanges) {
-                    return changes.length < options.stopAfterChanges
+                if (options?.stopAfterChanges) {
+                    return changes.length < options.stopAfterChanges;
                 }
 
                 return true;
             }, (current, target) => {
-                if(current === target) {
+                if (current === target) {
                     return current;
                 }
 
@@ -94,17 +94,17 @@ export function useSequencer(options?: SequencerOptions): UseSequencer {
             target.digits,
             walkerOptions,
             stopWhen((changes, current, target) => {
-                if(options?.stopWhen) {
-                    return options?.stopWhen(changes, current, target)
+                if (options?.stopWhen) {
+                    return options?.stopWhen(changes, current, target);
                 }
 
-                if(options?.stopAfterChanges) {
-                    return changes.length < options.stopAfterChanges
+                if (options?.stopAfterChanges) {
+                    return changes.length < options.stopAfterChanges;
                 }
 
                 return true;
             }, (current, target) => {
-                if(current === target) {
+                if (current === target) {
                     return current;
                 }
 
@@ -119,5 +119,5 @@ export function useSequencer(options?: SequencerOptions): UseSequencer {
         charset,
         decrement,
         increment,
-    } as const
+    } as const;
 }

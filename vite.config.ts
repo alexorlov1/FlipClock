@@ -14,7 +14,6 @@ export default defineConfig({
     lib: {
       entry: {
         flipclock: resolve(__dirname, 'index.ts'),
-        // 'themes/flipclock.theme': resolve(__dirname, 'src/themes/flipclock/index.ts'),
       },
       formats: ['es', 'cjs'],
       fileName: (format, name) => {
@@ -25,13 +24,6 @@ export default defineConfig({
   plugins: [
     {
       name: 'css-to-js',
-      resolveId(id) {
-        console.log('resolveId', id);
-        // Resolve .css.ts files to .css
-        if (id.endsWith('.css.ts')) {
-          return id.replace('.ts', '');
-        }
-      },
       transform(code, id) {
         if(!id.endsWith('.css.ts')) {
           return

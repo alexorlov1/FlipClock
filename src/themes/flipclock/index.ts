@@ -1,8 +1,8 @@
 import { type FaceValue } from '../../FaceValue';
-import { type FlipClock } from "../../FlipClock";
-import { type DigitizedValue, type DigitizedValues } from "../../helpers/digitizer";
-import { classes, el, type HTMLClassAttribute } from "../../helpers/dom";
-import { debounce } from "../../helpers/functions";
+import { type FlipClock } from '../../FlipClock';
+import { type DigitizedValue, type DigitizedValues } from '../../helpers/digitizer';
+import { classes, el, type HTMLClassAttribute } from '../../helpers/dom';
+import { debounce } from '../../helpers/functions';
 
 /**
  * @public
@@ -32,7 +32,7 @@ export function theme(options: FlipClockThemeOptions = {}) {
             dividers: options.dividers,
             value: instance.face.faceValue(),
         })
-    }
+    };
 }
 
 /**
@@ -52,11 +52,11 @@ export type ClockOptions = {
  */
 export function render(options: ClockOptions) {
     function regexp(dividers?: Dividers): RegExp|undefined {
-        if(divider === undefined) {
+        if (divider === undefined) {
             return;
         }
 
-        if(dividers instanceof RegExp) {
+        if (dividers instanceof RegExp) {
             return dividers;
         }
 
@@ -68,7 +68,7 @@ export function render(options: ClockOptions) {
     function isDivider(value: DigitizedValue, dividers?: Dividers) {
         const pattern = regexp(dividers);
 
-        if(!pattern) {
+        if (!pattern) {
             return false;
         }
 
@@ -77,7 +77,7 @@ export function render(options: ClockOptions) {
 
 
     function walk(digits: DigitizedValues | string, el?: Element | null, labels?: string | DigitizedValues): Element {
-        if(Array.isArray(digits)) {
+        if (Array.isArray(digits)) {
             const nextLabel = typeof labels === 'string'
                 ? undefined
                 : labels?.shift();
@@ -95,7 +95,7 @@ export function render(options: ClockOptions) {
             });
         }
         
-        if(isDivider(digits, options.dividers)) {
+        if (isDivider(digits, options.dividers)) {
             return divider({
                 el,
                 value: digits
@@ -105,7 +105,7 @@ export function render(options: ClockOptions) {
         return card({
             el,
             value: digits
-        })
+        });
     }
 
     const labels = Array.isArray(options.labels)
@@ -160,7 +160,7 @@ export function group(options: FlipClockGroupOptions): Element {
                 children: options.children
             })
         ]
-    })
+    });
 }
 
 /**
@@ -205,17 +205,17 @@ export function card(options: CardOptions): Element {
                 el: parent.children.item(1),
                 value: lastValue,
                 class: 'before'
-            })
+            });
 
             return [
                 active,
                 before
-            ]
+            ];
         }
     });
 
     const debounced = debounce(() => {
-        element.classList.remove('animate')
+        element.classList.remove('animate');
     }, 100);
 
     return element;
@@ -264,7 +264,7 @@ export function cardItem(options: CardItemOptions): Element {
                         })       
                     ]
                 })
-            ]
+            ];
         }
     });
 }

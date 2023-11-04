@@ -65,7 +65,7 @@ export class Timer {
      * @public
      */
     get elapsed(): number {
-        if(!this.$startDate) {
+        if (!this.$startDate) {
             return 0;
         }
 
@@ -78,7 +78,7 @@ export class Timer {
      * @public
      */
     get elapsedSinceLastLoop(): number {
-        if(!this.lastLoop) {
+        if (!this.lastLoop) {
             return this.lastLoop;
         }
 
@@ -117,7 +117,7 @@ export class Timer {
      * 
      * @public
      */
-    get started(): Date|undefined {
+    get started(): Date | undefined {
         return this.$startDate;
     }
 
@@ -129,7 +129,7 @@ export class Timer {
     reset(fn?: (timer: Timer) => void): Timer {
         this.stop(() => {
             this.$count = 0;
-            this.$lastLoop = 0
+            this.$lastLoop = 0;
             this.start(fn);
         });
 
@@ -146,10 +146,10 @@ export class Timer {
 
         const loop = () => {
             if (Date.now() - this.lastLoop >= this.interval) {
-                if(typeof fn === 'function') {
+                if (typeof fn === 'function') {
                     fn(this);
                 }
-                
+
                 this.$lastLoop = Date.now();
                 this.$count++;
             }
@@ -168,12 +168,12 @@ export class Timer {
      * @public
      */
     stop(fn?: (timer: Timer) => void): Timer {
-        if(this.isRunning && this.$handle) {
+        if (this.isRunning && this.$handle) {
             window.cancelAnimationFrame(this.$handle);
 
             this.$handle = undefined;
 
-            if(typeof fn === 'function') {
+            if (typeof fn === 'function') {
                 fn(this);
             }
         }

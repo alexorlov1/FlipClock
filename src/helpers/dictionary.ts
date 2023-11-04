@@ -4,12 +4,12 @@ export type DictionaryRecord = Record<string, string | Translator>
 export type DictionaryMap = Map<string, string | Translator>
 export type DefinitionTerms = Record<string, string | Translator>;
 
-export type DefineFunction<V> = (key: string | Record<string,V>, value?: V) => void;
+export type DefineFunction<V> = (key: string | Record<string, V>, value?: V) => void;
 
 export type UnsetFunction = (key: string | string[]) => void;
 
 export type UseDefinitionMap<V> = {
-    map: Map<string,V>
+    map: Map<string, V>
     define: (key: string | Record<string, V>, value?: V) => void
     unset: (keys: string | string[]) => void
 }
@@ -23,19 +23,19 @@ export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
     const map = new Map(items);
 
     function define(key: string | Record<string, V>, value?: V): void {
-        if(typeof key === 'string' && value) {
+        if (typeof key === 'string' && value) {
             map.set(key, value);
         }
-        else if(typeof key === 'object') {
+        else if (typeof key === 'object') {
             for (const entry of Object.entries(key)) {
                 map.set(entry[0], entry[1]);
             }
-        }        
+        }
     }
 
-    function unset(keys: string|string[]): void {
+    function unset(keys: string | string[]): void {
         if (Array.isArray(keys)) {
-            for(const key of keys) {
+            for (const key of keys) {
                 map.delete(key);
             }
         }
@@ -46,7 +46,7 @@ export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
 
     return {
         map, define, unset
-    }
+    };
 }
 
 /**
@@ -54,7 +54,7 @@ export function useDefinitionMap<V>(items: [string, V][]): UseDefinitionMap<V> {
  * 
  * @public
  */
-export type UseDictionary = UseDefinitionMap<string|Translator> & {
+export type UseDictionary = UseDefinitionMap<string | Translator> & {
     translate: Translator
 }
 
@@ -65,7 +65,7 @@ export type UseDictionary = UseDefinitionMap<string|Translator> & {
  */
 export function useDictionary(terms: DefinitionTerms = {}): UseDictionary {
     const { map, define, unset } = useDefinitionMap(Object.entries(terms));
-    
+
     function translate(key: string): string {
         const term = map.get(key);
 
@@ -85,5 +85,5 @@ export function useDictionary(terms: DefinitionTerms = {}): UseDictionary {
         define,
         translate,
         unset,
-    }
+    };
 }

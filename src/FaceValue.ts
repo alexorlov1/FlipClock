@@ -1,6 +1,6 @@
-import { DigitizedValues, UseDigitizer, useDigitizer } from "./helpers/digitizer";
-import { Ref, ref } from "./helpers/ref";
-import { count } from "./helpers/structure";
+import { DigitizedValues, UseDigitizer, useDigitizer } from './helpers/digitizer';
+import { Ref, ref } from './helpers/ref';
+import { count } from './helpers/structure';
 
 /**
  * The `FaceValue` face options.
@@ -25,7 +25,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    public readonly digitizer: UseDigitizer
+    public readonly digitizer: UseDigitizer;
 
     /**
      * The reactive value.
@@ -76,7 +76,7 @@ export class FaceValue<T> {
      * @public
      */
     get value() {
-        return this.$value.value
+        return this.$value.value;
     }
 
     /**

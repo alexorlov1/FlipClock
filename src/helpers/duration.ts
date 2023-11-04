@@ -1,5 +1,5 @@
-import { add, differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInMonths, differenceInSeconds, differenceInWeeks, differenceInYears, pad } from "./date";
-import { DefineFunction, Translator, UnsetFunction, UseDictionary, useDefinitionMap } from "./dictionary";
+import { add, differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInMonths, differenceInSeconds, differenceInWeeks, differenceInYears, pad } from './date';
+import { DefineFunction, Translator, UnsetFunction, UseDictionary, useDefinitionMap } from './dictionary';
 
 /**
  * The time intervals between two dates.
@@ -60,7 +60,7 @@ export type DurationFlagFormatter = (duration: Duration, length: number) => stri
  * 
  * @public
  */
-export type DurationMapDefinition = [keyof Duration|(keyof Duration)[], DurationFlagFormatter]
+export type DurationMapDefinition = [keyof Duration | (keyof Duration)[], DurationFlagFormatter]
 
 /**
  * The options for `useDurationFormats()`.
@@ -118,7 +118,7 @@ export function useDurationFormats(options?: UseDurationFormatOptions): UseDurat
             (date, weeks) => add(date, { weeks })
         ],
         days: [
-            (left: Date, right: Date) => differenceInDays(left, right), 
+            (left: Date, right: Date) => differenceInDays(left, right),
             (date, days) => add(date, { days })
         ],
         hours: [
@@ -142,7 +142,7 @@ export function useDurationFormats(options?: UseDurationFormatOptions): UseDurat
     const translate = typeof options?.translate === 'function'
         ? options.translate
         : options?.translate?.translate;
-  
+
     function format(start: Date, end: Date, format: string) {
         const flagPattern: RegExp = new RegExp(
             Array.from(map.keys()).map(value => `${value}+`).join('|'), 'g'
@@ -150,22 +150,22 @@ export function useDurationFormats(options?: UseDurationFormatOptions): UseDurat
 
         const matches = format.match(flagPattern);
 
-        if(!matches) {
+        if (!matches) {
             return format;
         }
-        
+
         const formatters = matches
             .map(match => map.get(match[0]))
             .filter(Boolean) as DurationMapDefinition[];
 
         const diff = duration(
-            start, end, formatters.map(([ key ]) => key).flat(1)
+            start, end, formatters.map(([key]) => key).flat(1)
         );
 
         return format.replace(flagPattern, (key) => {
             const formatter = map.get(key[0]);
 
-            if(!formatter) {
+            if (!formatter) {
                 return key;
             }
 
@@ -179,29 +179,29 @@ export function useDurationFormats(options?: UseDurationFormatOptions): UseDurat
         const durationKeys = Object.keys(intervals) as (keyof Duration)[];
 
         const sortedKeys = !keys ? durationKeys : keys.sort((a, b) => {
-            if(durationKeys.indexOf(a) < durationKeys.indexOf(b)) {
+            if (durationKeys.indexOf(a) < durationKeys.indexOf(b)) {
                 return -1;
             }
 
-            if(durationKeys.indexOf(a) < durationKeys.indexOf(b)) {
+            if (durationKeys.indexOf(a) < durationKeys.indexOf(b)) {
                 return 1;
             }
-            
+
             return 0;
         });
-        
-        const [ duration ] = sortedKeys
+
+        const [duration] = sortedKeys
             .map<[string, [(left: Date, right: Date) => number, (date: Date, value: number) => Date]]>(key => [key, intervals[key]])
             .reduce<[Duration, Date]>(([duration, date], [key, [diff, advance]]) => {
                 const difference = diff(right, date);
 
                 duration[key as keyof Duration] = difference;
-                
+
                 return [duration, advance(date, difference)];
             }, [{}, new Date(left)]);
 
         return duration;
     }
 
-    return { map, define, duration, format, unset }
+    return { map, define, duration, format, unset };
 }

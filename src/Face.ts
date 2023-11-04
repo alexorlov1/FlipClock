@@ -1,5 +1,5 @@
 import { FaceValue } from './FaceValue';
-import { FlipClock } from "./FlipClock";
+import { FlipClock } from './FlipClock';
 
 /**
  * The hooks that are fired during the lifecycle. Hooks are triggered in the
@@ -110,5 +110,5 @@ export interface Face<T extends Face<T> = any> extends FaceHooks<T> {
      * @public
      */
     interval(instance: FlipClock<T>): void;
-    
+
 }

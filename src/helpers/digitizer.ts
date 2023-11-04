@@ -1,4 +1,4 @@
-import { parse } from "./parser";
+import { parse } from './parser';
 
 /**
  * A single digitized value
@@ -45,27 +45,27 @@ export function useDigitizer(): UseDigitizer {
      * @public
      */
     function digitize(value?: number | string | DigitizedValue | DigitizedValues): DigitizedValues {
-        if(value === undefined) {
+        if (value === undefined) {
             return [];
         }
 
-        if(typeof value === 'string') {
+        if (typeof value === 'string') {
             return value.match(/\[|\]/) ? parse(value) : Array.from(value);
         }
 
-        if(typeof value === 'number') {
+        if (typeof value === 'number') {
             return Array.from(value.toString());
         }
 
-        for(const item of value) {
+        for (const item of value) {
             const index = value.indexOf(item);
             const response = digitize(item);
 
-            if(response === undefined) {
+            if (response === undefined) {
                 continue;
             }
 
-            if(typeof item == 'string') {
+            if (typeof item == 'string') {
                 value.splice(index, 1, ...response);
             }
             else {
@@ -84,18 +84,18 @@ export function useDigitizer(): UseDigitizer {
     function undigitize(value: DigitizedValues): DigitizedValue {
         function recurse(value: DigitizedValues): DigitizedValues | DigitizedValue {
             const digits: DigitizedValues = [];
-            
+
             let containsArray = false, newString = true;
 
-            for(let i = 0; i < value.length; i++) {
-                if(Array.isArray(value[i])) {
+            for (let i = 0; i < value.length; i++) {
+                if (Array.isArray(value[i])) {
                     digits.push(recurse(value[i] as DigitizedValues));
 
                     containsArray = newString = true;
 
                     continue;
                 }
-                
+
                 if (newString) {
                     digits.push('');
 
@@ -104,13 +104,13 @@ export function useDigitizer(): UseDigitizer {
 
                 (digits as string[])[digits.length - 1] += value[i];
             }
-            
+
             return (containsArray ? digits : digits[0]);
         }
 
         return recurse(value) as DigitizedValue;
     }
-    
+
     /**
      * Check if the value is the type `DigitizedValues`.
      * 
@@ -123,14 +123,14 @@ export function useDigitizer(): UseDigitizer {
             }
 
             for (const i in value) {
-                if (typeof value[i]  === 'string' && (value[i] as string).length === 1) {
-                    continue
+                if (typeof value[i] === 'string' && (value[i] as string).length === 1) {
+                    continue;
                 }
 
                 if (!Array.isArray(value[i])) {
                     return false;
                 }
-                else if(!(value[i] as DigitizedValues).length) {
+                else if (!(value[i] as DigitizedValues).length) {
                     continue;
                 }
 
@@ -149,5 +149,5 @@ export function useDigitizer(): UseDigitizer {
         digitize,
         isDigitized,
         undigitize
-    }
+    };
 }

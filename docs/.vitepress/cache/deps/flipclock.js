@@ -1,55 +1,269 @@
 // node_modules/.pnpm/file+/node_modules/flipclock/dist/flipclock.es.js
-var he = Object.defineProperty;
-var de = (e, t, r) => t in e ? he(e, t, { enumerable: true, configurable: true, writable: true, value: r }) : e[t] = r;
-var w = (e, t, r) => (de(e, typeof t != "symbol" ? t + "" : t, r), r);
-var ge = " ";
-function ie() {
-  function e(a) {
-    function u(s) {
-      return s === void 0 ? "" : typeof s != "string" ? u(s.toString()) : s.length === 1 ? s : Array.from(s);
-    }
-    function f(s) {
-      if (Array.isArray(s)) {
-        for (let i = 0; i < s.length; i++)
-          s[i] = f(s[i]);
-        return s;
-      }
-      return u(s);
-    }
-    return Array.from(f(a));
+var me = Object.defineProperty;
+var ve = (e, t, r) => t in e ? me(e, t, { enumerable: true, configurable: true, writable: true, value: r }) : e[t] = r;
+var b = (e, t, r) => (ve(e, typeof t != "symbol" ? t + "" : t, r), r);
+function ye(e, t) {
+  function r() {
+    this.constructor = e;
   }
-  function t(a) {
-    function u(f) {
-      const s = [];
-      let i = false, c = true;
-      for (let n = 0; n < f.length; n++) {
-        if (Array.isArray(f[n])) {
-          s.push(u(f[n])), i = c = true;
+  r.prototype = t.prototype, e.prototype = new r();
+}
+function E(e, t, r, n) {
+  var f = Error.call(this, e);
+  return Object.setPrototypeOf && Object.setPrototypeOf(f, E.prototype), f.expected = t, f.found = r, f.location = n, f.name = "SyntaxError", f;
+}
+ye(E, Error);
+function W(e, t, r) {
+  return r = r || " ", e.length > t ? e : (t -= e.length, r += r.repeat(t), e + r.slice(0, t));
+}
+E.prototype.format = function(e) {
+  var t = "Error: " + this.message;
+  if (this.location) {
+    var r = null, n;
+    for (n = 0; n < e.length; n++)
+      if (e[n].source === this.location.source) {
+        r = e[n].text.split(/\r\n|\n|\r/g);
+        break;
+      }
+    var f = this.location.start, c = this.location.source && typeof this.location.source.offset == "function" ? this.location.source.offset(f) : f, a = this.location.source + ":" + c.line + ":" + c.column;
+    if (r) {
+      var s = this.location.end, g = W("", c.line.toString().length, " "), i = r[f.line - 1], u = f.line === s.line ? s.column : i.length + 1, d = u - f.column || 1;
+      t += `
+ --> ` + a + `
+` + g + ` |
+` + c.line + " | " + i + `
+` + g + " | " + W("", f.column - 1, " ") + W("", d, "^");
+    } else
+      t += `
+ at ` + a;
+  }
+  return t;
+};
+E.buildMessage = function(e, t) {
+  var r = {
+    literal: function(i) {
+      return '"' + f(i.text) + '"';
+    },
+    class: function(i) {
+      var u = i.parts.map(function(d) {
+        return Array.isArray(d) ? c(d[0]) + "-" + c(d[1]) : c(d);
+      });
+      return "[" + (i.inverted ? "^" : "") + u.join("") + "]";
+    },
+    any: function() {
+      return "any character";
+    },
+    end: function() {
+      return "end of input";
+    },
+    other: function(i) {
+      return i.description;
+    }
+  };
+  function n(i) {
+    return i.charCodeAt(0).toString(16).toUpperCase();
+  }
+  function f(i) {
+    return i.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(u) {
+      return "\\x0" + n(u);
+    }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(u) {
+      return "\\x" + n(u);
+    });
+  }
+  function c(i) {
+    return i.replace(/\\/g, "\\\\").replace(/\]/g, "\\]").replace(/\^/g, "\\^").replace(/-/g, "\\-").replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(u) {
+      return "\\x0" + n(u);
+    }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(u) {
+      return "\\x" + n(u);
+    });
+  }
+  function a(i) {
+    return r[i.type](i);
+  }
+  function s(i) {
+    var u = i.map(a), d, y;
+    if (u.sort(), u.length > 0) {
+      for (d = 1, y = 1; d < u.length; d++)
+        u[d - 1] !== u[d] && (u[y] = u[d], y++);
+      u.length = y;
+    }
+    switch (u.length) {
+      case 1:
+        return u[0];
+      case 2:
+        return u[0] + " or " + u[1];
+      default:
+        return u.slice(0, -1).join(", ") + ", or " + u[u.length - 1];
+    }
+  }
+  function g(i) {
+    return i ? '"' + f(i) + '"' : "end of input";
+  }
+  return "Expected " + s(e) + " but " + g(t) + " found.";
+};
+function Ae(e, t) {
+  t = t !== void 0 ? t : {};
+  var r = {}, n = t.grammarSource, f = { start: ee }, c = ee, a = "[", s = "]", g = /^[[\]]/, i = X("[", false), u = X("]", false), d = oe(["[", "]"], false, false), y = he(), l = function(o) {
+    return () => o;
+  }, v = function(o) {
+    return re(o);
+  }, w = function(o) {
+    return () => o;
+  }, D = function(o) {
+    return re(o);
+  }, C = function(o) {
+    return o.flat(1).filter(Boolean);
+  }, A = 0, O = [{ line: 1, column: 1 }], x = 0, H = [], N = 0, j;
+  if ("startRule" in t) {
+    if (!(t.startRule in f))
+      throw new Error(`Can't start parsing from rule "` + t.startRule + '".');
+    c = f[t.startRule];
+  }
+  function X(o, h) {
+    return { type: "literal", text: o, ignoreCase: h };
+  }
+  function oe(o, h, m) {
+    return { type: "class", parts: o, inverted: h, ignoreCase: m };
+  }
+  function he() {
+    return { type: "any" };
+  }
+  function de() {
+    return { type: "end" };
+  }
+  function Z(o) {
+    var h = O[o], m;
+    if (h)
+      return h;
+    for (m = o - 1; !O[m]; )
+      m--;
+    for (h = O[m], h = {
+      line: h.line,
+      column: h.column
+    }; m < o; )
+      e.charCodeAt(m) === 10 ? (h.line++, h.column = 1) : h.column++, m++;
+    return O[o] = h, h;
+  }
+  function _(o, h, m) {
+    var M = Z(o), S = Z(h), T = {
+      source: n,
+      start: {
+        offset: o,
+        line: M.line,
+        column: M.column
+      },
+      end: {
+        offset: h,
+        line: S.line,
+        column: S.column
+      }
+    };
+    return m && n && typeof n.offset == "function" && (T.start = n.offset(T.start), T.end = n.offset(T.end)), T;
+  }
+  function p(o) {
+    A < x || (A > x && (x = A, H = []), H.push(o));
+  }
+  function ge(o, h, m) {
+    return new E(
+      E.buildMessage(o, h),
+      o,
+      h,
+      m
+    );
+  }
+  function ee() {
+    var o, h, m, M;
+    for (o = A, h = [], m = A, M = L(), M !== r && (M = l(M)), m = M, m === r && (m = z()); m !== r; )
+      h.push(m), m = A, M = L(), M !== r && (M = l(M)), m = M, m === r && (m = z());
+    return h = v(h), o = h, o;
+  }
+  function z() {
+    var o, h, m, M, S;
+    if (o = A, e.charCodeAt(A) === 91 ? (h = a, A++) : (h = r, N === 0 && p(i)), h !== r) {
+      if (m = [], M = A, S = L(), S !== r && (S = w(S)), M = S, M === r && (M = z()), M !== r)
+        for (; M !== r; )
+          m.push(M), M = A, S = L(), S !== r && (S = w(S)), M = S, M === r && (M = z());
+      else
+        m = r;
+      m !== r ? (e.charCodeAt(A) === 93 ? (M = s, A++) : (M = r, N === 0 && p(u)), M !== r ? o = D(m) : (A = o, o = r)) : (A = o, o = r);
+    } else
+      A = o, o = r;
+    return o;
+  }
+  function L() {
+    var o, h, m;
+    if (o = A, h = [], m = te(), m !== r)
+      for (; m !== r; )
+        h.push(m), m = te();
+    else
+      h = r;
+    return h !== r && (h = C(h)), o = h, o;
+  }
+  function te() {
+    var o, h, m;
+    return o = A, h = A, N++, g.test(e.charAt(A)) ? (m = e.charAt(A), A++) : (m = r, N === 0 && p(d)), N--, m === r ? h = void 0 : (A = h, h = r), h !== r ? (e.length > A ? (m = e.charAt(A), A++) : (m = r, N === 0 && p(y)), m !== r ? (h = [h, m], o = h) : (A = o, o = r)) : (A = o, o = r), o;
+  }
+  function re(o) {
+    for (const h of o)
+      typeof h == "function" && o.splice(o.indexOf(h), 1, ...h());
+    return o;
+  }
+  if (j = c(), j !== r && A === e.length)
+    return j;
+  throw j !== r && A < e.length && p(de()), ge(
+    H,
+    x < e.length ? e.charAt(x) : null,
+    x < e.length ? _(x, x + 1) : _(x, x)
+  );
+}
+var we = Ae;
+var be = " ";
+function ue() {
+  function e(n) {
+    if (n === void 0)
+      return [];
+    if (typeof n == "string")
+      return n.match(/\[|\]/) ? we(n) : Array.from(n);
+    if (typeof n == "number")
+      return Array.from(n.toString());
+    for (const f of n) {
+      const c = n.indexOf(f), a = e(f);
+      a !== void 0 && (typeof f == "string" ? n.splice(c, 1, ...a) : n.splice(c, 1, a));
+    }
+    return n.filter(Boolean) ?? [];
+  }
+  function t(n) {
+    function f(c) {
+      const a = [];
+      let s = false, g = true;
+      for (let i = 0; i < c.length; i++) {
+        if (Array.isArray(c[i])) {
+          a.push(f(c[i])), s = g = true;
           continue;
         }
-        c && (s.push(""), c = false), s[s.length - 1] += f[n];
+        g && (a.push(""), g = false), a[a.length - 1] += c[i];
       }
-      return i ? s : s[0];
+      return s ? a : a[0];
     }
-    return u(a);
+    return f(n);
   }
-  function r(a) {
-    function u(f) {
-      if (!Array.isArray(f))
+  function r(n) {
+    function f(c) {
+      if (!Array.isArray(c))
         return false;
-      for (const s in f)
-        if (!(typeof f[s] == "string" && f[s].length === 1)) {
-          if (Array.isArray(f[s])) {
-            if (!f[s].length)
+      for (const a in c)
+        if (!(typeof c[a] == "string" && c[a].length === 1)) {
+          if (Array.isArray(c[a])) {
+            if (!c[a].length)
               continue;
           } else
             return false;
-          if (!u(f[s]))
+          if (!f(c[a]))
             return false;
         }
       return true;
     }
-    return u(a);
+    return f(n);
   }
   return {
     digitize: e,
@@ -57,16 +271,16 @@ function ie() {
     undigitize: t
   };
 }
-function me(e = 0, t) {
+function De(e = 0, t) {
   return Array.from(Array(t).keys()).map((r) => r + e);
 }
-function q(e, t) {
-  return me(
+function P(e, t) {
+  return De(
     e.charCodeAt(0),
     t.charCodeAt(0) + 1 - e.charCodeAt(0)
-  ).map((a) => String.fromCharCode(a));
+  ).map((n) => String.fromCharCode(n));
 }
-function ye(e) {
+function Me(e) {
   const t = [];
   for (; e.length; ) {
     const r = Math.floor(
@@ -76,11 +290,11 @@ function ye(e) {
   }
   return t;
 }
-function ve() {
+function $e() {
   return [
-    ...q("a", "z"),
-    ...q("A", "Z"),
-    ...q("0", "9"),
+    ...P("a", "z"),
+    ...P("A", "Z"),
+    ...P("0", "9"),
     ":",
     "-",
     ".",
@@ -89,315 +303,116 @@ function ve() {
     "?"
   ];
 }
-function Ae(e = {}) {
-  const t = e.blacklist || [], r = e.whitelist || [], a = e.emptyChar || ge, u = typeof e.shuffle == "function" ? e.shuffle : e.shuffle ? ye : void 0;
-  function f() {
-    const l = (e == null ? void 0 : e.charset) || ve;
-    return u ? u(l()) : l();
+function xe(e = {}) {
+  const t = e.blacklist || [], r = e.whitelist || [], n = e.emptyChar || be, f = typeof e.shuffle == "function" ? e.shuffle : e.shuffle ? Me : void 0;
+  function c() {
+    const l = (e == null ? void 0 : e.charset) || $e;
+    return f ? f(l()) : l();
   }
-  const s = f();
-  function i(l) {
-    const h = l.charCodeAt(0), b = s.map((D) => D.charCodeAt(0));
+  const a = c();
+  function s(l) {
+    const v = l.charCodeAt(0), w = a.map((D) => D.charCodeAt(0));
     return String.fromCharCode(
-      b.reduce((D, v) => Math.abs(v - h) < Math.abs(D - h) ? v : D)
+      w.reduce((D, C) => Math.abs(C - v) < Math.abs(D - v) ? C : D)
     );
   }
-  function c(l, h = 1) {
-    let b = [a, ...s, a, ...s];
-    h < 0 && (b = b.reverse());
+  function g(l, v = 1) {
+    let w = [n, ...a, n, ...a];
+    v < 0 && (w = w.reverse());
     let D = 1;
-    l === void 0 ? l = a : b.includes(l) || (l = a, D = 0);
-    const v = b.indexOf(l);
-    return b.slice(
-      v + D,
-      b.indexOf(l, v + 1) + D
-    ).splice(0, Math.abs(h));
+    l === void 0 ? l = n : w.includes(l) || (l = n, D = 0);
+    const C = w.indexOf(l);
+    return w.slice(
+      C + D,
+      w.indexOf(l, C + 1) + D
+    ).splice(0, Math.abs(v));
   }
-  function n(l, h, b = 1) {
-    if (h === void 0 && l === a)
+  function i(l, v, w = 1) {
+    if (v === void 0 && l === n)
       return;
-    if (typeof h == "string" && !s.includes(h))
-      return h;
-    if (l && (A(l) || h === l))
+    if (typeof v == "string" && !a.includes(v))
+      return v;
+    if (l && (y(l) || v === l))
       return l;
     if (l && d(l))
-      return i(l);
-    const D = c(l, b);
-    if (typeof h == "string" && D.includes(h))
-      return h;
-    if (!(h === void 0 && l && s.indexOf(D[b - 1]) < s.indexOf(l)))
-      return D[b - 1];
+      return s(l);
+    const D = g(l, w);
+    if (typeof v == "string" && D.includes(v))
+      return v;
+    if (!(v === void 0 && l && a.indexOf(D[w - 1]) < a.indexOf(l)))
+      return D[w - 1];
   }
-  function o(l, h, b = 1) {
-    if (h === void 0 && l === a)
+  function u(l, v, w = 1) {
+    if (v === void 0 && l === n)
       return;
-    if (typeof h == "string" && !s.includes(h))
-      return h;
-    if (l && (A(l) || h === l))
+    if (typeof v == "string" && !a.includes(v))
+      return v;
+    if (l && (y(l) || v === l))
       return l;
     if (l && d(l))
-      return i(l);
-    const D = c(l, -b);
-    if (typeof h == "string" && D.includes(h))
-      return h;
-    if (!(h === void 0 && l && s.indexOf(D[b - 1]) > s.indexOf(l)))
-      return D[b - 1];
+      return s(l);
+    const D = g(l, -w);
+    if (typeof v == "string" && D.includes(v))
+      return v;
+    if (!(v === void 0 && l && a.indexOf(D[w - 1]) > a.indexOf(l)))
+      return D[w - 1];
   }
   function d(l) {
     return t.includes(l);
   }
-  function A(l) {
+  function y(l) {
     return r.includes(l);
   }
   return {
-    charset: s,
-    chunk: c,
-    emptyChar: a,
+    charset: a,
+    chunk: g,
+    emptyChar: n,
     isBlacklisted: d,
-    isWhitelisted: A,
-    next: n,
-    prev: o
+    isWhitelisted: y,
+    next: i,
+    prev: u
   };
 }
-function B(e) {
+function G(e) {
   const t = new Map(e);
-  function r(u, f) {
-    if (typeof u == "string" && f)
-      t.set(u, f);
-    else if (typeof u == "object")
-      for (const s of Object.entries(u))
-        t.set(s[0], s[1]);
+  function r(f, c) {
+    if (typeof f == "string" && c)
+      t.set(f, c);
+    else if (typeof f == "object")
+      for (const a of Object.entries(f))
+        t.set(a[0], a[1]);
   }
-  function a(u) {
-    if (Array.isArray(u))
-      for (const f of u)
-        t.delete(f);
+  function n(f) {
+    if (Array.isArray(f))
+      for (const c of f)
+        t.delete(c);
     else
-      t.delete(u);
+      t.delete(f);
   }
   return {
     map: t,
     define: r,
-    unset: a
+    unset: n
   };
 }
-function ht(e = {}) {
-  const { map: t, define: r, unset: a } = B(Object.entries(e));
-  function u(f) {
-    const s = t.get(f);
-    return typeof s == "function" ? s(f) : s === void 0 ? f : s;
+function gt(e = {}) {
+  const { map: t, define: r, unset: n } = G(Object.entries(e));
+  function f(c) {
+    const a = t.get(c);
+    return typeof a == "function" ? a(c) : a === void 0 ? c : a;
   }
   return {
     map: t,
     define: r,
-    translate: u,
-    unset: a
+    translate: f,
+    unset: n
   };
 }
-function we(e, t) {
-  function r() {
-    this.constructor = e;
-  }
-  r.prototype = t.prototype, e.prototype = new r();
-}
-function p(e, t, r, a) {
-  var u = Error.call(this, e);
-  return Object.setPrototypeOf && Object.setPrototypeOf(u, p.prototype), u.expected = t, u.found = r, u.location = a, u.name = "SyntaxError", u;
-}
-we(p, Error);
-function H(e, t, r) {
-  return r = r || " ", e.length > t ? e : (t -= e.length, r += r.repeat(t), e + r.slice(0, t));
-}
-p.prototype.format = function(e) {
-  var t = "Error: " + this.message;
-  if (this.location) {
-    var r = null, a;
-    for (a = 0; a < e.length; a++)
-      if (e[a].source === this.location.source) {
-        r = e[a].text.split(/\r\n|\n|\r/g);
-        break;
-      }
-    var u = this.location.start, f = this.location.source && typeof this.location.source.offset == "function" ? this.location.source.offset(u) : u, s = this.location.source + ":" + f.line + ":" + f.column;
-    if (r) {
-      var i = this.location.end, c = H("", f.line.toString().length, " "), n = r[u.line - 1], o = u.line === i.line ? i.column : n.length + 1, d = o - u.column || 1;
-      t += `
- --> ` + s + `
-` + c + ` |
-` + f.line + " | " + n + `
-` + c + " | " + H("", u.column - 1, " ") + H("", d, "^");
-    } else
-      t += `
- at ` + s;
-  }
-  return t;
-};
-p.buildMessage = function(e, t) {
-  var r = {
-    literal: function(n) {
-      return '"' + u(n.text) + '"';
-    },
-    class: function(n) {
-      var o = n.parts.map(function(d) {
-        return Array.isArray(d) ? f(d[0]) + "-" + f(d[1]) : f(d);
-      });
-      return "[" + (n.inverted ? "^" : "") + o.join("") + "]";
-    },
-    any: function() {
-      return "any character";
-    },
-    end: function() {
-      return "end of input";
-    },
-    other: function(n) {
-      return n.description;
-    }
-  };
-  function a(n) {
-    return n.charCodeAt(0).toString(16).toUpperCase();
-  }
-  function u(n) {
-    return n.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(o) {
-      return "\\x0" + a(o);
-    }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(o) {
-      return "\\x" + a(o);
-    });
-  }
-  function f(n) {
-    return n.replace(/\\/g, "\\\\").replace(/\]/g, "\\]").replace(/\^/g, "\\^").replace(/-/g, "\\-").replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(o) {
-      return "\\x0" + a(o);
-    }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(o) {
-      return "\\x" + a(o);
-    });
-  }
-  function s(n) {
-    return r[n.type](n);
-  }
-  function i(n) {
-    var o = n.map(s), d, A;
-    if (o.sort(), o.length > 0) {
-      for (d = 1, A = 1; d < o.length; d++)
-        o[d - 1] !== o[d] && (o[A] = o[d], A++);
-      o.length = A;
-    }
-    switch (o.length) {
-      case 1:
-        return o[0];
-      case 2:
-        return o[0] + " or " + o[1];
-      default:
-        return o.slice(0, -1).join(", ") + ", or " + o[o.length - 1];
-    }
-  }
-  function c(n) {
-    return n ? '"' + u(n) + '"' : "end of input";
-  }
-  return "Expected " + i(e) + " but " + c(t) + " found.";
-};
-function be(e, t) {
-  t = t !== void 0 ? t : {};
-  var r = {}, a = t.grammarSource, u = { start: Z }, f = Z, s = "[", i = "]", c = /^[[\]]/, n = K("[", false), o = K("]", false), d = ue(["[", "]"], false, false), A = fe(), l = function(g) {
-    return g.length === 1 && typeof g[0] == "string" || g.length === 1 && Array.isArray(g[0]) ? g[0] : g;
-  }, h = function(g) {
-    return [g];
-  }, b = function(g) {
-    return g;
-  }, D = function(g) {
-    return g.flat(1).join("");
-  }, v = 0, k = [{ line: 1, column: 1 }], C = 0, V = [], O = 0, L;
-  if ("startRule" in t) {
-    if (!(t.startRule in u))
-      throw new Error(`Can't start parsing from rule "` + t.startRule + '".');
-    f = u[t.startRule];
-  }
-  function K(g, m) {
-    return { type: "literal", text: g, ignoreCase: m };
-  }
-  function ue(g, m, y) {
-    return { type: "class", parts: g, inverted: m, ignoreCase: y };
-  }
-  function fe() {
-    return { type: "any" };
-  }
-  function le() {
-    return { type: "end" };
-  }
-  function Q(g) {
-    var m = k[g], y;
-    if (m)
-      return m;
-    for (y = g - 1; !k[y]; )
-      y--;
-    for (m = k[y], m = {
-      line: m.line,
-      column: m.column
-    }; y < g; )
-      e.charCodeAt(y) === 10 ? (m.line++, m.column = 1) : m.column++, y++;
-    return k[g] = m, m;
-  }
-  function X(g, m, y) {
-    var F = Q(g), $ = Q(m), x = {
-      source: a,
-      start: {
-        offset: g,
-        line: F.line,
-        column: F.column
-      },
-      end: {
-        offset: m,
-        line: $.line,
-        column: $.column
-      }
-    };
-    return y && a && typeof a.offset == "function" && (x.start = a.offset(x.start), x.end = a.offset(x.end)), x;
-  }
-  function E(g) {
-    v < C || (v > C && (C = v, V = []), V.push(g));
-  }
-  function oe(g, m, y) {
-    return new p(
-      p.buildMessage(g, m),
-      g,
-      m,
-      y
-    );
-  }
-  function Z() {
-    var g, m;
-    return g = v, m = R(), m !== r && (m = l(m)), g = m, g;
-  }
-  function R() {
-    var g, m, y, F, $, x;
-    for (g = v, m = [], y = Y(), y === r && (y = v, e.charCodeAt(v) === 91 ? (F = s, v++) : (F = r, O === 0 && E(n)), F !== r ? ($ = Y(), $ === r && ($ = R()), $ !== r ? (e.charCodeAt(v) === 93 ? (x = i, v++) : (x = r, O === 0 && E(o)), x !== r ? y = h($) : (v = y, y = r)) : (v = y, y = r)) : (v = y, y = r)); y !== r; )
-      m.push(y), y = Y(), y === r && (y = v, e.charCodeAt(v) === 91 ? (F = s, v++) : (F = r, O === 0 && E(n)), F !== r ? ($ = Y(), $ === r && ($ = R()), $ !== r ? (e.charCodeAt(v) === 93 ? (x = i, v++) : (x = r, O === 0 && E(o)), x !== r ? y = h($) : (v = y, y = r)) : (v = y, y = r)) : (v = y, y = r));
-    return m = b(m), g = m, g;
-  }
-  function Y() {
-    var g, m, y;
-    if (g = v, m = [], y = _(), y !== r)
-      for (; y !== r; )
-        m.push(y), y = _();
-    else
-      m = r;
-    return m !== r && (m = D(m)), g = m, g;
-  }
-  function _() {
-    var g, m, y;
-    return g = v, m = v, O++, c.test(e.charAt(v)) ? (y = e.charAt(v), v++) : (y = r, O === 0 && E(d)), O--, y === r ? m = void 0 : (v = m, m = r), m !== r ? (e.length > v ? (y = e.charAt(v), v++) : (y = r, O === 0 && E(A)), y !== r ? (m = [m, y], g = m) : (v = g, g = r)) : (v = g, g = r), g;
-  }
-  if (L = f(), L !== r && v === e.length)
-    return L;
-  throw L !== r && v < e.length && E(le()), oe(
-    V,
-    C < e.length ? e.charAt(C) : null,
-    C < e.length ? X(C, C + 1) : X(C, C)
-  );
-}
-var De = be;
-var Me = 7;
-var $e = 864e5;
-var xe = 36e5;
-var Se = 6e4;
-var Ce = [
+var Se = 7;
+var Ce = 864e5;
+var Fe = 36e5;
+var ke = 6e4;
+var Oe = [
   "Sunday",
   "Monday",
   "Tuesday",
@@ -406,7 +421,7 @@ var Ce = [
   "Friday",
   "Saturday"
 ];
-var Fe = [
+var Ne = [
   "Sun",
   "Mon",
   "Tue",
@@ -416,7 +431,7 @@ var Fe = [
   "Sat",
   "Sun"
 ];
-var ke = [
+var Ee = [
   "January",
   "February",
   "March",
@@ -430,7 +445,7 @@ var ke = [
   "November",
   "December"
 ];
-var Oe = [
+var pe = [
   "Jan",
   "Feb",
   "Mar",
@@ -444,93 +459,81 @@ var Oe = [
   "Nov",
   "Dec"
 ];
-function Ne(e) {
-  var c;
-  const { map: t, define: r, unset: a } = B(Object.entries(
+function Te(e) {
+  var a;
+  const { map: t, define: r, unset: n } = G(Object.entries(
     Object.assign({
-      A: (n) => n.getHours() < 12 ? "AM" : "PM",
-      a: (n) => n.getHours() < 12 ? "am" : "pm",
-      Q: (n) => Math.ceil((n.getMonth() + 1) / 3).toString(),
-      YYYY: (n) => n.getFullYear().toString(),
-      YY: (n) => M(n.getFullYear().toString().slice(2), 2),
-      MMMM: (n) => ke[n.getMonth()],
-      MMM: (n) => Oe[n.getMonth()],
-      MM: (n) => M(n.getMonth() + 1, 2),
-      M: (n) => String(n.getMonth() + 1),
-      DDDD: (n) => Ce[n.getDay()],
-      DDD: (n) => Fe[n.getDay()],
-      DD: (n) => M(n.getDate(), 2),
-      D: (n) => String(n.getDate()),
-      HH: (n) => M(n.getHours(), 2),
-      H: (n) => String(n.getHours()),
-      hh: (n) => M(ee(n), 2),
-      h: (n) => ee(n),
-      mm: (n) => M(n.getMinutes(), 2),
-      m: (n) => String(n.getMinutes()),
-      ss: (n) => M(n.getSeconds(), 2),
-      s: (n) => String(n.getSeconds()),
-      vvvv: (n) => M(n.getMilliseconds(), 4),
-      vvv: (n) => M(n.getMilliseconds(), 3),
-      vv: (n) => M(n.getMilliseconds(), 2),
-      v: (n) => String(n.getMilliseconds())
+      A: (s) => s.getHours() < 12 ? "AM" : "PM",
+      a: (s) => s.getHours() < 12 ? "am" : "pm",
+      Q: (s) => Math.ceil((s.getMonth() + 1) / 3).toString(),
+      YYYY: (s) => s.getFullYear().toString(),
+      YY: (s) => $(s.getFullYear().toString().slice(2), 2),
+      MMMM: (s) => Ee[s.getMonth()],
+      MMM: (s) => pe[s.getMonth()],
+      MM: (s) => $(s.getMonth() + 1, 2),
+      M: (s) => String(s.getMonth() + 1),
+      DDDD: (s) => Oe[s.getDay()],
+      DDD: (s) => Ne[s.getDay()],
+      DD: (s) => $(s.getDate(), 2),
+      D: (s) => String(s.getDate()),
+      HH: (s) => $(s.getHours(), 2),
+      H: (s) => String(s.getHours()),
+      hh: (s) => $(ne(s), 2),
+      h: (s) => ne(s),
+      mm: (s) => $(s.getMinutes(), 2),
+      m: (s) => String(s.getMinutes()),
+      ss: (s) => $(s.getSeconds(), 2),
+      s: (s) => String(s.getSeconds()),
+      vvvv: (s) => $(s.getMilliseconds(), 4),
+      vvv: (s) => $(s.getMilliseconds(), 3),
+      vv: (s) => $(s.getMilliseconds(), 2),
+      v: (s) => String(s.getMilliseconds())
     }, e == null ? void 0 : e.formats)
-  )), u = typeof (e == null ? void 0 : e.translate) == "function" ? e.translate : (c = e == null ? void 0 : e.translate) == null ? void 0 : c.translate, { digitize: f } = (e == null ? void 0 : e.digitizer) ?? ie();
-  function s(n, o) {
-    const d = new RegExp([...Ee(t)].join("|"), "g");
-    return o.replace(d, (A) => {
-      const l = t.get(A);
-      if (!l)
-        return A;
-      const h = l(n);
-      return (u == null ? void 0 : u(h)) ?? h;
+  )), f = typeof (e == null ? void 0 : e.translate) == "function" ? e.translate : (a = e == null ? void 0 : e.translate) == null ? void 0 : a.translate;
+  (e == null ? void 0 : e.digitizer) ?? ue();
+  function c(s, g) {
+    const i = new RegExp([...Ie(t)].join("|"), "g");
+    return g.replace(i, (u) => {
+      const d = t.get(u);
+      if (!d)
+        return u;
+      const y = d(s);
+      return (f == null ? void 0 : f(y)) ?? y;
     });
   }
-  function i(n, o) {
-    function d(A) {
-      if (Array.isArray(A)) {
-        for (const l of A) {
-          const h = A.indexOf(l);
-          Array.isArray(l) ? A.splice(h, 1, d(l)) : A.splice(h, 1, ...d(l));
-        }
-        return A;
-      }
-      return f(A);
-    }
-    return d(De(s(n, o)));
-  }
-  return { map: t, define: r, format: s, parse: i, unset: a };
+  return { map: t, define: r, format: c, unset: n };
 }
-function Ee(e) {
+function Ie(e) {
   return Array.from(e.keys()).sort((t, r) => t.length < r.length ? 1 : t.length > r.length ? -1 : 0);
 }
-function M(e, t) {
+function $(e, t) {
   return e === void 0 ? "" : (typeof e == "number" && (e = e.toString()), t < e.length ? e : Array(t - e.length + 1).join("0") + e);
 }
-function N(e, t) {
+function k(e, t) {
   const {
     years: r = 0,
-    months: a = 0,
-    weeks: u = 0,
-    days: f = 0,
-    hours: s = 0,
-    minutes: i = 0,
-    seconds: c = 0,
-    milliseconds: n = 0
-  } = t || {}, o = a || r ? Ie(e, a + r * 12) : new Date(e.getTime()), d = f || u ? pe(o, f + u * 7) : o, A = i + s * 60, h = (c + A * 60) * 1e3 + n;
-  return new Date(d.getTime() + h);
+    months: n = 0,
+    weeks: f = 0,
+    days: c = 0,
+    hours: a = 0,
+    minutes: s = 0,
+    seconds: g = 0,
+    milliseconds: i = 0
+  } = t || {}, u = n || r ? Ye(e, n + r * 12) : new Date(e.getTime()), d = c || f ? Ve(u, c + f * 7) : u, y = s + a * 60, v = (g + y * 60) * 1e3 + i;
+  return new Date(d.getTime() + v);
 }
-function pe(e, t) {
+function Ve(e, t) {
   return isNaN(t) || !t || e.setDate(e.getDate() + t), e;
 }
-function Ie(e, t) {
+function Ye(e, t) {
   if (isNaN(t) || !t)
     return e;
-  const r = e.getDate(), a = new Date(e.getTime());
-  a.setMonth(e.getMonth() + t + 1, 0);
-  const u = a.getDate();
-  return r >= u ? a : (e.setFullYear(
-    a.getFullYear(),
-    a.getMonth(),
+  const r = e.getDate(), n = new Date(e.getTime());
+  n.setMonth(e.getMonth() + t + 1, 0);
+  const f = n.getDate();
+  return r >= f ? n : (e.setFullYear(
+    n.getFullYear(),
+    n.getMonth(),
     r
   ), e);
 }
@@ -538,104 +541,104 @@ function I(e, t) {
   const r = e.getTime() - t.getTime();
   return r < 0 ? -1 : r > 0 ? 1 : r;
 }
-function Te(e) {
+function je(e) {
   return e.setHours(23, 59, 59, 999), e;
 }
-function Le(e) {
+function ze(e) {
   const t = e.getMonth();
   return e.setFullYear(e.getFullYear(), t + 1, 0), e.setHours(23, 59, 59, 999), e;
 }
-function Ye(e) {
+function Le(e) {
   const t = new Date(e);
-  return Te(t).getTime() === Le(t).getTime();
-}
-function je(e, t) {
-  return e.getFullYear() - t.getFullYear();
-}
-function ze(e, t) {
-  const r = e.getFullYear() - t.getFullYear(), a = e.getMonth() - t.getMonth();
-  return r * 12 + a;
-}
-function Ve(e, t) {
-  const r = new Date(e), a = new Date(t), u = I(r, a), f = Math.abs(je(r, a));
-  r.setFullYear(1584), a.setFullYear(1584);
-  const s = I(r, a) === -u, i = u * (f - Number(s));
-  return i === 0 ? 0 : i;
+  return je(t).getTime() === ze(t).getTime();
 }
 function Re(e, t) {
-  const r = new Date(e), a = new Date(t), u = I(r, a), f = Math.abs(ze(r, a));
-  if (f < 1)
-    return 0;
-  r.getMonth() === 1 && r.getDate() > 27 && r.setDate(30), r.setMonth(r.getMonth() - u * f);
-  let s = I(r, a) === -u;
-  Ye(r) && f === 1 && I(r, a) === 1 && (s = false);
-  const i = u * (f - Number(s));
-  return i === 0 ? 0 : i;
+  return e.getFullYear() - t.getFullYear();
 }
 function qe(e, t) {
-  return Math.floor(se(e, t) / Me);
-}
-function se(e, t) {
-  return Math.floor(T(e, t) / $e);
+  const r = e.getFullYear() - t.getFullYear(), n = e.getMonth() - t.getMonth();
+  return r * 12 + n;
 }
 function He(e, t) {
-  return Math.floor(T(e, t) / xe);
+  const r = new Date(e), n = new Date(t), f = I(r, n), c = Math.abs(Re(r, n));
+  r.setFullYear(1584), n.setFullYear(1584);
+  const a = I(r, n) === -f, s = f * (c - Number(a));
+  return s === 0 ? 0 : s;
 }
 function We(e, t) {
-  return Math.floor(T(e, t) / Se);
+  const r = new Date(e), n = new Date(t), f = I(r, n), c = Math.abs(qe(r, n));
+  if (c < 1)
+    return 0;
+  r.getMonth() === 1 && r.getDate() > 27 && r.setDate(30), r.setMonth(r.getMonth() - f * c);
+  let a = I(r, n) === -f;
+  Le(r) && c === 1 && I(r, n) === 1 && (a = false);
+  const s = f * (c - Number(a));
+  return s === 0 ? 0 : s;
 }
 function Pe(e, t) {
-  return Math.floor(T(e, t) / 1e3);
+  return Math.floor(fe(e, t) / Se);
 }
-function T(e, t) {
+function fe(e, t) {
+  return Math.floor(Y(e, t) / Ce);
+}
+function Je(e, t) {
+  return Math.floor(Y(e, t) / Fe);
+}
+function Be(e, t) {
+  return Math.floor(Y(e, t) / ke);
+}
+function Ue(e, t) {
+  return Math.floor(Y(e, t) / 1e3);
+}
+function Y(e, t) {
   return new Date(e).getTime() - new Date(t).getTime();
 }
-function ee(e) {
+function ne(e) {
   const t = e.getHours() % 12;
   return String(t === 0 ? 12 : t);
 }
-function S(e) {
-  var o, d, A;
-  const { el: t, tagName: r, attrs: a, class: u, events: f, style: s } = e, i = t && "tagName" in t && ((o = t == null ? void 0 : t.tagName) == null ? void 0 : o.toLowerCase()) === r.toLowerCase() ? t : document.createElement(r);
+function F(e) {
+  var u, d, y;
+  const { el: t, tagName: r, attrs: n, class: f, events: c, style: a } = e, s = t && "tagName" in t && ((u = t == null ? void 0 : t.tagName) == null ? void 0 : u.toLowerCase()) === r.toLowerCase() ? t : document.createElement(r);
   if (t && "attributes" in t && (t != null && t.attributes))
     for (const { name: l } of t.attributes)
-      i.removeAttribute(l);
-  if (a)
-    for (const [l, h] of Object.entries(a))
-      i.setAttribute(l, h);
-  if (u) {
-    const l = ae(u);
-    l ? i.setAttribute("class", l) : i.removeAttribute("class");
+      s.removeAttribute(l);
+  if (n)
+    for (const [l, v] of Object.entries(n))
+      s.setAttribute(l, v);
+  if (f) {
+    const l = ce(f);
+    l ? s.setAttribute("class", l) : s.removeAttribute("class");
   }
-  if (s) {
-    const l = Je(s);
-    l ? i.setAttribute("style", l) : i.removeAttribute("style");
+  if (a) {
+    const l = Ge(a);
+    l ? s.setAttribute("style", l) : s.removeAttribute("style");
   }
-  if (f)
-    for (const l in f) {
-      const h = f[l];
-      h && i.addEventListener(l.replace(/^on/, ""), (b) => {
-        h.apply(i, [b]);
+  if (c)
+    for (const l in c) {
+      const v = c[l];
+      v && s.addEventListener(l.replace(/^on/, ""), (w) => {
+        v.apply(s, [w]);
       });
     }
-  let { children: c } = e;
-  typeof c == "function" && (c = c(i));
-  const n = c == null ? void 0 : c.filter(
+  let { children: g } = e;
+  typeof g == "function" && (g = g(s));
+  const i = g == null ? void 0 : g.filter(
     (l) => typeof l == "string" || l instanceof Node
   );
-  if (n && n.length) {
-    for (let l = 0; l < n.length; l++) {
-      const h = n[l], b = i.childNodes.item(l);
-      b !== h && (i.childNodes[l] ? b.replaceWith(h) : i.append(h));
+  if (i && i.length) {
+    for (let l = 0; l < i.length; l++) {
+      const v = i[l], w = s.childNodes.item(l);
+      w !== v && (s.childNodes[l] ? w.replaceWith(v) : s.append(v));
     }
-    for (; i.childNodes.length > ((n == null ? void 0 : n.length) ?? 0); )
-      (d = i.childNodes[i.childNodes.length - 1]) == null || d.remove();
+    for (; s.childNodes.length > ((i == null ? void 0 : i.length) ?? 0); )
+      (d = s.childNodes[s.childNodes.length - 1]) == null || d.remove();
   } else
-    for (; i.childNodes.length; )
-      (A = i.lastChild) == null || A.remove();
-  return i;
+    for (; s.childNodes.length; )
+      (y = s.lastChild) == null || y.remove();
+  return s;
 }
-function ae(e) {
+function ce(e) {
   if (!e)
     return "";
   const t = [];
@@ -644,125 +647,125 @@ function ae(e) {
   else if (Array.isArray(e))
     t.push(...e);
   else if (e)
-    for (const [r, a] of Object.entries(e))
-      a && t.push(...r.split(" "));
+    for (const [r, n] of Object.entries(e))
+      n && t.push(...r.split(" "));
   return t.join(" ");
 }
-function Je(e) {
+function Ge(e) {
   return typeof e == "string" ? e : Object.entries(e).map(([t, r]) => `${t}:${r}`).join(";");
 }
-function Be(e) {
-  const { map: t, define: r, unset: a } = B(Object.entries(
+function Ke(e) {
+  var g;
+  const { map: t, define: r, unset: n } = G(Object.entries(
     {
-      Y: ["years", ({ years: i }, c) => M(i, c)],
-      M: ["months", ({ months: i }, c) => M(i, c)],
-      W: ["weeks", ({ weeks: i }, c) => M(i, c)],
-      D: ["days", ({ days: i }, c) => M(i, c)],
-      h: ["hours", ({ hours: i }, c) => M(i, c)],
-      m: ["minutes", ({ minutes: i }, c) => M(i, c)],
-      s: ["seconds", ({ seconds: i }, c) => M(i, c)],
-      v: ["milliseconds", ({ milliseconds: i }, c) => M(i, c)]
+      Y: ["years", ({ years: i }, u) => $(i, u)],
+      M: ["months", ({ months: i }, u) => $(i, u)],
+      W: ["weeks", ({ weeks: i }, u) => $(i, u)],
+      D: ["days", ({ days: i }, u) => $(i, u)],
+      h: ["hours", ({ hours: i }, u) => $(i, u)],
+      m: ["minutes", ({ minutes: i }, u) => $(i, u)],
+      s: ["seconds", ({ seconds: i }, u) => $(i, u)],
+      v: ["milliseconds", ({ milliseconds: i }, u) => $(i, u)]
     }
-  )), u = {
+  )), f = {
     years: [
-      (i, c) => Ve(i, c),
-      (i, c) => N(i, { years: c })
+      (i, u) => He(i, u),
+      (i, u) => k(i, { years: u })
     ],
     months: [
-      (i, c) => Re(i, c),
-      (i, c) => N(i, { months: c })
+      (i, u) => We(i, u),
+      (i, u) => k(i, { months: u })
     ],
     weeks: [
-      (i, c) => qe(i, c),
-      (i, c) => N(i, { weeks: c })
+      (i, u) => Pe(i, u),
+      (i, u) => k(i, { weeks: u })
     ],
     days: [
-      (i, c) => se(i, c),
-      (i, c) => N(i, { days: c })
+      (i, u) => fe(i, u),
+      (i, u) => k(i, { days: u })
     ],
     hours: [
-      (i, c) => He(i, c),
-      (i, c) => N(i, { hours: c })
+      (i, u) => Je(i, u),
+      (i, u) => k(i, { hours: u })
     ],
     minutes: [
-      (i, c) => We(i, c),
-      (i, c) => N(i, { minutes: c })
+      (i, u) => Be(i, u),
+      (i, u) => k(i, { minutes: u })
     ],
     seconds: [
-      (i, c) => Pe(i, c),
-      (i, c) => N(i, { seconds: c })
+      (i, u) => Ue(i, u),
+      (i, u) => k(i, { seconds: u })
     ],
     milliseconds: [
-      (i, c) => T(i, c),
-      (i, c) => N(i, { milliseconds: c })
+      (i, u) => Y(i, u),
+      (i, u) => k(i, { milliseconds: u })
     ]
-  };
-  function f(i, c, n) {
-    const o = new RegExp(
-      Array.from(t.keys()).map((h) => `${h}+`).join("|"),
+  }, c = typeof (e == null ? void 0 : e.translate) == "function" ? e.translate : (g = e == null ? void 0 : e.translate) == null ? void 0 : g.translate;
+  function a(i, u, d) {
+    const y = new RegExp(
+      Array.from(t.keys()).map((D) => `${D}+`).join("|"),
       "g"
-    ), d = n.match(o);
-    if (!d)
-      return n;
-    const A = d.map((h) => t.get(h[0])).filter(Boolean), l = s(
+    ), l = d.match(y);
+    if (!l)
+      return d;
+    const v = l.map((D) => t.get(D[0])).filter(Boolean), w = s(
       i,
-      c,
-      A.map(([h]) => h).flat(1)
+      u,
+      v.map(([D]) => D).flat(1)
     );
-    return n.replace(o, (h) => {
-      var v;
-      const b = t.get(h[0]);
-      if (!b)
-        return h;
-      const D = b[1](l, h.length);
-      return ((v = e == null ? void 0 : e.translate) == null ? void 0 : v.call(e, D)) ?? D;
+    return d.replace(y, (D) => {
+      const C = t.get(D[0]);
+      if (!C)
+        return D;
+      const A = C[1](w, D.length);
+      return (c == null ? void 0 : c(A)) ?? A;
     });
   }
-  function s(i, c, n) {
-    const o = Object.keys(u), d = n ? n.sort((l, h) => o.indexOf(l) < o.indexOf(h) ? -1 : o.indexOf(l) < o.indexOf(h) ? 1 : 0) : o, [A] = d.map((l) => [l, u[l]]).reduce(([l, h], [b, [D, v]]) => {
-      const k = D(c, h);
-      return l[b] = k, [l, v(h, k)];
+  function s(i, u, d) {
+    const y = Object.keys(f), l = d ? d.sort((w, D) => y.indexOf(w) < y.indexOf(D) ? -1 : y.indexOf(w) < y.indexOf(D) ? 1 : 0) : y, [v] = l.map((w) => [w, f[w]]).reduce(([w, D], [C, [A, O]]) => {
+      const x = A(u, D);
+      return w[C] = x, [w, O(D, x)];
     }, [{}, new Date(i)]);
-    return A;
+    return v;
   }
-  return { map: t, define: r, duration: s, format: f, unset: a };
+  return { map: t, define: r, duration: s, format: a, unset: n };
 }
-function Ue(e, t = 25) {
+function Qe(e, t = 25) {
   let r;
-  return function(...a) {
-    clearTimeout(r), r = setTimeout(() => e.apply(this, a), t);
+  return function(...n) {
+    clearTimeout(r), r = setTimeout(() => e.apply(this, n), t);
   };
 }
-var j;
-function Ge(e) {
+var R;
+function Xe(e) {
   let t = e;
   const r = [];
-  function a() {
-    return j && r.push(j), t;
+  function n() {
+    return R && r.push(R), t;
   }
-  function u(s) {
-    t = s, r.forEach((i) => i());
+  function f(a) {
+    t = a, r.forEach((s) => s());
   }
-  function f() {
+  function c() {
     return t = e, r.splice(0, r.length), t;
   }
-  return [a, u, f];
+  return [n, f, c];
 }
-function U(e) {
-  j = e, e(), j = void 0;
+function q(e) {
+  R = e, e(), R = void 0;
 }
-function Ke(e) {
-  const [t, r] = Ge(e);
+function le(e) {
+  const [t, r] = Xe(e);
   return new Proxy({ value: e }, {
     get() {
       return t();
     },
-    set(a, u, f) {
-      return a.value = f, r(f), true;
+    set(n, f, c) {
+      return n.value = c, r(c), true;
     }
   });
 }
-function dt(e) {
+function mt(e) {
   return typeof e == "function" ? {
     get value() {
       return e();
@@ -776,56 +779,56 @@ function dt(e) {
     }
   };
 }
-function te(e, t, r, a) {
-  typeof r == "function" ? (a = r, r = {}) : r || (r = {});
-  const u = !r.backwards;
-  function f(s, i) {
-    if (z(i)) {
-      s = Xe(s);
-      const c = Math.max(i.length, s.length);
-      for (let n = u ? 0 : c - 1; u ? n < c : n >= 0; u ? n++ : n--) {
-        const o = s[n] ? f(s[n], i[n]) : f([], i[n]);
-        s[n] ? s[n] = o : s.push(o);
+function ie(e, t, r, n) {
+  typeof r == "function" ? (n = r, r = {}) : r || (r = {});
+  const f = !r.backwards;
+  function c(a, s) {
+    if (V(s)) {
+      a = _e(a);
+      const g = Math.max(s.length, a.length);
+      for (let i = f ? 0 : g - 1; f ? i < g : i >= 0; f ? i++ : i--) {
+        const u = a[i] ? c(a[i], s[i]) : c([], s[i]);
+        a[i] ? a[i] = u : a.push(u);
       }
-      for (let n = 0; n < s.length; n++)
-        s[n] === void 0 && s.splice(n, 1);
-      return s;
+      for (let i = 0; i < a.length; i++)
+        a[i] === void 0 && a.splice(i, 1);
+      return a;
     }
-    if (Ze(i)) {
-      s = Qe(s);
-      let c = 0;
-      for (; c < s.length; ) {
-        const n = u ? c : s.length - 1 - c, o = u ? c : i.length - 1 - c;
-        s[n] = f(
-          s[n],
-          i[o]
-        ), s[n] === void 0 ? s.splice(n, 1) : c++;
+    if (Array.isArray(s) && !V(s)) {
+      a = Ze(a);
+      let g = 0;
+      for (; g < a.length; ) {
+        const i = f ? g : a.length - 1 - g, u = f ? g : s.length - 1 - g;
+        a[i] = c(
+          a[i],
+          s[u]
+        ), a[i] === void 0 ? a.splice(i, 1) : g++;
       }
-      for (let n = u ? s.length : i.length - 1; u ? n < i.length : n >= s.length; u ? n++ : n--) {
-        const o = f(void 0, i[n]);
-        if (o === void 0)
+      for (let i = f ? a.length : s.length - 1; f ? i < s.length : i >= a.length; f ? i++ : i--) {
+        const u = c(void 0, s[i]);
+        if (u === void 0)
           break;
-        s.push(o);
+        a.push(u);
       }
-      return s;
+      return a;
     }
-    return a ? a(W(s), i) : i === void 0 ? void 0 : W(s);
+    return n ? n(J(a), s) : s === void 0 ? void 0 : J(a);
   }
-  return f(e, t);
+  return c(e, t);
 }
-function W(e) {
-  return Array.isArray(e) ? W(e[0]) : e;
-}
-function Qe(e) {
-  return z(e) ? e.flat(1 / 0) : Array.isArray(e) ? e : e === void 0 ? [] : [e];
-}
-function Xe(e) {
-  return z(e) ? e : Array.isArray(e) ? [e] : e === void 0 ? [[]] : [[e]];
+function J(e) {
+  return Array.isArray(e) ? J(e[0]) : e;
 }
 function Ze(e) {
-  return Array.isArray(e) && !z(e);
+  return V(e) ? e.flat(1 / 0) : Array.isArray(e) ? e : e === void 0 ? [] : [e];
 }
-function z(e) {
+function _e(e) {
+  return V(e) ? e : Array.isArray(e) ? [e] : e === void 0 ? [[]] : [[e]];
+}
+function vt(e) {
+  return Array.isArray(e) && !V(e);
+}
+function V(e) {
   if (!Array.isArray(e) || !e.length)
     return false;
   for (const t in e)
@@ -833,66 +836,74 @@ function z(e) {
       return true;
   return false;
 }
-function _e() {
+function et(e) {
+  function t(r, n = 0) {
+    for (const f of r)
+      Array.isArray(f) ? n += t(f, n) : n += f.length;
+    return n;
+  }
+  return t(e);
+}
+function tt() {
   return { stop: true };
 }
-function et(e) {
+function rt(e) {
   const t = [];
   return (...r) => {
-    const [a] = r;
-    let u = typeof a == "object" || Array.isArray(a) ? JSON.stringify(a) : a;
-    const f = e(t, ...r);
-    if (f && typeof f == "object" && "stop" in f && f.stop === true)
-      return a;
-    const s = f;
-    let i = typeof s == "object" || Array.isArray(s) ? JSON.stringify(s) : s;
-    return u !== i && t.push({
-      from: a,
-      to: s
-    }), s;
+    const [n] = r;
+    let f = typeof n == "object" || Array.isArray(n) ? JSON.stringify(n) : n;
+    const c = e(t, ...r);
+    if (c && typeof c == "object" && "stop" in c && c.stop === true)
+      return n;
+    const a = c;
+    let s = typeof a == "object" || Array.isArray(a) ? JSON.stringify(a) : a;
+    return f !== s && t.push({
+      from: n,
+      to: a
+    }), a;
   };
 }
-function P(e, t) {
-  return et((r, ...a) => e(r, ...a) ? t(...a) : _e());
+function B(e, t) {
+  return rt((r, ...n) => e(r, ...n) ? t(...n) : tt());
 }
-function gt(e, t) {
-  return P((r, ...a) => r.length < e, t);
+function yt(e, t) {
+  return B((r, ...n) => r.length < e, t);
 }
-function tt(e) {
-  const { charset: t, next: r, prev: a } = e != null && e.charset && "next" in e.charset ? e.charset : Ae(e == null ? void 0 : e.charset);
-  function u(s, i, c = 1, n = false) {
-    const o = {
-      backwards: n,
+function nt(e) {
+  const { charset: t, next: r, prev: n } = e != null && e.charset && "next" in e.charset ? e.charset : xe(e == null ? void 0 : e.charset);
+  function f(a, s, g = 1, i = false) {
+    const u = {
+      backwards: i,
       ...e == null ? void 0 : e.matchArray
     };
-    return s.digits = te(
+    return a.digits = ie(
+      a.digits,
       s.digits,
-      i.digits,
-      o,
-      P((d, A, l) => e != null && e.stopWhen ? e.stopWhen(d, A, l) : e != null && e.stopAfterChanges ? d.length < e.stopAfterChanges : true, (d, A) => d === A ? d : a(d ?? "", A, c))
-    ), s;
+      u,
+      B((d, y, l) => e != null && e.stopWhen ? e.stopWhen(d, y, l) : e != null && e.stopAfterChanges ? d.length < e.stopAfterChanges : true, (d, y) => d === y ? d : n(d ?? "", y, g))
+    ), a;
   }
-  function f(s, i, c = 1, n = false) {
-    const o = {
-      backwards: n,
+  function c(a, s, g = 1, i = false) {
+    const u = {
+      backwards: i,
       ...e == null ? void 0 : e.matchArray
     };
-    return s.digits = te(
+    return a.digits = ie(
+      a.digits,
       s.digits,
-      i.digits,
-      o,
-      P((d, A, l) => e != null && e.stopWhen ? e == null ? void 0 : e.stopWhen(d, A, l) : e != null && e.stopAfterChanges ? d.length < e.stopAfterChanges : true, (d, A) => d === A ? d : r(d, A, c))
-    ), s;
+      u,
+      B((d, y, l) => e != null && e.stopWhen ? e == null ? void 0 : e.stopWhen(d, y, l) : e != null && e.stopAfterChanges ? d.length < e.stopAfterChanges : true, (d, y) => d === y ? d : r(d, y, g))
+    ), a;
   }
   return {
     charset: t,
-    decrement: u,
-    increment: f
+    decrement: f,
+    increment: c
   };
 }
-var rt = class {
+var it = class {
   constructor() {
-    w(this, "events", []);
+    b(this, "events", []);
   }
   /**
    * Emit an event.
@@ -900,8 +911,8 @@ var rt = class {
    * @public
   */
   emit(t, ...r) {
-    for (const a of this.events)
-      a.key === t && a.fn(...r);
+    for (const n of this.events)
+      n.key === t && n.fn(...r);
   }
   /**
    * Listen for an event. This returns a function to unwatch the event.
@@ -909,11 +920,11 @@ var rt = class {
    * @public
    */
   on(t, r) {
-    const a = () => {
-      const u = this.events.findIndex((f) => f.key === t && f.fn === r);
-      this.events.splice(u, 1);
+    const n = () => {
+      const f = this.events.findIndex((c) => c.key === t && c.fn === r);
+      this.events.splice(f, 1);
     };
-    return this.events.push({ key: t, fn: r, unwatch: a }), a;
+    return this.events.push({ key: t, fn: r, unwatch: n }), n;
   }
   /**
    * Listen for an event once.
@@ -921,14 +932,14 @@ var rt = class {
    * @public
    */
   once(t, r) {
-    const a = this.on(t, (...u) => {
-      r(...u), a();
+    const n = this.on(t, (...f) => {
+      r(...f), n();
     });
-    return a;
+    return n;
   }
   off(t, r) {
-    for (const a of this.events)
-      a.key === t && (!r || r === a.fn) && a.unwatch();
+    for (const n of this.events)
+      n.key === t && (!r || r === n.fn) && n.unwatch();
   }
   /**
    * Reset the event bus and remove all watchers.
@@ -940,27 +951,16 @@ var rt = class {
       t();
   }
 };
-var G = class _G {
+var K = class _K {
   /**
    * Instantiate the face value.
    * 
    * @public
    */
   constructor(t, r) {
-    w(this, "$carryLength");
-    w(this, "digitizer");
-    w(this, "$value");
-    this.digitizer = (r == null ? void 0 : r.digitizer) || ie(), this.$value = Ke(t), this.$carryLength = this.digits.length, U(() => {
-      this.$carryLength = this.digits.length;
-    });
-  }
-  /**
-   * The carry length.
-   * 
-   * @public
-   */
-  get carryLength() {
-    return this.$carryLength;
+    b(this, "digitizer");
+    b(this, "$value");
+    this.digitizer = (r == null ? void 0 : r.digitizer) || ue(), this.$value = le(t);
   }
   /**
    * The digitized value.
@@ -979,24 +979,12 @@ var G = class _G {
     this.value = this.digitizer.undigitize(t);
   }
   /**
-   * Get the minimum length.
-   * 
-   * @public
-   */
-  get minimumLength() {
-    var t;
-    return Math.max(
-      this.carryLength || 0,
-      ((t = this.digits) == null ? void 0 : t.flat().length) || 0
-    );
-  }
-  /**
    * Get the length of the flattened digitized array.
    * 
    * @public
    */
   get length() {
-    return this.digits.flat(1 / 0).length;
+    return et(this.digits);
   }
   /**
    * Get the value.
@@ -1028,26 +1016,26 @@ var G = class _G {
    * @public
    */
   copy(t, r = {}) {
-    return new _G(t === void 0 ? this.value : t, Object.assign({
+    return new _K(t === void 0 ? this.value : t, Object.assign({
       digitizer: this.digitizer
     }, r));
   }
 };
-function ce(e, t) {
-  return new G(e, t);
+function Q(e, t) {
+  return new K(e, t);
 }
-var J = class {
+var U = class {
   /**
    * Create a new `Timer` instance.
    * 
    * @public
    */
   constructor(t = 1e3) {
-    w(this, "$count", 0);
-    w(this, "$handle");
-    w(this, "interval");
-    w(this, "$lastLoop");
-    w(this, "$startDate");
+    b(this, "$count", 0);
+    b(this, "$handle");
+    b(this, "interval");
+    b(this, "$lastLoop");
+    b(this, "$startDate");
     this.interval = t;
   }
   /**
@@ -1135,21 +1123,21 @@ var J = class {
     return this.isRunning && this.$handle && (window.cancelAnimationFrame(this.$handle), this.$handle = void 0, typeof t == "function" && t(this)), this;
   }
 };
-function mt(e = 1e3) {
-  return new J(e);
+function At(e = 1e3) {
+  return new U(e);
 }
-var nt = class extends rt {
+var st = class extends it {
   /**
    * Construct the FlipClock.
    */
   constructor(r) {
     super();
-    w(this, "autoStart", true);
-    w(this, "el");
-    w(this, "face");
-    w(this, "theme");
-    w(this, "timer");
-    this.face = r.face, this.theme = r.theme, typeof r.autoStart == "boolean" && (this.autoStart = r.autoStart), this.timer = r.timer instanceof J ? r.timer : new J(r.timer), this.hook("afterCreate", this), r.el && this.mount(r.el);
+    b(this, "autoStart", true);
+    b(this, "el");
+    b(this, "face");
+    b(this, "theme");
+    b(this, "timer");
+    this.face = r.face, this.theme = r.theme, typeof r.autoStart == "boolean" && (this.autoStart = r.autoStart), this.timer = r.timer instanceof U ? r.timer : new U(r.timer), this.hook("afterCreate", this), r.el && this.mount(r.el);
   }
   get animationRate() {
     var r;
@@ -1161,7 +1149,7 @@ var nt = class extends rt {
    * @public
    */
   mount(r) {
-    return this.hook("beforeMount", this), this.el = r, U(() => {
+    return this.hook("beforeMount", this), this.el = r, q(() => {
       this.theme.render(this);
     }), this.hook("afterMount", this), this.autoStart && this.timer.isStopped && window.requestAnimationFrame(() => this.start()), this;
   }
@@ -1201,42 +1189,42 @@ var nt = class extends rt {
    * @public
    */
   unmount() {
-    var r, a;
-    return this.hook("beforeUnmount", this), (a = (r = this.el) == null ? void 0 : r.parentElement) == null || a.removeChild(this.el), this.hook("afterUnmount", this), this;
+    var r, n;
+    return this.hook("beforeUnmount", this), (n = (r = this.el) == null ? void 0 : r.parentElement) == null || n.removeChild(this.el), this.hook("afterUnmount", this), this;
   }
   /**
    * Dispatch the event and call the method that corresponds to given hook.
    * 
    * @protected
    */
-  hook(r, ...a) {
+  hook(r, ...n) {
     if (r in this.face && typeof this.face[r] == "function") {
-      const u = this.face[r];
-      u == null || u.apply(this.face, a);
+      const f = this.face[r];
+      f == null || f.apply(this.face, n);
     }
     if (r in this.theme && typeof this.theme[r] == "function") {
-      const u = this.theme[r];
-      u == null || u(...a);
+      const f = this.theme[r];
+      f == null || f(...n);
     }
-    this.emit(r, ...a);
+    this.emit(r, ...n);
   }
 };
-function yt(e) {
-  return new nt(e);
+function wt(e) {
+  return new st(e);
 }
-var it = class {
+var at = class {
   /**
    * Instantiate the clock face.
    * 
    * @public
    */
   constructor(t) {
-    w(this, "direction", "auto");
-    w(this, "sequencer");
-    w(this, "skipChars");
-    w(this, "value");
-    w(this, "targetValue");
-    t.skipChars && (this.skipChars = t.skipChars), t.direction && (this.direction = t.direction), this.sequencer = t.sequencer && "increment" in t.sequencer ? t.sequencer : tt(t.sequencer), this.value = t.value, this.targetValue = t.targetValue;
+    b(this, "direction", "auto");
+    b(this, "sequencer");
+    b(this, "skipChars");
+    b(this, "value");
+    b(this, "targetValue");
+    t.skipChars && (this.skipChars = t.skipChars), t.direction && (this.direction = t.direction), this.sequencer = t.sequencer && "increment" in t.sequencer ? t.sequencer : nt(t.sequencer), this.value = t.value, this.targetValue = t.targetValue ?? this.value.copy();
   }
   /**
    * The sequencer method to call.
@@ -1246,6 +1234,14 @@ var it = class {
   get backwards() {
     var t;
     return this.direction === "backwards" ? true : this.direction === "forwards" ? false : this.value.length >= (((t = this.targetValue) == null ? void 0 : t.length) ?? 0);
+  }
+  /**
+   * The face's current value.
+   * 
+   * @public
+   */
+  faceValue() {
+    return this.value;
   }
   /**
    * This method is called with every interval, or every time the clock
@@ -1268,26 +1264,41 @@ var it = class {
    * @internal
    */
   afterCreate(t) {
-    U(() => {
+    q(() => {
       t.autoStart && t.timer.isStopped && this.value.value && t.start();
     });
   }
 };
-function vt(e) {
-  return new it(e);
+function bt(e) {
+  return new at(e);
 }
-var st = class {
+var ut = class {
   /**
    * Instantiate the clock face.
    * 
    * @public
    */
   constructor(t) {
-    w(this, "date");
-    w(this, "value");
-    w(this, "format", "[hh]:[mm]:[ss] [A]");
-    w(this, "formatter");
-    this.date = t == null ? void 0 : t.date, this.formatter = t != null && t.formatter && "format" in t.formatter ? t.formatter : Ne(t == null ? void 0 : t.formatter), t != null && t.format && (this.format = t.format), this.value = ce(this.formatter.parse(/* @__PURE__ */ new Date(), this.format));
+    b(this, "date");
+    b(this, "value");
+    b(this, "format", "[hh]:[mm]:[ss] [A]");
+    b(this, "formatter");
+    this.date = le(t == null ? void 0 : t.date), this.formatter = t != null && t.formatter && "format" in t.formatter ? t.formatter : Te(t == null ? void 0 : t.formatter), t != null && t.format && (this.format = t.format);
+    const r = () => {
+      var n;
+      return this.formatter.format(((n = this.date) == null ? void 0 : n.value) ?? /* @__PURE__ */ new Date(), this.format);
+    };
+    this.value = Q(""), q(() => {
+      this.value.value = r();
+    });
+  }
+  /**
+   * The face's current value.
+   * 
+   * @public
+   */
+  faceValue() {
+    return this.value;
   }
   /**
    * Format the face value to the current date/time.
@@ -1295,29 +1306,51 @@ var st = class {
    * @public
    */
   interval(t) {
-    if (!this.date)
-      this.value.value = this.formatter.parse(/* @__PURE__ */ new Date(), this.format);
+    var r;
+    if (!((r = this.date) != null && r.value))
+      this.value.value = this.formatter.format(/* @__PURE__ */ new Date(), this.format);
     else {
-      const r = /* @__PURE__ */ new Date();
-      r.setTime(this.date.getTime() + t.timer.elapsed), this.value.value = this.formatter.parse(r, this.format);
+      const n = /* @__PURE__ */ new Date();
+      n.setTime(this.date.value.getTime() + t.timer.elapsed), this.value.value = this.formatter.format(n, this.format);
     }
   }
 };
-function At(e) {
-  return new st(e);
+function Dt(e) {
+  return new ut(e);
 }
-var at = class {
+var ft = class {
   /**
    * Instantiate the clock face.
    * 
    * @public
    */
   constructor(t) {
-    w(this, "countdown", false);
-    w(this, "step", 1);
-    w(this, "targetValue");
-    w(this, "value");
-    this.value = t.value, this.targetValue = t.targetValue, typeof t.countdown == "boolean" && (this.countdown = t.countdown), typeof t.step == "number" && (this.step = t.step);
+    b(this, "countdown", false);
+    b(this, "step", 1);
+    b(this, "formattedValue");
+    b(this, "targetValue");
+    b(this, "value");
+    b(this, "format");
+    b(this, "formatter");
+    this.value = t.value, this.targetValue = t.targetValue, this.format = t.format, this.formatter = t.formatter, this.formattedValue = Q(""), q(() => {
+      this.formattedValue.value = this.formattedString;
+    }), typeof t.countdown == "boolean" && (this.countdown = t.countdown), typeof t.step == "number" && (this.step = t.step);
+  }
+  /**
+   * Get the number as a formatted string.
+   * 
+   * @public
+   */
+  get formattedString() {
+    return this.formatter ? this.formatter.format(this.value.value) : this.format ? this.format(this.value.value) : this.value.value.toString();
+  }
+  /**
+  * The face's current value.
+   * 
+   * @public
+   */
+  faceValue() {
+    return this.formattedValue;
   }
   /**
    * Substract the face value by the given value.
@@ -1346,8 +1379,8 @@ var at = class {
     this.countdown ? this.decrement() : this.increment(), this.value.compare(this.targetValue) && t.stop();
   }
 };
-function wt(e) {
-  return new at(e);
+function Mt(e) {
+  return new ft(e);
 }
 var ct = class {
   /**
@@ -1356,12 +1389,12 @@ var ct = class {
    * @public
    */
   constructor(t) {
-    w(this, "end");
-    w(this, "format");
-    w(this, "formatter");
-    w(this, "start");
-    w(this, "value");
-    this.start = t.start, this.end = t.end, this.format = t.format, this.formatter = t.formatter && "format" in t.formatter ? t.formatter : Be(t.formatter), this.value = ce(
+    b(this, "end");
+    b(this, "format");
+    b(this, "formatter");
+    b(this, "start");
+    b(this, "value");
+    this.start = t.start, this.end = t.end, this.format = t.format, this.formatter = t.formatter && "format" in t.formatter ? t.formatter : Ke(t.formatter), this.value = Q(
       this.formatter.format(this.span.start, this.span.end, this.format)
     );
   }
@@ -1377,6 +1410,14 @@ var ct = class {
     };
   }
   /**
+   * The face's current value.
+   * 
+   * @public
+   */
+  faceValue() {
+    return this.value;
+  }
+  /**
    * Format the value with the new elapsed time.
    * 
    * @public
@@ -1389,81 +1430,81 @@ var ct = class {
     );
   }
 };
-function bt(e) {
+function $t(e) {
   return new ct(e);
 }
-function Dt(e = {}) {
+function xt(e = {}) {
   return {
-    render: (t) => ut({
+    render: (t) => lt({
       el: t.el,
       labels: e.labels,
       dividers: e.dividers,
-      value: t.face.value
+      value: t.face.faceValue()
     })
   };
 }
-function ut(e) {
-  function t(f) {
-    if (ne !== void 0)
-      return f instanceof RegExp ? f : new RegExp(
-        `[${(Array.isArray(f) ? f : [f]).join("|")}]`
+function lt(e) {
+  function t(c) {
+    if (ae !== void 0)
+      return c instanceof RegExp ? c : new RegExp(
+        `[${(Array.isArray(c) ? c : [c]).join("|")}]`
       );
   }
-  function r(f, s) {
-    const i = t(s);
-    return i ? f.match(i) : false;
+  function r(c, a) {
+    const s = t(a);
+    return s ? c.match(s) : false;
   }
-  function a(f, s, i) {
-    if (Array.isArray(f)) {
-      const c = typeof i == "string" || i == null ? void 0 : i.shift();
-      return ft({
-        el: s,
-        label: typeof c == "string" ? c : void 0,
-        children: (n) => f.map((o, d) => a(
-          o,
-          n == null ? void 0 : n.children.item(d),
-          c
+  function n(c, a, s) {
+    if (Array.isArray(c)) {
+      const g = typeof s == "string" || s == null ? void 0 : s.shift();
+      return ot({
+        el: a,
+        label: typeof g == "string" ? g : void 0,
+        children: (i) => c.map((u, d) => n(
+          u,
+          i == null ? void 0 : i.children.item(d),
+          g
         ))
       });
     }
-    return r(f, e.dividers) ? ne({
-      el: s,
-      value: f
-    }) : lt({
-      el: s,
-      value: f
+    return r(c, e.dividers) ? ae({
+      el: a,
+      value: c
+    }) : ht({
+      el: a,
+      value: c
     });
   }
-  const u = Array.isArray(e.labels) ? structuredClone(e.labels) : e.labels;
-  return S({
+  const f = Array.isArray(e.labels) ? structuredClone(e.labels) : e.labels;
+  return F({
     el: e.el,
     tagName: "div",
     class: {
       "flip-clock": true
     },
-    children: e.value.digits.map((f, s) => {
-      var i;
-      return a(
-        f,
-        (i = e == null ? void 0 : e.el) == null ? void 0 : i.children.item(s),
-        u
+    children: e.value.digits.map((c, a) => {
+      var s;
+      return n(
+        c,
+        (s = e == null ? void 0 : e.el) == null ? void 0 : s.children.item(a),
+        f
       );
     })
   });
 }
-function ft(e) {
-  return S({
+function ot(e) {
+  return F({
     el: e.el,
     tagName: "div",
     class: "flip-clock-group",
     children: (t) => [
-      !!e.label && S({
+      !!e.label && F({
         el: t.querySelector(".flip-clock-label"),
         tagName: "div",
         class: "flip-clock-label",
         children: [e.label]
       }),
-      S({
+      F({
         el: t.querySelector(".flip-clock-group-items"),
         tagName: "div",
         class: "flip-clock-group-items",
@@ -1472,9 +1513,9 @@ function ft(e) {
     ]
   });
 }
-function lt(e) {
-  var u, f;
-  const t = (u = e.el) == null ? void 0 : u.getAttribute("data-value"), r = S({
+function ht(e) {
+  var f, c;
+  const t = (f = e.el) == null ? void 0 : f.getAttribute("data-value"), r = F({
     el: e.el,
     tagName: "div",
     attrs: {
@@ -1482,54 +1523,54 @@ function lt(e) {
     },
     class: {
       "flip-clock-card": true,
-      animate: ((f = e.el) == null ? void 0 : f.getAttribute("data-value")) !== e.value
+      animate: ((c = e.el) == null ? void 0 : c.getAttribute("data-value")) !== e.value
     },
     events: {
       onanimationend() {
-        a();
+        n();
       }
     },
-    children: (s) => {
-      const i = re({
-        el: s.children.item(0),
+    children: (a) => {
+      const s = se({
+        el: a.children.item(0),
         value: e.value,
         class: "active"
-      }), c = re({
-        el: s.children.item(1),
+      }), g = se({
+        el: a.children.item(1),
         value: t,
         class: "before"
       });
       return [
-        i,
-        c
+        s,
+        g
       ];
     }
-  }), a = Ue(() => {
+  }), n = Qe(() => {
     r.classList.remove("animate");
   }, 100);
   return r;
 }
-function re(e) {
-  return S({
+function se(e) {
+  return F({
     el: e.el,
     tagName: "div",
     class: {
       "flip-clock-card-item": true,
-      [ae(e == null ? void 0 : e.class)]: !!(e != null && e.class)
+      [ce(e == null ? void 0 : e.class)]: !!(e != null && e.class)
     },
     children: (t) => [
-      S({
+      F({
         el: t.children.item(0),
         tagName: "div",
         class: "flip-clock-card-item-inner",
         children: (r) => [
-          S({
+          F({
             el: r.children.item(0),
             tagName: "div",
             class: "top",
             children: [(e == null ? void 0 : e.value) ?? " "]
           }),
-          S({
+          F({
             el: r.children.item(1),
             tagName: "div",
             class: "bottom",
@@ -1540,13 +1581,13 @@ function re(e) {
     ]
   });
 }
-function ne(e) {
-  return S({
+function ae(e) {
+  return F({
     el: e.el,
     tagName: "div",
     class: "flip-clock-divider",
     children: (t) => [
-      S({
+      F({
         el: t.childNodes.item(0),
         tagName: "div",
         class: "flip-clock-divider-inner",
@@ -1557,85 +1598,95 @@ function ne(e) {
     ]
   });
 }
+var St = {
+  body: {
+    background: "red"
+  }
+};
+function Ct() {
+}
 export {
-  it as Alphanumeric,
-  st as Clock,
-  at as Counter,
-  ge as EMPTY_CHAR,
+  at as Alphanumeric,
+  ut as Clock,
+  ft as Counter,
+  be as EMPTY_CHAR,
   ct as ElapsedTime,
-  rt as EventEmitter,
-  G as FaceValue,
-  nt as FlipClock,
-  J as Timer,
-  N as add,
-  pe as addDays,
-  Ie as addMonths,
-  vt as alphanumeric,
-  lt as card,
-  re as cardItem,
-  Xe as castDigitizedGroup,
-  W as castDigitizedString,
-  Qe as castDigitizedValues,
-  q as characterRange,
-  ae as classes,
-  At as clock,
+  it as EventEmitter,
+  K as FaceValue,
+  st as FlipClock,
+  U as Timer,
+  k as add,
+  Ve as addDays,
+  Ye as addMonths,
+  bt as alphanumeric,
+  ht as card,
+  se as cardItem,
+  _e as castDigitizedGroup,
+  J as castDigitizedString,
+  Ze as castDigitizedValues,
+  P as characterRange,
+  ce as classes,
+  Dt as clock,
   I as compareAsc,
-  dt as computed,
-  wt as counter,
-  Ge as createSignal,
-  Fe as dayAbbreviations,
-  Ce as days,
-  Me as daysInWeek,
-  Ue as debounce,
-  ve as defaultCharset,
-  ze as differenceInCalendarMonths,
-  je as differenceInCalendarYears,
-  se as differenceInDays,
-  He as differenceInHours,
-  T as differenceInMilliseconds,
-  We as differenceInMinutes,
-  Re as differenceInMonths,
-  Pe as differenceInSeconds,
-  qe as differenceInWeeks,
-  Ve as differenceInYears,
-  ne as divider,
-  S as el,
-  bt as elapsedTime,
-  Te as endOfDay,
-  Le as endOfMonth,
-  ce as faceValue,
-  ye as fisherYatesShuffle,
-  yt as flipClock,
-  ee as getTwelveHourFormat,
-  ft as group,
-  z as isDigitizedGroup,
-  Ze as isDigitizedValues,
-  Ye as isLastDayOfMonth,
-  te as matchArrayStructure,
-  $e as millisecondsInDay,
-  xe as millisecondsInHour,
-  Se as millisecondsInMinute,
-  Oe as monthAbbreviations,
-  ke as months,
-  M as pad,
-  me as range,
-  Ke as ref,
-  ut as render,
-  Ee as sort,
-  _e as stop,
-  gt as stopAfterChanges,
-  P as stopWhen,
-  Je as style,
-  Dt as theme,
-  mt as timer,
-  et as trackChanges,
-  Ae as useCharset,
-  Ne as useDateFormats,
-  B as useDefinitionMap,
-  ht as useDictionary,
-  ie as useDigitizer,
-  Be as useDurationFormats,
-  tt as useSequencer,
-  U as watchEffect
+  mt as computed,
+  et as count,
+  Mt as counter,
+  Xe as createSignal,
+  St as css,
+  Ne as dayAbbreviations,
+  Oe as days,
+  Se as daysInWeek,
+  Qe as debounce,
+  $e as defaultCharset,
+  qe as differenceInCalendarMonths,
+  Re as differenceInCalendarYears,
+  fe as differenceInDays,
+  Je as differenceInHours,
+  Y as differenceInMilliseconds,
+  Be as differenceInMinutes,
+  We as differenceInMonths,
+  Ue as differenceInSeconds,
+  Pe as differenceInWeeks,
+  He as differenceInYears,
+  ae as divider,
+  F as el,
+  $t as elapsedTime,
+  je as endOfDay,
+  ze as endOfMonth,
+  Q as faceValue,
+  Me as fisherYatesShuffle,
+  wt as flipClock,
+  ne as getTwelveHourFormat,
+  ot as group,
+  V as isDigitizedGroup,
+  vt as isDigitizedValues,
+  Le as isLastDayOfMonth,
+  ie as matchArrayStructure,
+  Ce as millisecondsInDay,
+  Fe as millisecondsInHour,
+  ke as millisecondsInMinute,
+  pe as monthAbbreviations,
+  Ee as months,
+  $ as pad,
+  De as range,
+  le as ref,
+  lt as render,
+  Ie as sort,
+  tt as stop,
+  yt as stopAfterChanges,
+  B as stopWhen,
+  Ge as style,
+  Ct as test,
+  xt as theme,
+  At as timer,
+  rt as trackChanges,
+  xe as useCharset,
+  Te as useDateFormats,
+  G as useDefinitionMap,
+  gt as useDictionary,
+  ue as useDigitizer,
+  Ke as useDurationFormats,
+  nt as useSequencer,
+  q as watchEffect
 };
 //# sourceMappingURL=flipclock.js.map

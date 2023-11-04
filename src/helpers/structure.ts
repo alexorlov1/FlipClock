@@ -1,4 +1,4 @@
-import { DigitizedValue, DigitizedValues } from "./digitizer";
+import { DigitizedValue, DigitizedValues } from './digitizer';
 
 /**
  * This method will match the structure of the current array against the target.
@@ -22,11 +22,11 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options: MatchArrayStructureOptions | undefined, fn?: MatchArrayStructureCallback): DigitizedValues
 export function matchArrayStructure(current: DigitizedValues, target: DigitizedValues, options?: MatchArrayStructureOptions | MatchArrayStructureCallback, fn?: MatchArrayStructureCallback): DigitizedValues {
     // Allow for the method overloading. If options is a function, assign it.
-    if(typeof options === 'function') {
+    if (typeof options === 'function') {
         fn = options;
         options = {};
     }
-    else if(!options) {
+    else if (!options) {
         options = {};
     }
     
@@ -35,7 +35,7 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
     function recurse(current: DigitizedValues | DigitizedValue | undefined, target: DigitizedValues | DigitizedValue): DigitizedValues | DigitizedValue | undefined {
         // If target is a digit group, then loop through them and recursively
         // iterate over the groups.
-        if(isDigitizedGroup(target)) {
+        if (isDigitizedGroup(target)) {
             // Cast the current value to a digitized group.
             current = castDigitizedGroup(current);
 
@@ -58,8 +58,8 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
                 // and recast to `DigitizedValues`. But this hack is fine for
                 // now. The loop below removes the undefined so its still
                 // guaranteed to be typesafe.
-                if(current[i]) {
-                    current[i] = value as any
+                if (current[i]) {
+                    current[i] = value as any;
                 }
                 else {
                     current.push(value as any);
@@ -68,8 +68,8 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
             
             // Remove the undefined items in the array. Use this instead of
             // filter to avoid copy the array.
-            for(let i = 0; i < current.length; i++) {
-                if(current[i] === undefined) {
+            for (let i = 0; i < current.length; i++) {
+                if (current[i] === undefined) {
                     current.splice(i, 1);
                 }
             }
@@ -79,7 +79,7 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
 
         // If the target is an array of digitized values, then recursively
         // force the current value to be an array of digitized values.
-        if(Array.isArray(target) && !isDigitizedGroup(target)) {
+        if (Array.isArray(target) && !isDigitizedGroup(target)) {
             current = castDigitizedValues(current);
 
             // Loop over the existing digitized value to ensure the digits are
@@ -177,12 +177,12 @@ export function castDigitizedGroup(value?: DigitizedValue | DigitizedValues): Di
         return value as DigitizedValues;
     }
 
-    if(Array.isArray(value)) {
+    if (Array.isArray(value)) {
         return [value];
     }
 
     if (value === undefined) {
-        return [[]]
+        return [[]];
     }
 
     return [[value]];
@@ -204,13 +204,13 @@ export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undef
         return false;
     }
 
-    for(const i in value) {
-        if(Array.isArray(value[i])) {
+    for (const i in value) {
+        if (Array.isArray(value[i])) {
             return true;
         }
     }
 
-    return false
+    return false;
 }
 
 /**
@@ -220,8 +220,8 @@ export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undef
  */
 export function count(values: DigitizedValues) {
     function recurse(values: DigitizedValues, count: number = 0) {
-        for(const value of values) {
-            if(Array.isArray(value)) {
+        for (const value of values) {
+            if (Array.isArray(value)) {
                 count += recurse(value, count);
             }
             else {
@@ -250,7 +250,7 @@ export type Stop = Readonly<{
 }>
 
 export function stop(): Stop {
-    return {stop: true};
+    return { stop: true };
 }
 
 export type TrackChangesCallback<P extends any[], R, C = P[0]|undefined> = (changes: Change<C>[], ...args: P) => R | Stop;
@@ -270,20 +270,20 @@ export function trackChanges<P extends any[], R>(fn: TrackChangesCallback<P, R>)
 
         const stopOrValue = fn(changes, ...args);
 
-        if(stopOrValue
+        if (stopOrValue
             && typeof stopOrValue === 'object'
             && 'stop' in stopOrValue
             && stopOrValue.stop === true) {
             return value;
         }
 
-        const response: R = stopOrValue as R
+        const response: R = stopOrValue as R;
 
         let newValue = typeof response === 'object' || Array.isArray(response)
             ? JSON.stringify(response)
             : response;
 
-        if(originalValue !== newValue) {
+        if (originalValue !== newValue) {
             changes.push({
                 from: value,
                 to: response
@@ -291,7 +291,7 @@ export function trackChanges<P extends any[], R>(fn: TrackChangesCallback<P, R>)
         }
 
         return response as R;
-    }
+    };
 }
 
 export type StopPredicateFunction<P extends CallbackParams<any[]> = any[]> = TrackChangesCallback<P, boolean>;
@@ -302,7 +302,7 @@ export type StopPredicateFunction<P extends CallbackParams<any[]> = any[]> = Tra
  */
 export function stopWhen<P extends CallbackParams<any[]>, R>(predicate: StopPredicateFunction<P>, fn: Callback<P, R>) {
     return trackChanges<P, R>((changes, ...args: P) => {
-        if(!predicate(changes, ...args)) {
+        if (!predicate(changes, ...args)) {
             return stop();
         }
         
