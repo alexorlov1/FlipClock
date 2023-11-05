@@ -7,7 +7,7 @@ import { parse } from './src/helpers/css';
 import { css } from './src/themes/flipclock/flipclock.css';
 
 const writeCssFiles = {
-    'flipclock.css': parse(css.css.value)
+    'flipclock.css': parse(css.css.value, ' ').trim()
 };
 
 export default defineConfig({

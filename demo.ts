@@ -5,14 +5,19 @@ import { theme } from './src/themes/flipclock';
 import { css } from './src/themes/flipclock/flipclock.css';
 
 const clock = flipClock({
-    autoStart: true,
+    autoStart: false,
     el: document.querySelector('#app'),
     face: counter({
-        value: faceValue(2)
+        value: faceValue(0)
     }),
     theme: theme({
-        css
+        css: css.extend({
+            '&.flip-clock': {
+                '--border-radius': '6px',
+                fontSize: '24px'
+            }
+        })
     })
 });
 
-console.log(clock);
+// clock.face.increment();

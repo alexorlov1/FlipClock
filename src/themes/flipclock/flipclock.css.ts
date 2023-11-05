@@ -1,9 +1,12 @@
 import { useCss } from '../../helpers/css';
 
 export const css = useCss({
-    '.flip-clock': {
+    '&.flip-clock': {
+        '--border-radius': '.75rem',
+        '--width': '1em',
+        '--height': '1.45em',
         fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSize: '1rem',
+        fontSize: '4.5em',
         userSelect: 'none',
         textAlign: 'center',
         position: 'relative',
@@ -11,7 +14,7 @@ export const css = useCss({
         display: 'inline-flex',
         boxSizing: 'border-box',
         alignItems: 'flex-end',
-        gap: '.3333em',
+        gap: '.25rem',
         '.flip-clock-group': {
             display: 'flex',
             flexDirection: 'column',
@@ -21,7 +24,7 @@ export const css = useCss({
             '.flip-clock-group-items': {
                 display: 'flex',
                 alignItems: 'stretch',
-                gap: '.3333em' 
+                gap: '.25rem' 
             },
             '.flip-clock-label': {
                 marginBottom: '.5rem',
@@ -39,13 +42,14 @@ export const css = useCss({
             } 
         },
         '.flip-clock-card': {
-            width: '4em',
-            height: '6em',
+            width: 'var(--width)',
+            height: 'var(--height)',
             position: 'relative',
-            borderRadius: '.75rem',
+            borderRadius: 'var(--border-radius)',
             boxShadow: '0 1.5px 3px rgba(0, 0, 0, 0.24), 0 3px 8px rgba(0, 0, 0, 0.05)',
             fontWeight: 'bold',
             color: '#ccc',
+            flexShrink: 0,
             '&:not(.animate)': {
                 '.active .flip-clock-card-item-inner': {
                     zIndex: '4' 
@@ -70,7 +74,7 @@ export const css = useCss({
                     height: '50%',
                     overflow: 'hidden',
                     position: 'relative',
-                    fontSize: '4.5em',
+                    fontSize: '1em',
                     background: '#333',
                     boxShadow: 'inset 0 0 .2em rgba(0,0,0,.5)',
                     '&:after': {
@@ -92,10 +96,10 @@ export const css = useCss({
                     } 
                 },
                 '.top': {
-                    borderRadius: '.75rem .75rem 0 0',
-                    lineHeight: 'calc(6em/4.5em)',
+                    borderRadius: 'var(--border-radius) var(--border-radius) 0 0',
+                    lineHeight: 'var(--height)',
                     '&:after': {
-                        borderRadius: '.75rem .75rem 0 0' 
+                        borderRadius: 'var(--border-radius) var(--border-radius) 0 0' 
                     },
                     '&:before': {
                         background: '#333',
@@ -104,10 +108,10 @@ export const css = useCss({
                     } 
                 },
                 '.bottom': {
-                    borderRadius: '0 0 .75rem .75rem',
+                    borderRadius: '0 0 var(--border-radius) var(--border-radius)',
                     lineHeight: '0',
                     '&:after': {
-                        borderRadius: '0 0 .75rem .75rem' 
+                        borderRadius: '0 0 var(--border-radius) var(--border-radius)' 
                     },
                     '&:before': {
                         background: '#ccc',
@@ -116,8 +120,8 @@ export const css = useCss({
                 } 
             },
             '&.animate': {
-                animationDuration: '80ms',
-                animationDelay: '80ms',
+                animationDuration: '250ms',
+                animationDelay: '250ms',
                 '.flip-clock-card-item-inner': {
                     perspective: '15em' 
                 },
@@ -186,7 +190,7 @@ export const css = useCss({
             color: '#333',
             width: '1em',
             '.flip-clock-divider-inner': {
-                fontSize: '5em' 
+                fontSize: '1.25em' 
             } 
         } 
     },

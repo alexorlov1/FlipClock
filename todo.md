@@ -17,6 +17,7 @@ Docs:
 - write examples for how to use CSS-in-JS.
 - have chat gpt edit/proof docs.
 - create another theme as an example that multiple themes can work.
+- document cli tool. make sure cli tool works with node and not just bun.
 
 Tests
 - Need better coverage of new code. Goal is > 95% test coverage.

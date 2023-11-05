@@ -74,7 +74,7 @@ export function css(value: CSSProperties) {
     return hash;
 }
 
-export function merge(target: CSSProperties, source: CSSProperties): CSSProperties {
+export function merge(source: CSSProperties, target: CSSProperties): CSSProperties {
     for (const key in source) {
         if (typeof source[key] === 'object' && typeof target[key] === 'object') {
             target[key] = merge(
@@ -132,7 +132,7 @@ export function useCss(source: CSSProperties): UseCss {
         if (typeof document === 'undefined') {
             return;
         }
-        
+
         sheet().innerHTML = Object.values(cachedHashedCss).join('');
     });
 
@@ -140,12 +140,12 @@ export function useCss(source: CSSProperties): UseCss {
         css,
         hash,
         merge(target: CSSProperties) {
-            css.value = merge(target, css.value);
+            css.value = merge(css.value, target);
 
             return context;
         },
         extend(target: CSSProperties) {
-            return useCss(merge(target, css.value));
+            return useCss(merge(css.value, target));
         },
         toString() {
             return cachedHashedCss[hash.value];
