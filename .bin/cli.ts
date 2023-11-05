@@ -14,10 +14,10 @@ program.command('css')
   .description('Convert a .css file into a .css.ts file.')
   .argument('<input>', 'The CSS file to process.')
   .argument('<output>', 'The output file location of the .css.ts file')
-  .action(async (input, output, options) => {
+  .action(async (input, output) => {
     const css = (await readFile(input)).toString();
 
-    const wrapper = `import { CSSProperties } from "flipclock";\n\nexport const css: CSSProperties = ${JSON.stringify(props(astish(css) as CSSProperties))}
+    const wrapper = `import { useCss } from "flipclock";\n\nexport const css = useCss(${JSON.stringify(props(astish(css) as CSSProperties))});
     `;
 
     writeFile(output, wrapper)
@@ -25,7 +25,7 @@ program.command('css')
     const eslint = new ESLint({
       fix: true,
       useEslintrc: true,
-      overrideConfigFile: resolve('.eslintrc.cli.js')
+      overrideConfigFile: resolve('.eslintrc.cli.cjs')
     });
 
     const results = await eslint.lintFiles(output);

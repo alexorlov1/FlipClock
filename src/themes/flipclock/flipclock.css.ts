@@ -1,6 +1,6 @@
-import { CSSProperties } from '../../helpers/css';
+import { useCss } from '../../helpers/css';
 
-export const css: CSSProperties = {
+export const css = useCss({
     '.flip-clock': {
         fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
         fontSize: '1rem',
@@ -233,5 +233,5 @@ export const css: CSSProperties = {
             opacity: '0' 
         } 
     } 
-};
+});
     

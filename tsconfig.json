@@ -8,6 +8,7 @@
       "declaration": true,
       "declarationMap": true,
       "emitDeclarationOnly": true,
+      "allowImportingTsExtensions": true,
   
       /* Bundler mode */
       "moduleResolution": "Bundler",
@@ -19,6 +20,6 @@
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
     },
-    "include": ["index.ts", "src", "demo.ts", ".bin/test.ts"]
+    "include": ["index.ts", "src"]
   }
   

@@ -1,5 +1,3 @@
-import './scss/flipclock.scss';
-
 export * from './src/helpers/charset';
 export * from './src/helpers/date';
 export * from './src/helpers/dictionary';

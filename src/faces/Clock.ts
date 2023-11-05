@@ -31,28 +31,28 @@ export class Clock implements Face {
      * 
      * @public
      */
-    public readonly date: Ref<Date|undefined>
+    public readonly date: Ref<Date|undefined>;
 
     /**
      * The current formatted value.
      * 
      * @public
      */
-    public readonly value: FaceValue<string>
+    public readonly value: FaceValue<string>;
 
     /**
      * The format string.
      * 
      * @public
      */
-    format: string = '[hh]:[mm]:[ss] [A]'
+    format: string = '[hh]:[mm]:[ss] [A]';
 
     /**
      * The duration formatter.
      * 
      * @public
      */
-    formatter: UseDateFormats
+    formatter: UseDateFormats;
 
     /**
      * Instantiate the clock face.
@@ -70,8 +70,8 @@ export class Clock implements Face {
         }
 
         const format = () => {
-            return this.formatter.format(this.date?.value ?? new Date, this.format)
-        }
+            return this.formatter.format(this.date?.value ?? new Date, this.format);
+        };
 
         this.value = faceValue('');
 
@@ -96,7 +96,7 @@ export class Clock implements Face {
      */
     public interval(instance: FlipClock<any>): void {
         if (!this.date?.value) {
-            this.value.value = this.formatter.format(new Date, this.format)
+            this.value.value = this.formatter.format(new Date, this.format);
         }
         else {
             const date = new Date;

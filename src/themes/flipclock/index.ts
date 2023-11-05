@@ -1,5 +1,6 @@
 import { type FaceValue } from '../../FaceValue';
 import { type FlipClock } from '../../FlipClock';
+import { UseCss } from '../../helpers/css';
 import { type DigitizedValue, type DigitizedValues } from '../../helpers/digitizer';
 import { classes, el, type HTMLClassAttribute } from '../../helpers/dom';
 import { debounce } from '../../helpers/functions';
@@ -16,7 +17,8 @@ export type Dividers = RegExp | string | string[];
  */
 export type FlipClockThemeOptions = {
     labels?: DigitizedValues,
-    dividers?: Dividers
+    dividers?: Dividers,
+    css?: UseCss
 }
 
 /**
@@ -27,9 +29,10 @@ export type FlipClockThemeOptions = {
 export function theme(options: FlipClockThemeOptions = {}) {
     return {
         render: (instance: FlipClock<any>) => render({
+            css: options.css,
+            dividers: options.dividers,
             el: instance.el,
             labels: options.labels,
-            dividers: options.dividers,
             value: instance.face.faceValue(),
         })
     };
@@ -39,6 +42,7 @@ export function theme(options: FlipClockThemeOptions = {}) {
  * @public
  */
 export type ClockOptions = {
+    css?: UseCss,
     dividers?: Dividers,
     el?: Element | null,
     labels?: DigitizedValues | string,
@@ -116,7 +120,8 @@ export function render(options: ClockOptions) {
         el: options.el,
         tagName: 'div',
         class: {
-            'flip-clock': true
+            'flip-clock': true,
+            [options.css?.hash.value ?? '']: !!options.css
         },
         children: options.value.digits.map((digits, i) => walk(
             digits,

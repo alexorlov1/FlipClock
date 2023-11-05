@@ -1,4 +1,6 @@
 import { Properties } from 'csstype';
+import { Ref, computed, ref } from './ref';
+import { watchEffect } from './signal';
 
 /**
  * A CSS-in-JS style object.
@@ -72,6 +74,117 @@ export function css(value: CSSProperties) {
     return hash;
 }
 
+export function merge(target: CSSProperties, source: CSSProperties): CSSProperties {
+    for (const key in source) {
+        if (typeof source[key] === 'object' && typeof target[key] === 'object') {
+            target[key] = merge(
+                target[key] as CSSProperties,
+                source[key] as CSSProperties
+            );
+        } else {
+            target[key] = source[key];
+        }
+    }
+
+    return target;
+}
+
+/**
+ * The return value for `useCss()`.
+ * 
+ * @public
+ */
+export type UseCss = {
+    css: Ref<CSSProperties>;
+    hash: Ref<string>;
+    merge: (target: CSSProperties) => UseCss;
+    extend: (target: CSSProperties) => UseCss;
+    toString: () => string
+}
+
+/**
+ * A composable for using CSS.
+ * 
+ * @public
+ */
+export function useCss(source: CSSProperties): UseCss {
+    const css = ref(source);
+
+    const hash = computed(() => {
+        const stringified = stringify(css.value);
+
+        if (cachedStringifiedCss[stringified]) {
+            return cachedStringifiedCss[stringified];
+        }
+
+        const hash = toHash(stringified);
+
+        cachedStringifiedCss[stringified] = hash;
+
+        return hash;
+    });
+
+    watchEffect(() => {
+        if (!cachedHashedCss[hash.value]) {
+            cachedHashedCss[hash.value] = parse(css.value, `.${hash.value}`);
+        }
+        
+        if (typeof document === 'undefined') {
+            return;
+        }
+        
+        sheet().innerHTML = Object.values(cachedHashedCss).join('');
+    });
+
+    const context: UseCss = {
+        css,
+        hash,
+        merge(target: CSSProperties) {
+            css.value = merge(target, css.value);
+
+            return context;
+        },
+        extend(target: CSSProperties) {
+            return useCss(merge(target, css.value));
+        },
+        toString() {
+            return cachedHashedCss[hash.value];
+        }
+    };
+
+    return context;
+}
+
+/**
+ * Convert the CSS properties into camelcase.
+ * 
+ * @public
+ */
+export function props(values: CSSProperties) {
+    for (const i in values) {
+        const value = values[i];
+
+        if (value && typeof value === 'object') {
+            values[i] = props(value);
+        }
+        else if (!i.match(/^-/)) {
+            values = Object.fromEntries(
+                Object.entries(values).map(([key, value]) => {
+                    if (key !== i) {
+                        return [key, value];
+                    }
+                    
+                    return [key.toLowerCase().replace(
+                        /[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase()
+                    ), value];
+                })
+            );
+        }
+    }
+
+    return values;
+}
+
 /**
  * Goober.is a fantastic library in which we took inspiration. The code below
  * this comment was taken from Goober.js If the goal wasn't zero dependencies,
@@ -104,7 +217,8 @@ export function css(value: CSSProperties) {
  */
 
 /**
- * Convert a css style string into a object.
+ * Convert a css style string into a object. This function deviates from
+ * goober.js in that \n or ; will parse the same on rules.
  * 
  * @public 
  */
@@ -130,31 +244,6 @@ export function astish(val: string): object {
 
     return tree[0];
 };
-
-export function props(values: CSSProperties) {
-    for (const i in values) {
-        const value = values[i];
-
-        if (value && typeof value === 'object') {
-            values[i] = props(value);
-        }
-        else if (!i.match(/^-/)) {
-            values = Object.fromEntries(
-                Object.entries(values).map(([key, value]) => {
-                    if (key !== i) {
-                        return [key, value];
-                    }
-                    
-                    return [key.toLowerCase().replace(
-                        /[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase()
-                    ), value];
-                })
-            );
-        }
-    }
-
-    return values;
-}
 
 /**
  * Parses the object into css, scoped, blocks.
