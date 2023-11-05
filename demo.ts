@@ -1,20 +1,26 @@
-import { faceValue } from './src/FaceValue';
 import { flipClock } from './src/FlipClock';
-import { counter } from './src/faces/Counter';
+import { elapsedTime } from './src/faces/ElapsedTime';
 import { theme } from './src/themes/flipclock';
 import { css } from './src/themes/flipclock/flipclock.css';
 
 const clock = flipClock({
     autoStart: false,
     el: document.querySelector('#app'),
-    face: counter({
-        value: faceValue(0)
+    face: elapsedTime({
+        start: new Date(),
+        end: new Date('2024-01-02'),
+        format: '[hh]:[mm]:[ss]'
     }),
     theme: theme({
+        labels: ['Hours', 'Minutes', 'Seconds'],
+        dividers: [':'],
         css: css.extend({
             '&.flip-clock': {
                 '--border-radius': '6px',
-                fontSize: '24px'
+                fontSize: 'inherit'
+            },
+            '.flip-clock-label': {
+                fontSize: '12px'
             }
         })
     })
