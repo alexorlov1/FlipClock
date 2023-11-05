@@ -1,5 +1,5 @@
 import { add, differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInMonths, differenceInSeconds, differenceInWeeks, differenceInYears, pad } from './date';
-import { DefineFunction, Translator, UnsetFunction, UseDictionary, useDefinitionMap } from './dictionary';
+import { useDefinitionMap, type DefineFunction, type Translator, type UnsetFunction, type UseDictionary } from './dictionary';
 
 /**
  * The time intervals between two dates.

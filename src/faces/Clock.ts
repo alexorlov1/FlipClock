@@ -1,11 +1,10 @@
-import { Ref } from './../helpers/ref';
-
 import { Face } from '../Face';
-import { FaceValue, faceValue } from '../FaceValue';
+import { faceValue, type FaceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
-import { UseDateFormatOptions, UseDateFormats, useDateFormats } from '../helpers/date';
+import { useDateFormats, type UseDateFormatOptions, type UseDateFormats } from '../helpers/date';
 import { ref } from '../helpers/ref';
 import { watchEffect } from '../helpers/signal';
+import { type Ref } from './../helpers/ref';
 
 /**
  * The `Clock` face options.

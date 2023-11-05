@@ -1,16 +1,20 @@
-import { DigitizedValue, DigitizedValues } from './digitizer';
+import { type DigitizedValue, type DigitizedValues } from './digitizer';
 
 /**
- * This method will match the structure of the current array against the target.
- * This method will not match the length of the DigitizedValue[] arrays, but
- * match lengths for groups. To ensure all structures have the same length, 
- * run matchStructureLength() after this method.
+ * The options for matchArrayStructure().
+ * 
+ * @public
  */
 
 export type MatchArrayStructureOptions = {
     backwards?: boolean
 }
 
+/**
+ * The callback for matchArrayStructure().
+ * 
+ * @public
+ */
 export type MatchArrayStructureCallback = Callback<[value?: DigitizedValue, target?: DigitizedValue | DigitizedValues], DigitizedValue | undefined>
 
 /**

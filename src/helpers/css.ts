@@ -1,5 +1,5 @@
-import { Properties } from 'csstype';
-import { Ref, computed, ref } from './ref';
+import { type Properties } from 'csstype';
+import { computed, ref, type Ref } from './ref';
 import { watchEffect } from './signal';
 
 /**

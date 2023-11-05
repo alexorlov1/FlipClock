@@ -1,6 +1,6 @@
-import { Translator, UseDefinitionMap, UseDictionary, useDefinitionMap } from './dictionary';
-import { UseDigitizer } from './digitizer';
-import { Duration } from './duration';
+import { useDefinitionMap, type Translator, type UseDefinitionMap, type UseDictionary } from './dictionary';
+import { type UseDigitizer } from './digitizer';
+import { type Duration } from './duration';
 
 /**
  * The number of days in a week.

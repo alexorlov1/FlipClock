@@ -1,4 +1,4 @@
-import { FaceValue } from '../../src/FaceValue';
+import { faceValue } from '../../src/FaceValue';
 import { useCharset } from '../../src/helpers/charset';
 import { useSequencer } from '../../src/helpers/sequencer';
 import { castDigitizedGroup, castDigitizedString, castDigitizedValues, matchArrayStructure, stopAfterChanges } from '../../src/helpers/structure';
@@ -8,21 +8,21 @@ test('casting a string to a digitized string', () => {
     expect(castDigitizedString(['1'])).toBe('1');
     expect(castDigitizedString([['1']])).toBe('1');
     expect(castDigitizedString(undefined)).toBe(undefined);
-})
+});
 
 test('casting a string to a digitized values', () => {
     expect(castDigitizedValues('1')).toStrictEqual(['1']);
     expect(castDigitizedValues(['1'])).toStrictEqual(['1']);
     expect(castDigitizedValues([['1']])).toStrictEqual(['1']);
     expect(castDigitizedValues(undefined)).toStrictEqual([]);
-})
+});
 
 test('casting a string to digitized values', () => {
     expect(castDigitizedGroup('1')).toStrictEqual([['1']]);
     expect(castDigitizedGroup(['1'])).toStrictEqual([['1']]);
     expect(castDigitizedGroup([['1']])).toStrictEqual([['1']]);
     expect(castDigitizedGroup(undefined)).toStrictEqual([[]]);
-})
+});
 
 test('matching array structure going left to right', () => {
     expect(matchArrayStructure([], [])).toStrictEqual([]);
@@ -45,7 +45,7 @@ test('matching array structure going left to right', () => {
     expect(matchArrayStructure(['1', [['2'], '3']], ['1', ['2', '3']])).toStrictEqual(['1', ['2', '3']]);
     expect(matchArrayStructure(['1', [['2'], '3']], ['1', [['2'], '3']])).toStrictEqual(['1', [['2'], '3']]);
     expect(matchArrayStructure(['1', ['2', '3']], ['1', ['2', ['3']]])).toStrictEqual(['1', ['2', []]]);
-})
+});
 
 test('matching array structure going right to left', () => {
     expect(matchArrayStructure([], [], { backwards: true })).toStrictEqual([]);
@@ -85,7 +85,7 @@ test('incrementing the array walker after 1 change', () => {
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'a']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'b']);
     expect(matchArrayStructure(subject, target, walker())).toStrictEqual(['a', 'b', 'c']);
-})
+});
 
 test('decrementing the array walker after 1 change', () => {
     const { prev } = useCharset();
@@ -99,14 +99,14 @@ test('decrementing the array walker after 1 change', () => {
     expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', 'b']);
     expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', 'a']);
     expect(matchArrayStructure(subject, target, { backwards: true }, walker())).toStrictEqual(['a', 'b', ' ']);
-})
+});
 
 test('incrementing towards "hello" 2 changes at a time', () => {
     const { increment } = useSequencer({
         stopAfterChanges: 2
     });
     
-    let subject = new FaceValue(''), target = new FaceValue('hello');
+    let subject = faceValue(''), target = faceValue('hello');
 
     subject = increment(subject, target, 2);
 
@@ -175,7 +175,7 @@ test('incrementing towards "hello" 2 changes at a time', () => {
     subject = increment(subject, target, 2);
 
     expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'o']);
-})
+});
 
 test('decrementing from "hello" 2 changes at a time', () => {
     const { decrement } = useSequencer({
@@ -185,7 +185,7 @@ test('decrementing from "hello" 2 changes at a time', () => {
         }
     });
 
-    let subject = new FaceValue('hello'), target = new FaceValue('');
+    let subject = faceValue('hello'), target = faceValue('');
 
     expect(subject.digits).toStrictEqual(['h', 'e', 'l', 'l', 'o']);
     

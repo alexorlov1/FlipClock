@@ -1,7 +1,7 @@
-import { FaceValue } from '../FaceValue';
-import { UseCharset, UseCharsetOptions, useCharset } from './charset';
-import { DigitizedValue, DigitizedValues } from './digitizer';
-import { MatchArrayStructureOptions, StopPredicateFunction, matchArrayStructure, stopWhen } from './structure';
+import { type FaceValue } from '../FaceValue';
+import { useCharset, type UseCharset, type UseCharsetOptions } from './charset';
+import { type DigitizedValue, type DigitizedValues } from './digitizer';
+import { matchArrayStructure, stopWhen, type MatchArrayStructureOptions, type StopPredicateFunction } from './structure';
 
 /** 
  * The options for `useSequencer()`.

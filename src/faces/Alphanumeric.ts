@@ -1,10 +1,10 @@
-import { Face } from '../Face';
+import { type Face } from '../Face';
 import { FaceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
-import { DigitizedValues } from '../helpers/digitizer';
-import { UseSequencer, useSequencer } from '../helpers/sequencer';
+import { type DigitizedValues } from '../helpers/digitizer';
+import { useSequencer, type UseSequencer } from '../helpers/sequencer';
 import { watchEffect } from '../helpers/signal';
-import { SequencerOptions } from './../helpers/sequencer';
+import { type SequencerOptions } from './../helpers/sequencer';
 
 /**
  * The `Alphanumeric` face options.

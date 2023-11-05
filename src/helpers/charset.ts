@@ -1,4 +1,4 @@
-import { DigitizedValue, DigitizedValues, EMPTY_CHAR } from './digitizer';
+import { EMPTY_CHAR, type DigitizedValue, type DigitizedValues } from './digitizer';
 
 /**
  * Get a range of numbers using the given size and starting point.

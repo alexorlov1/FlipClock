@@ -1,6 +1,6 @@
-import { Face } from '../Face';
-import { FaceValue, faceValue } from '../FaceValue';
-import { UseDurationFormatOptions, UseDurationFormats, useDurationFormats } from '../helpers/duration';
+import { type Face } from '../Face';
+import { faceValue, type FaceValue } from '../FaceValue';
+import { useDurationFormats, type UseDurationFormatOptions, type UseDurationFormats } from '../helpers/duration';
 
 /**
  * The `ElapsedTime` face options.
@@ -28,21 +28,21 @@ export class ElapsedTime implements Face {
      * 
      * @public
      */
-    end?: Date
+    end?: Date;
 
     /**
      * The format string.
      * 
      * @public
      */
-    format: string
+    format: string;
 
     /**
      * The duration formatter.
      * 
      * @public
      */
-    formatter: UseDurationFormats
+    formatter: UseDurationFormats;
     
     /**
      * The starting date used to calculate the elsapsed time.
@@ -56,7 +56,7 @@ export class ElapsedTime implements Face {
      * 
      * @public
      */
-    public value: FaceValue<string>
+    public value: FaceValue<string>;
 
     /**
      * Instantiate a Clock face with a given value and attributes.
@@ -85,7 +85,7 @@ export class ElapsedTime implements Face {
         return {
             start: this.start ?? new Date,
             end: this.end ?? new Date
-        }
+        };
     }
 
     /**
