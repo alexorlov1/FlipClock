@@ -2,9 +2,9 @@
 import Clock from './components/Clock.vue';
 </script>
 
-# Getting Started
+# Installation
 
-The recommended way to use FlipClock is to install it with your preferred package manager and let your bundler handle it.
+The recommended way to use FlipClock.js is to install it with your preferred package manager and let your bundler handle it to get the benefits of tree-shaking. Your bundler will only include the parts of the library you use. However, you can import the entire bundle using a CDN.
 
 ::: code-group
 
@@ -24,20 +24,14 @@ yarn add flipclock
 bun i flipclock
 ```
 
-### CDN
+```bash [Unpkg]
 
-@todo: insert CDN link here
+```
 
-::: info
-FlipClock.js has no depedencies and can be easily implemented into any front-end framework like React, Vue, and Svelte. Unless otherwise noted, all examples are framework agnostic.
+```bash [JSDelivr]
+
+```
+
+::: tip
+FlipClock.js has no depedencies and can be easily implemented into any front-end framework like React, Vue, and Svelte.
 :::
-
-## Basic Example
-
-The most basic implementation is a `Clock` that shows the current time.
-
-<Clock />
-
-<<< @/components/Clock.vue#import{TS}
-<<< @/components/Clock.vue#example{TS}
-

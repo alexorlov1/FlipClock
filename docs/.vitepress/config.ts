@@ -15,19 +15,13 @@ export default defineConfig({
       {
         text: 'Getting Started',
         items: [
-          { text: 'What is FlipClock.js?', link: '/what-is-flipclock' },
+          { text: 'Introduction', link: '/introduction' },
+          { text: 'Why FlipClock.js?', link: '/why-flipclock' },
           { text: 'Installation', link: '/installation' },
           { text: 'Core Concepts', link: '/core-concepts' },
+          { text: 'CSS-in-JS', link: '/css-in-js' },
           // { text: 'Quick Start', link: '/quick-start' },
           // { text: 'Why FlipClock?', link: '/about' },
-        ]
-      },
-      {
-        text: 'Core', items: [
-          { text: 'FlipClock', link: '/core/flipclock' },
-          { text: 'FaceValue', link: '/core/face-value' },
-          { text: 'Hooks', link: '/core/hooks' },
-          { text: 'Timer', link: '/core/timer' },
         ]
       },
       {
@@ -37,6 +31,14 @@ export default defineConfig({
           { text: 'Elapsed Time', link: '/faces/elapsed-time' },
           { text: 'Alphanumeric', link: '/faces/alphanumeric' },
           { text: 'Build your own face', link: '/faces/build-your-own-face' }
+        ]
+      },
+      {
+        text: 'Core', items: [
+          { text: 'FlipClock', link: '/core/flipclock' },
+          { text: 'FaceValue', link: '/core/face-value' },
+          { text: 'Hooks', link: '/core/hooks' },
+          { text: 'Timer', link: '/core/timer' },
         ]
       },
       {
