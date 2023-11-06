@@ -3,10 +3,18 @@ import { Face, FaceHooks } from './Face';
 import { Timer } from './Timer';
 import { watchEffect } from './helpers/signal';
 
+/**
+ * A FlipClock theme definition.
+ * 
+ * @public
+ */
 export type Theme<T extends Face<T>> = {
     render: (instance: FlipClock<T>) => void
 } & FaceHooks<T>
 
+/**
+ * The options for `FlipClock`.
+ */
 export type FlipClockProps<T extends Face<T>> = {
     autoStart?: boolean,
     face: T
@@ -18,7 +26,8 @@ export type FlipClockProps<T extends Face<T>> = {
 /**
  * The FlipClock class starts, stops, resets, mounts, and unmounts the clock.
  * The clock also tracks the time and renders the clock with each interval.
-
+ * 
+ * @public
  */
 export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
 
@@ -59,6 +68,8 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
 
     /**
      * Construct the FlipClock.
+     * 
+     * @public
      */
     constructor(props: FlipClockProps<T>) {
         super();
@@ -81,7 +92,12 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
         }
     }
 
-    get animationRate() {
+    /**
+     * Get the animation rate of the clock.
+     * 
+     * @public
+     */
+    public get animationRate() {
         if (!this.el) {
             return 0;
         }
@@ -94,7 +110,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
      * 
      * @public
      */
-    mount(el: Element) {
+    public mount(el: Element) {
         this.hook('beforeMount', this);
 
         this.el = el;
@@ -117,7 +133,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
      * 
      * @public
      */
-    start(fn?: (instance: FlipClock<T>) => void): this {
+    public start(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStart', this);
 
         this.timer.start(() => {
@@ -144,7 +160,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
      * 
      * @public
      */
-    stop(fn?: (instance: FlipClock<T>) => void): this {
+    public stop(fn?: (instance: FlipClock<T>) => void): this {
         this.hook('beforeStop', this);
 
         this.timer.stop(() => {
@@ -163,7 +179,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
      * 
      * @public
      */
-    toggle(fn?: (instance: FlipClock<T>) => void): this {
+    public toggle(fn?: (instance: FlipClock<T>) => void): this {
         if (this.timer.isStopped) {
             this.start(fn);
         }
@@ -179,7 +195,7 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
      * 
      * @public
      */
-    unmount(): this {
+    public unmount(): this {
         this.hook('beforeUnmount', this);
 
         this.el?.parentElement?.removeChild(this.el);
@@ -213,6 +229,8 @@ export class FlipClock<T extends Face<T>> extends EventEmitter<T> {
 
 /**
  * Instantiate a new `FlipClock` instance.
+ * 
+ * @public
  */
 export function flipClock<T extends Face<T>>(props: FlipClockProps<T>): FlipClock<T> {
     return new FlipClock<T>(props);

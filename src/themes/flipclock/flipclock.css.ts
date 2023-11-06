@@ -1,5 +1,10 @@
 import { useCss } from '../../helpers/css';
 
+/**
+ * The FlipClock Theme CSS.
+ * 
+ * @public
+ */
 export const css = useCss({
     '&.flip-clock': {
         '--border-radius': '.75rem',

@@ -90,7 +90,7 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    get backwards(): boolean {
+    public get backwards(): boolean {
         if (this.direction === 'backwards') {
             return true;
         }
@@ -107,7 +107,7 @@ export class Alphanumeric implements Face {
      * 
      * @public
      */
-    faceValue(): FaceValue<string | DigitizedValues> {
+    public faceValue(): FaceValue<string | DigitizedValues> {
         return this.value;
     }
 

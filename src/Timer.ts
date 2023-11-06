@@ -82,6 +82,8 @@ export class Timer {
             return this.lastLoop;
         }
 
+        console.log(Date.now() - this.lastLoop);
+
         return Date.now() - this.lastLoop;
     }
 

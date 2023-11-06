@@ -23,6 +23,8 @@ export type EventEmitterCallback<T, K extends keyof Required<T>> = (...args: Req
  */
 export class EventEmitter<T> {
     /**
+     * The registered events.
+     * 
      * @protected
      */
     protected events: Event<T, any>[] = [];

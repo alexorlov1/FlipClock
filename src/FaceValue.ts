@@ -48,7 +48,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    get digits() {
+    public get digits() {
         return this.digitizer.digitize(this.value);
     }
 
@@ -57,7 +57,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    set digits(value: DigitizedValues) {
+    public set digits(value: DigitizedValues) {
         this.value = this.digitizer.undigitize(value) as T;
     }
 
@@ -66,7 +66,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    get length() {
+    public get length() {
         return count(this.digits);
     }
 
@@ -75,7 +75,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    get value() {
+    public get value() {
         return this.$value.value;
     }
 
@@ -84,7 +84,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    set value(value) {
+    public set value(value) {
         this.$value.value = value;
     }
 
@@ -93,7 +93,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    compare(subject?: FaceValue<any>) {
+    public compare(subject?: FaceValue<any>) {
         return JSON.stringify(this.value) === JSON.stringify(subject?.value);
     }
 
@@ -102,7 +102,7 @@ export class FaceValue<T> {
      * 
      * @public
      */
-    copy(value?: T, props: FaceValueProps = {}): FaceValue<T> {
+    public copy(value?: T, props: FaceValueProps = {}): FaceValue<T> {
         return new FaceValue(value === undefined ? this.value : value, Object.assign({
             digitizer: this.digitizer
         }, props));

@@ -192,7 +192,7 @@ export function card(options: CardOptions): Element {
         },
         class: {
             'flip-clock-card': true,
-            'animate': options.el?.getAttribute('data-value') !== options.value
+            'animate': lastValue !== options.value
         },
         events: {
             onanimationend() {

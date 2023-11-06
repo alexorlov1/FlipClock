@@ -44,14 +44,14 @@ export class Clock implements Face {
      * 
      * @public
      */
-    format: string = '[hh]:[mm]:[ss] [A]';
+    public format: string = '[hh]:[mm]:[ss] [A]';
 
     /**
      * The duration formatter.
      * 
      * @public
      */
-    formatter: UseDateFormats;
+    public formatter: UseDateFormats;
 
     /**
      * Instantiate the clock face.
@@ -84,7 +84,7 @@ export class Clock implements Face {
      * 
      * @public
      */
-    faceValue(): FaceValue<string> {
+    public faceValue(): FaceValue<string> {
         return this.value;
     }
 

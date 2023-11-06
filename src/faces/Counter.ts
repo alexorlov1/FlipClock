@@ -9,12 +9,12 @@ import { watchEffect } from '../helpers/signal';
  * @public
  */
 export type CounterProps = {
-     countdown?: boolean;
-     format?: (number: number) => string;
-     formatter?: Intl.NumberFormat,
-     value: FaceValue<number>;
-     step?: number;
-     targetValue?: FaceValue<number>;
+	countdown?: boolean;
+	format?: (number: number) => string;
+	formatter?: Intl.NumberFormat,
+	value: FaceValue<number>;
+	step?: number;
+	targetValue?: FaceValue<number>;
 }
 
 /**
@@ -26,59 +26,59 @@ export type CounterProps = {
 export class Counter implements Face {
 
     /**
-      * Should the face count down instead of up.
-      * 
-      * @public
-      */
+	  * Should the face count down instead of up.
+	  * 
+	  * @public
+	  */
     public countdown: boolean = false;
 
     /**
-      * The number to increment/decrement in the interval.
-      * 
-      * @public
-      */
+	  * The number to increment/decrement in the interval.
+	  * 
+	  * @public
+	  */
     public step: number = 1;
 
     /**
-      * The formatted face value to display on the clock.
-      * 
-      * @protected
-      */
+	  * The formatted face value to display on the clock.
+	  * 
+	  * @protected
+	  */
     protected formattedValue: FaceValue<string>;
 
     /**
-      * The target value determines when the counter should stop.
-      * 
-      * @public
-      */
+	  * The target value determines when the counter should stop.
+	  * 
+	  * @public
+	  */
     public targetValue?: FaceValue<number>;
 
     /**
-      * The current face value.
-      * 
-      * @public
-      */
+	  * The current face value.
+	  * 
+	  * @public
+	  */
     public value: FaceValue<number>;
 
     /**
-      * A format callback. If the `formatter` is defined, this prop is ignored.
-      * 
-      * @public
-      */
+	  * A format callback. If the `formatter` is defined, this prop is ignored.
+	  * 
+	  * @public
+	  */
     public format?: (number: number) => string;
 
     /**
-      * An `Intl.NumberFormat` instance used to format the number into a string.
-      * 
-      * @public
-      */
+	  * An `Intl.NumberFormat` instance used to format the number into a string.
+	  * 
+	  * @public
+	  */
     public formatter?: Intl.NumberFormat;
 
     /**
-      * Instantiate the clock face.
-      * 
-      * @public
-      */
+	  * Instantiate the clock face.
+	  * 
+	  * @public
+	  */
     constructor(props: CounterProps) {
         this.value = props.value;
         this.targetValue = props.targetValue;
@@ -100,11 +100,11 @@ export class Counter implements Face {
     }
 
     /**
-      * Get the number as a formatted string.
-      * 
-      * @public
-      */
-    get formattedString() {
+	  * Get the number as a formatted string.
+	  * 
+	  * @public
+	  */
+    public get formattedString() {
         if (this.formatter) {
             return this.formatter.format(this.value.value);
         }
@@ -117,39 +117,39 @@ export class Counter implements Face {
     }
 
     /**
-     * The face's current value.
-      * 
-      * @public
-      */
-    faceValue(): FaceValue<string> {
+	 * The face's current value.
+	  * 
+	  * @public
+	  */
+    public faceValue(): FaceValue<string> {
         return this.formattedValue;
     }
 
     /**
-      * Substract the face value by the given value.
-      * 
-      * @public
-      */
+	  * Substract the face value by the given value.
+	  * 
+	  * @public
+	  */
     public decrement(value: number = 1): void {
         this.value.value = this.value.value - value;
     }
 
     /**
-      * Add to the face value by the given value.
-      * 
-      * @public
-      */
+	  * Add to the face value by the given value.
+	  * 
+	  * @public
+	  */
     public increment(value: number = 1): void {
         this.value.value = this.value.value + value;
     }
 
     /**
-      * This method is called with every interval, or every time the clock
-      * should change, and handles the actual incrementing and decrementing the
-      * clock's `FaceValue`.
-      * 
-      * @public
-      */
+	  * This method is called with every interval, or every time the clock
+	  * should change, and handles the actual incrementing and decrementing the
+	  * clock's `FaceValue`.
+	  * 
+	  * @public
+	  */
     public interval(instance: FlipClock<Counter>): void {
         if (this.countdown) {
             this.decrement();
