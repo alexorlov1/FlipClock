@@ -1,9 +1,5 @@
 Requires API fixes:
 
-- elapsedtime needs a stop at. the loop with never stop.
-- elapsedtime, start and end should be reactive.
-- somehow remove undigitize functionality. its too complex and not consistent.
-- make more clock face props reactive like Clock's value property.
 - probably should have proper function passing and typing when using stopWhen. need to accept real functions in addition to the params.
 - fix parse() export. there are two parse functions. need to rename the CSS one.
 

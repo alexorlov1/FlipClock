@@ -145,6 +145,8 @@ export function matchArrayStructure(current: DigitizedValues, target: DigitizedV
 
 /**
  * Cast a value to a string.
+ * 
+ * @public
  */
 export function castDigitizedString(value?: DigitizedValue | DigitizedValues): DigitizedValue | undefined {
     if (Array.isArray(value)) {
@@ -156,6 +158,8 @@ export function castDigitizedString(value?: DigitizedValue | DigitizedValues): D
 
 /**
  * Cast a value to an array of strings.
+ * 
+ * @public
  */
 export function castDigitizedValues(value?: DigitizedValue | DigitizedValues): DigitizedValue[] {
     if (isDigitizedGroup(value)) {
@@ -175,6 +179,8 @@ export function castDigitizedValues(value?: DigitizedValue | DigitizedValues): D
 
 /**
  * Cast a value to a array of digitized arrays.
+ * 
+ * @public
  */
 export function castDigitizedGroup(value?: DigitizedValue | DigitizedValues): DigitizedValues {
     if (isDigitizedGroup(value)) {
@@ -194,6 +200,8 @@ export function castDigitizedGroup(value?: DigitizedValue | DigitizedValues): Di
 
 /**
  * Determines if the value is an array of digitized strings.
+ * 
+ * @public
  */
 export function isDigitizedValues(value: DigitizedValue | DigitizedValues): boolean {
     return Array.isArray(value) && !isDigitizedGroup(value);
@@ -202,6 +210,8 @@ export function isDigitizedValues(value: DigitizedValue | DigitizedValues): bool
 /**
  * Determines if the value is a digitized group, which is an array of digitized
  * values.
+ * 
+ * @public
  */
 export function isDigitizedGroup(value: DigitizedValues | DigitizedValue | undefined) {
     if (!Array.isArray(value) || !value.length) {
@@ -244,23 +254,43 @@ export type Callback<P extends CallbackParams<any[]>, R = undefined> = (...args:
 
 export type CallbackParams<T> = T extends any[] ? T : never; 
 
+/**
+ * A change object that tracks changes within an iterator.
+ * 
+ * @public
+ */
 export type Change<R> = {
     from: R,
     to: R
 }
 
+/**
+ * A readonly object that when returned will stop an iterator.
+ */
 export type Stop = Readonly<{
     stop: true
 }>
 
+/**
+ * Utility function to stop an iterator.
+ * 
+ * @public
+ */
 export function stop(): Stop {
     return { stop: true };
 }
 
+/**
+ * Call for for `trackChanges()`.
+ * 
+ * @public
+ */
 export type TrackChangesCallback<P extends any[], R, C = P[0]|undefined> = (changes: Change<C>[], ...args: P) => R | Stop;
 
 /**
  * Create a callback with the values that can be tracked.
+ * 
+ * @public
  */
 export function trackChanges<P extends any[], R>(fn: TrackChangesCallback<P, R>): Callback<P, R> {
     const changes: Change<R>[] = [];
@@ -298,11 +328,18 @@ export function trackChanges<P extends any[], R>(fn: TrackChangesCallback<P, R>)
     };
 }
 
+/**
+ * Determines if a iterator should stop.
+ * 
+ * @public
+ */
 export type StopPredicateFunction<P extends CallbackParams<any[]> = any[]> = TrackChangesCallback<P, boolean>;
 
 /**
  * Stop the walker using a predicate function. Return `false` to stop and `true`
  * to continue. The predicate is ran before the callback function.
+ * 
+ * @public
  */
 export function stopWhen<P extends CallbackParams<any[]>, R>(predicate: StopPredicateFunction<P>, fn: Callback<P, R>) {
     return trackChanges<P, R>((changes, ...args: P) => {
@@ -316,6 +353,8 @@ export function stopWhen<P extends CallbackParams<any[]>, R>(predicate: StopPred
 
 /**
  * Stop the walker after X number of changes.
+ * 
+ * @public
  */
 export function stopAfterChanges<P extends CallbackParams<any[]>, R>(totalChanges: number, fn: Callback<P, R>) {
     return stopWhen<P, R>((changes, ..._: P) => {

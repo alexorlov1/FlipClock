@@ -28,11 +28,18 @@ export class FaceValue<T> {
     public readonly digitizer: UseDigitizer;
 
     /**
-     * The reactive value.
+     * The value ref.
      * 
      * @protected
      */
     protected $value: Ref<T>;
+
+    /**
+     * The digits ref.
+     * 
+     * @protected
+     */
+    protected $digits: Ref<DigitizedValues>;
 
     /**
      * Instantiate the face value.
@@ -42,6 +49,7 @@ export class FaceValue<T> {
     constructor(value: T, props?: FaceValueProps) {
         this.digitizer = props?.digitizer || useDigitizer();
         this.$value = ref(value);
+        this.$digits = ref(this.digitizer.digitize(value));
     }
     /**
      * The digitized value.
@@ -49,16 +57,18 @@ export class FaceValue<T> {
      * @public
      */
     public get digits() {
-        return this.digitizer.digitize(this.value);
+        return this.$digits.value;
     }
 
     /**
-     * Set the value from a digitized value.
+     * Set the digits from a `DigitizedValue`. It's possible the digits differ
+     * than the value, if a sequencer or something else is iterating on the
+     * digits.
      * 
      * @public
      */
     public set digits(value: DigitizedValues) {
-        this.value = this.digitizer.undigitize(value) as T;
+        this.$digits.value = value;
     }
 
     /**
@@ -67,7 +77,7 @@ export class FaceValue<T> {
      * @public
      */
     public get length() {
-        return count(this.digits);
+        return count(this.$digits.value);
     }
 
     /**
@@ -86,6 +96,7 @@ export class FaceValue<T> {
      */
     public set value(value) {
         this.$value.value = value;
+        this.$digits.value = this.digitizer.digitize(value);
     }
 
     /**

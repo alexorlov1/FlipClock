@@ -135,7 +135,9 @@ export class Alphanumeric implements Face {
      */
     public afterCreate(instance: FlipClock<Alphanumeric>) {
         watchEffect(() => {
-            if (instance.autoStart && instance.timer.isStopped && this.value.value) {
+            if (instance.autoStart
+                && instance.timer.isStopped
+                && this.targetValue.value) {
                 instance.start();
             }
         });

@@ -1,19 +1,28 @@
+import { faceValue } from './src/FaceValue';
 import { flipClock } from './src/FlipClock';
-import { elapsedTime } from './src/faces/ElapsedTime';
+import { alphanumeric } from './src/faces/Alphanumeric';
+import { DigitizedValue, DigitizedValues } from './src/helpers/digitizer';
+import { stopWhen } from './src/helpers/structure';
 import { theme } from './src/themes/flipclock';
 import { css } from './src/themes/flipclock/flipclock.css';
 
-const end = new Date();
+// StopPredicateFunction<[current?: DigitizedValue, target?: DigitizedValue | DigitizedValues ]>
 
-end.setTime(Date.now() + 4000);
+const stopWhenFn = stopWhen<[current?: DigitizedValue, target?: DigitizedValue | DigitizedValues], DigitizedValue | undefined>(() => {
+    return false;
+}, (value, target) => {
+    return value;
+});
 
 const clock = flipClock({
     autoStart: true,
     el: document.querySelector('#app'),
-    face: elapsedTime({
-        start: new Date(),
-        end: end,
-        format: '[hh]:[mm]:[ss]'
+    face: alphanumeric({
+        value: faceValue('test'),
+        targetValue: faceValue('hello'),
+        sequencer: {
+            stopWhen: stopWhenFn
+        }
     }),
     theme: theme({
         labels: ['Hours', 'Minutes', 'Seconds'],
@@ -29,5 +38,4 @@ const clock = flipClock({
         })
     })
 });
-
 // clock.face.increment();

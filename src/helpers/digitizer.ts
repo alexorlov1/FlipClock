@@ -28,7 +28,6 @@ export const EMPTY_CHAR = ' ' as const;
  */
 export type UseDigitizer = {
     digitize: (value: any) => DigitizedValues;
-    undigitize: (value: DigitizedValues) => DigitizedValue;
     isDigitized: (value: any) => boolean;
 }
 
@@ -77,41 +76,6 @@ export function useDigitizer(): UseDigitizer {
     }
 
     /**
-     * Recursively undigitize a value into a string or array of strings.
-     * 
-     * @public
-     */
-    function undigitize(value: DigitizedValues): DigitizedValue {
-        function recurse(value: DigitizedValues): DigitizedValues | DigitizedValue {
-            const digits: DigitizedValues = [];
-
-            let containsArray = false, newString = true;
-
-            for (let i = 0; i < value.length; i++) {
-                if (Array.isArray(value[i])) {
-                    digits.push(recurse(value[i] as DigitizedValues));
-
-                    containsArray = newString = true;
-
-                    continue;
-                }
-
-                if (newString) {
-                    digits.push('');
-
-                    newString = false;
-                }
-
-                (digits as string[])[digits.length - 1] += value[i];
-            }
-
-            return (containsArray ? digits : digits[0]);
-        }
-
-        return recurse(value) as DigitizedValue;
-    }
-
-    /**
      * Check if the value is the type `DigitizedValues`.
      * 
      * @public
@@ -147,7 +111,6 @@ export function useDigitizer(): UseDigitizer {
 
     return {
         digitize,
-        isDigitized,
-        undigitize
+        isDigitized
     };
 }
