@@ -66,7 +66,7 @@ export function css(value: CSSProperties) {
     }
 
     if (!cachedHashedCss[hash]) {
-        cachedHashedCss[hash] = parse(value, `.${hash}`);
+        cachedHashedCss[hash] = jsToCss(value, `.${hash}`);
     }
 
     sheet().innerHTML = Object.values(cachedHashedCss).join('');
@@ -74,19 +74,19 @@ export function css(value: CSSProperties) {
     return hash;
 }
 
-export function merge(source: CSSProperties, target: CSSProperties): CSSProperties {
-    for (const key in source) {
+export function mergeCss(source: CSSProperties, target: CSSProperties): CSSProperties {
+    for (const key in target) {
         if (typeof source[key] === 'object' && typeof target[key] === 'object') {
-            target[key] = merge(
+            source[key] = mergeCss(
+                source[key] as CSSProperties,
                 target[key] as CSSProperties,
-                source[key] as CSSProperties
             );
         } else {
-            target[key] = source[key];
+            source[key] = target[key];
         }
     }
 
-    return target;
+    return source;
 }
 
 /**
@@ -126,7 +126,7 @@ export function useCss(source: CSSProperties): UseCss {
 
     watchEffect(() => {
         if (!cachedHashedCss[hash.value]) {
-            cachedHashedCss[hash.value] = parse(css.value, `.${hash.value}`);
+            cachedHashedCss[hash.value] = jsToCss(css.value, `.${hash.value}`);
         }
         
         if (typeof document === 'undefined') {
@@ -140,12 +140,12 @@ export function useCss(source: CSSProperties): UseCss {
         css,
         hash,
         merge(target: CSSProperties) {
-            css.value = merge(css.value, target);
+            css.value = mergeCss(css.value, target);
 
             return context;
         },
         extend(target: CSSProperties) {
-            return useCss(merge(css.value, target));
+            return useCss(mergeCss(css.value, target));
         },
         toString() {
             return cachedHashedCss[hash.value];
@@ -156,16 +156,16 @@ export function useCss(source: CSSProperties): UseCss {
 }
 
 /**
- * Convert the CSS properties into camelcase.
+ * Convert the CSS properties into camel case.
  * 
  * @public
  */
-export function props(values: CSSProperties) {
+export function camelCaseProps(values: CSSProperties) {
     for (const i in values) {
         const value = values[i];
 
         if (value && typeof value === 'object') {
-            values[i] = props(value);
+            values[i] = camelCaseProps(value);
         }
         else if (!i.match(/^-/)) {
             values = Object.fromEntries(
@@ -222,7 +222,7 @@ export function props(values: CSSProperties) {
  * 
  * @public 
  */
-export function astish(val: string): object {
+export function cssToJs(val: string, sanitize: boolean = true): object {
     const newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?)(?:;|\n)|([^;}{]*?) *{)|(}\s*)/g;
     const ruleClean = /\/\*[^]*?\*\/|  +/g;
     const ruleNewline = /\n+/g;
@@ -235,14 +235,14 @@ export function astish(val: string): object {
         if (block[4]) {
             tree.shift();
         } else if (block[3]) {
-            left = block[3].replace(ruleNewline, empty).trim();
+            left = block[3].replace(ruleNewline, '').trim();
             tree.unshift((tree[0][left] = tree[0][left] || {}));
         } else {
             tree[0][block[1]] = block[2].replace(ruleNewline, empty).trim();
         }
     }
 
-    return tree[0];
+    return sanitize ? camelCaseProps(tree[0]) : tree[0];
 };
 
 /**
@@ -250,7 +250,7 @@ export function astish(val: string): object {
  * 
  * @public
  */
-export function parse(obj: any, selector?: string): string {
+export function jsToCss(obj: any, selector?: string): string {
     let outer = '';
     let blocks = '';
     let current = '';
@@ -266,14 +266,14 @@ export function parse(obj: any, selector?: string): string {
             } else if (key[1] == 'f') {
                 // Handling the `@font-face` where the
                 // block doesn't need the brackets wrapped
-                blocks += parse(val, key);
+                blocks += jsToCss(val, key);
             } else {
                 // Regular at rule block
-                blocks += key + '{' + parse(val, key[1] == 'k' ? '' : selector) + '}';
+                blocks += key + '{' + jsToCss(val, key[1] == 'k' ? '' : selector) + '}';
             }
         } else if (typeof val == 'object') {
             // Call the parse for this block
-            blocks += parse(
+            blocks += jsToCss(
                 val,
                 selector
                     ? // Go over the selector and replace the matching multiple selectors if any
@@ -293,13 +293,7 @@ export function parse(obj: any, selector?: string): string {
             // Convert all but CSS variables
             key = /^--/.test(key) ? key : key.replace(/[A-Z]/g, '-$&').toLowerCase();
             // Push the line for this property
-            // @ts-ignore
-            current += parse.p
-                ? // We have a prefixer and we need to run this through that
-                // @ts-ignore
-                parse.p(key, val)
-                : // Nope no prefixer just append it
-                key + ':' + val + ';';
+            current += key + ':' + val + ';';
         }
     }
 

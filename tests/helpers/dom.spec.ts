@@ -18,7 +18,7 @@ test('creating and updating a div', () => {
     });
 
     expect(dev).toBeInstanceOf(HTMLDivElement);
-    expect(dev.outerHTML).toBe('<div id="test" class="test" style="background:red">test</div>')
+    expect(dev.outerHTML).toBe('<div id="test" class="test" style="background:red">test</div>');
 
     el({
         el: dev,
@@ -31,7 +31,7 @@ test('creating and updating a div', () => {
         }
     });
 
-    expect(dev.outerHTML).toBe('<div data-test=\"test\"></div>')
+    expect(dev.outerHTML).toBe('<div data-test=\"test\"></div>');
 
     el({
         el: dev,

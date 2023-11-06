@@ -1,7 +1,7 @@
 import { parse } from './parser';
 
 /**
- * A single digitized value
+ * A single digitized value.
  * 
  * @public
  */

@@ -1,7 +1,10 @@
 # CSS-in-JS
 
-Flipclock.js provides a robust CSS-in-JS solution for customizing the styles without using an third-party frameworks. Using CSS-in-JS is entirely optional, and we provide .css files for traditional use. Like everything in FlipClock.js, tree-shaking will prevent anything you don't use from ending up in your bundle.
+Flipclock.js provides a robust CSS-in-JS solution for customizing the styles default styles. Using CSS-in-JS is entirely optional, and we provide .css files should you not want to use JS for your CSS. However, CSS-in-JS is worth a look. 
 
+::: tip
+Like everything in FlipClock.js, tree-shaking will prevent anything you don't use from ending up in your bundle. So if you don't use CSS-in-JS, it won't end up in your bundle.
+:::
 
 ## What is CSS-in-JS?
 
@@ -9,7 +12,7 @@ It's exactly as it sounds. You write the CSS in JS and all the CSS is added to t
 
 ### Why would I use CSS-in-JS?
 
-CSS-in-JS makes reusable CSS provides a better developer experience for things such as import, exports, passing CSS as a variable, modifying the CSS and scoping and more. The only real downside is CSS-in-JS increases the JS bundle, which is why you can still import the library CSS how you traditionally would.
+CSS-in-JS makes reusable CSS provides a better developer experience for things such as import, exports, passing CSS as a variable, extending the CSS, scoping, collision prevention and more. The only real downside is may increase your bundle size because your JS contains your CSS. There are ways around this of course.
 
 ### Using FlipClock CSS
 

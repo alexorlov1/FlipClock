@@ -2,7 +2,7 @@ import { useDateFormats } from '../../src/helpers/date';
 import { useDictionary } from '../../src/helpers/dictionary';
 
 test('formatting dates', () => {
-    const { define, format, unset } = useDateFormats()
+    const { define, format, unset } = useDateFormats();
 
     const date = new Date(2000, 0, 1);
 
@@ -15,8 +15,8 @@ test('formatting dates', () => {
     expect(format(date, 'MMM')).toBe('Jan');
     expect(format(date, 'MM')).toBe('01');
     expect(format(date, 'M')).toBe('1');
-    expect(format(date, 'DDDD')).toBe('Saturday')
-    expect(format(date, 'DDD')).toBe('Sat')
+    expect(format(date, 'DDDD')).toBe('Saturday');
+    expect(format(date, 'DDD')).toBe('Sat');
     expect(format(date, 'DD')).toBe('01');
     expect(format(date, 'D')).toBe('1');
     expect(format(date, 'HH')).toBe('00');
@@ -76,9 +76,9 @@ test('formatting dates with a translator', () => {
 
     const { format } = useDateFormats({
         translate
-    })
+    });
 
     const date = new Date(2000, 0, 1);
 
     expect(format(date, 'MMMM')).toBe('Enero');
-})
+});

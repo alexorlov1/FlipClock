@@ -3,7 +3,7 @@ import { ESLint } from 'eslint';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { version } from '../package.json' assert { type: 'json' };
-import { CSSProperties, astish, props } from '../src/helpers/css';
+import { CSSProperties, cssToJs } from '../src/helpers/css';
 
 program
   .name('flipclock')
@@ -12,12 +12,12 @@ program
 
 program.command('css')
   .description('Convert a .css file into a .css.ts file.')
-  .argument('<input>', 'The CSS file to process.')
-  .argument('<output>', 'The output file location of the .css.ts file')
+  .argument('<input>', 'The input path for the CSS file.')
+  .argument('<output>', 'The output path of the .css.ts file.')
   .action(async (input, output) => {
     const css = (await readFile(input)).toString();
 
-    const wrapper = `import { useCss } from "flipclock";\n\nexport const css = useCss(${JSON.stringify(props(astish(css) as CSSProperties))});
+    const wrapper = `import { useCss } from "flipclock";\n\nexport const css = useCss(${JSON.stringify(cssToJs(css) as CSSProperties)});
     `;
 
     writeFile(output, wrapper)

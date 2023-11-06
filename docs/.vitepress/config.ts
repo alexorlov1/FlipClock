@@ -60,11 +60,19 @@ export default defineConfig({
         ]
       },
       {
+        text: 'CLI', items: [
+          {
+            text: 'Using the CLI',
+            link: '/cli.md',
+          },
+        ]
+      },
+      {
         text: 'Adanced', items: [
           {
             text: 'API Reference',
             link: '/api/flipclock.md',
-          }
+          },
         ]
       }
     ],

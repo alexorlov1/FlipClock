@@ -393,7 +393,7 @@ export function isLastDayOfMonth(dirtyDate: Date): boolean {
  * 
  * @public
  */
-export function differenceInCalendarYears(left: Date, right: Date): number {
+export function diffInCalYears(left: Date, right: Date): number {
     return left.getFullYear() - right.getFullYear();
 }
 
@@ -402,7 +402,7 @@ export function differenceInCalendarYears(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInCalendarMonths(left: Date, right: Date): number {
+export function diffInCalMonths(left: Date, right: Date): number {
     const yearDiff = left.getFullYear() - right.getFullYear();
     const monthDiff = left.getMonth() - right.getMonth();
     return yearDiff * 12 + monthDiff;
@@ -413,11 +413,11 @@ export function differenceInCalendarMonths(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
+export function diffInYears(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
     const right: Date = new Date(dirtyRight);
     const sign = compareAsc(left, right);
-    const difference = Math.abs(differenceInCalendarYears(left, right));
+    const difference = Math.abs(diffInCalYears(left, right));
 
     // Set both dates to a valid leap year for accurate comparison when dealing
     // with leap days
@@ -438,11 +438,11 @@ export function differenceInYears(dirtyLeft: Date, dirtyRight: Date): number {
  * 
  * @public
  */
-export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
+export function diffInMonths(dirtyLeft: Date, dirtyRight: Date): number {
     const left: Date = new Date(dirtyLeft);
     const right: Date = new Date(dirtyRight);
     const sign = compareAsc(left, right);
-    const difference = Math.abs(differenceInCalendarMonths(left, right));
+    const difference = Math.abs(diffInCalMonths(left, right));
 
     // Check for the difference of less than month
     if (difference < 1) {
@@ -477,8 +477,8 @@ export function differenceInMonths(dirtyLeft: Date, dirtyRight: Date): number {
  * 
  * @public
  */
-export function differenceInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
-    return Math.floor(differenceInDays(dirtyLeft, dirtyRight) / daysInWeek);
+export function diffInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
+    return Math.floor(diffInDays(dirtyLeft, dirtyRight) / daysInWeek);
 }
 
 /**
@@ -486,8 +486,8 @@ export function differenceInWeeks(dirtyLeft: Date, dirtyRight: Date): number {
  * 
  * @public
  */
-export function differenceInDays(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInDay);
+export function diffInDays(left: Date, right: Date): number {
+    return Math.floor(diffInMilliseconds(left, right) / millisecondsInDay);
 }
 
 /**
@@ -495,8 +495,8 @@ export function differenceInDays(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInHours(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInHour);
+export function diffInHours(left: Date, right: Date): number {
+    return Math.floor(diffInMilliseconds(left, right) / millisecondsInHour);
 }
 
 /**
@@ -504,8 +504,8 @@ export function differenceInHours(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInMinutes(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / millisecondsInMinute);
+export function diffInMinutes(left: Date, right: Date): number {
+    return Math.floor(diffInMilliseconds(left, right) / millisecondsInMinute);
 }
 
 /**
@@ -513,8 +513,8 @@ export function differenceInMinutes(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInSeconds(left: Date, right: Date): number {
-    return Math.floor(differenceInMilliseconds(left, right) / 1000);
+export function diffInSeconds(left: Date, right: Date): number {
+    return Math.floor(diffInMilliseconds(left, right) / 1000);
 }
 
 /**
@@ -522,7 +522,7 @@ export function differenceInSeconds(left: Date, right: Date): number {
  * 
  * @public
  */
-export function differenceInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number {
+export function diffInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number {
     return new Date(dirtyLeft).getTime() - new Date(dirtyRight).getTime();
 }
 

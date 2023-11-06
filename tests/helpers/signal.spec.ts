@@ -1,4 +1,4 @@
-import { createSignal, watchEffect } from "../../src/helpers/signal";
+import { createSignal, watchEffect } from '../../src/helpers/signal';
 
 test('using a signal', () => {
     const [ getCount, setCount ] = createSignal(0);

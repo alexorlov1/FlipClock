@@ -1,4 +1,4 @@
-import { add, differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInMonths, differenceInSeconds, differenceInWeeks, differenceInYears, pad } from './date';
+import { add, diffInDays, diffInHours, diffInMilliseconds, diffInMinutes, diffInMonths, diffInSeconds, diffInWeeks, diffInYears, pad } from './date';
 import { useDefinitionMap, type DefineFunction, type Translator, type UnsetFunction, type UseDictionary } from './dictionary';
 
 /**
@@ -106,35 +106,35 @@ export function useDurationFormats(options?: UseDurationFormatOptions): UseDurat
 
     const intervals: Record<keyof Duration, [(left: Date, right: Date) => number, (date: Date, value: number) => Date]> = {
         years: [
-            (left: Date, right: Date) => differenceInYears(left, right),
+            (left: Date, right: Date) => diffInYears(left, right),
             (date, years) => add(date, { years })
         ],
         months: [
-            (left: Date, right: Date) => differenceInMonths(left, right),
+            (left: Date, right: Date) => diffInMonths(left, right),
             (date, months) => add(date, { months })
         ],
         weeks: [
-            (left: Date, right: Date) => differenceInWeeks(left, right),
+            (left: Date, right: Date) => diffInWeeks(left, right),
             (date, weeks) => add(date, { weeks })
         ],
         days: [
-            (left: Date, right: Date) => differenceInDays(left, right),
+            (left: Date, right: Date) => diffInDays(left, right),
             (date, days) => add(date, { days })
         ],
         hours: [
-            (left: Date, right: Date) => differenceInHours(left, right),
+            (left: Date, right: Date) => diffInHours(left, right),
             (date, hours) => add(date, { hours })
         ],
         minutes: [
-            (left: Date, right: Date) => differenceInMinutes(left, right),
+            (left: Date, right: Date) => diffInMinutes(left, right),
             (date, minutes) => add(date, { minutes })
         ],
         seconds: [
-            (left: Date, right: Date) => differenceInSeconds(left, right),
+            (left: Date, right: Date) => diffInSeconds(left, right),
             (date, seconds) => add(date, { seconds })
         ],
         milliseconds: [
-            (left: Date, right: Date) => differenceInMilliseconds(left, right),
+            (left: Date, right: Date) => diffInMilliseconds(left, right),
             (date, milliseconds) => add(date, { milliseconds })
         ],
     };

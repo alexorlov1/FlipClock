@@ -1,4 +1,4 @@
-import { characterRange, defaultCharset, fisherYatesShuffle, range, useCharset } from "../../src/helpers/charset";
+import { characterRange, defaultCharset, fisherYatesShuffle, range, useCharset } from '../../src/helpers/charset';
 
 test('validating whitelisted and blacklisted characters', () => {
     const { isBlacklisted, isWhitelisted } = useCharset({
@@ -6,8 +6,8 @@ test('validating whitelisted and blacklisted characters', () => {
         blacklist: ['#']
     });
 
-    expect(isWhitelisted('@')).toEqual(true)
-    expect(isBlacklisted('#')).toEqual(true)
+    expect(isWhitelisted('@')).toEqual(true);
+    expect(isBlacklisted('#')).toEqual(true);
 });
 
 test('retrieving chunks of the charset going forwards and backwards', () => {
@@ -80,7 +80,7 @@ test('using a randomize charset', () => {
     });
 
     expect(chunk('a', 5)).not.toStrictEqual(defaultCharset);
-})
+});
 
 test('using a custom shuffle function', () => {
     const { charset } = useCharset();
@@ -90,7 +90,7 @@ test('using a custom shuffle function', () => {
     });
 
     expect(chunk('a', 100)).not.toStrictEqual(charset);
-})
+});
 
 test('using a custom charset', () => {
     const { chunk } = useCharset({
@@ -101,23 +101,23 @@ test('using a custom charset', () => {
     expect(chunk('a', 1)).toStrictEqual(['b']);
     expect(chunk('a', 5)).toStrictEqual(['b', 'c', 'd', 'e', 'f']);
     expect(chunk('a', 100)).toStrictEqual(['b', 'c', 'd', 'e', 'f', '$', 'a']);
-})
+});
 
 test('the default charset', () => {
     const { charset } = useCharset();
     
     expect(charset).toEqual(defaultCharset());
-})
+});
 
 test('creating character ranges', () => {
-    expect(characterRange('a', 'b')).toEqual(['a', 'b'])
-    expect(characterRange('a', 'c')).toEqual(['a', 'b', 'c'])
-    expect(characterRange('a', 'z')).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
-})
+    expect(characterRange('a', 'b')).toEqual(['a', 'b']);
+    expect(characterRange('a', 'c')).toEqual(['a', 'b', 'c']);
+    expect(characterRange('a', 'z')).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']);
+});
 
 test('creating ranges', () => {
-    expect(range(5, 1)).toEqual([5])
-    expect(range(5, 2)).toEqual([5, 6])
-    expect(range(5, 5)).toEqual([5, 6, 7, 8, 9])
-    expect(range(5, 10)).toEqual([5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
-})
+    expect(range(5, 1)).toEqual([5]);
+    expect(range(5, 2)).toEqual([5, 6]);
+    expect(range(5, 5)).toEqual([5, 6, 7, 8, 9]);
+    expect(range(5, 10)).toEqual([5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+});

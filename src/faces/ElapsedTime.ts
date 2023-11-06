@@ -1,4 +1,4 @@
-import { differenceInSeconds } from '../..';
+import { diffInSeconds } from '../..';
 import { Ref } from '../../dist/src/helpers/ref';
 import { type Face } from '../Face';
 import { faceValue, type FaceValue } from '../FaceValue';
@@ -114,7 +114,7 @@ export class ElapsedTime implements Face {
 
         this.current.value = this.current.value;
 
-        if (differenceInSeconds(this.end.value, this.current.value) <= 0) {
+        if (diffInSeconds(this.end.value, this.current.value) <= 0) {
             instance.stop();
         }
     }
