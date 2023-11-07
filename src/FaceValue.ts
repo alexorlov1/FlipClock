@@ -105,7 +105,7 @@ export class FaceValue<T> {
      * @public
      */
     public compare(subject?: FaceValue<any>) {
-        return JSON.stringify(this.value) === JSON.stringify(subject?.value);
+        return JSON.stringify(this.digits) === JSON.stringify(subject?.digits);
     }
 
     /**

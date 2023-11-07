@@ -29,6 +29,7 @@ class EventEmitter<T> {
      * @public
      */
     off<K extends keyof Required<T>>(key: K): void;
+    off<K extends keyof Required<T>>(key: K, fn: T[K]): void;
     /**
      * Reset the event bus and remove all watchers.
      *

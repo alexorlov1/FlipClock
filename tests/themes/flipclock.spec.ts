@@ -46,7 +46,8 @@ test('creating an alphanumeric face', () => {
         autoStart: false,
         face: alphanumeric({
             value: faceValue('a'),
-            targetValue: faceValue('b')
+            targetValue: faceValue('b'),
+            skipChars: 2
         }),
         theme: theme(),
     });

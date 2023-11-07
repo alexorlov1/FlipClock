@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import 'flipclock/style.css';
+// import 'flipclock/flipclock.css';
 
 import DefaultTheme from 'vitepress/theme';
+import HomeHero from './HomeHero.vue';
 
 const { Layout} = DefaultTheme;
 </script>
 
 <template>
-    <Layout />
+    <Layout>
+        <template #home-hero-before>
+            <HomeHero/>
+        </template>
+    </Layout>
 </template>
 
 <style>

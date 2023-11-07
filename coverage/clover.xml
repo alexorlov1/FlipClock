@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1699325306956" clover="3.2.0">
-  <project timestamp="1699325306956" name="All files">
-    <metrics statements="3800" coveredstatements="3450" conditionals="623" coveredconditionals="565" methods="210" coveredmethods="182" elements="4633" coveredelements="4197" complexity="0" loc="3800" ncloc="3800" packages="4" files="18" classes="18"/>
+<coverage generated="1699325529449" clover="3.2.0">
+  <project timestamp="1699325529449" name="All files">
+    <metrics statements="3800" coveredstatements="3452" conditionals="622" coveredconditionals="565" methods="210" coveredmethods="182" elements="4632" coveredelements="4199" complexity="0" loc="3800" ncloc="3800" packages="4" files="18" classes="18"/>
     <package name="src">
       <metrics statements="662" coveredstatements="598" conditionals="61" coveredconditionals="55" methods="40" coveredmethods="35"/>
       <file name="EventEmitter.ts" path="/Users/justinkimbrell/Code/flipclock/src/EventEmitter.ts">
@@ -680,9 +680,9 @@
       </file>
     </package>
     <package name="src.faces">
-      <metrics statements="155" coveredstatements="141" conditionals="20" coveredconditionals="8" methods="7" coveredmethods="7"/>
+      <metrics statements="155" coveredstatements="143" conditionals="19" coveredconditionals="8" methods="7" coveredmethods="7"/>
       <file name="Alphanumeric.ts" path="/Users/justinkimbrell/Code/flipclock/src/faces/Alphanumeric.ts">
-        <metrics statements="155" coveredstatements="141" conditionals="20" coveredconditionals="8" methods="7" coveredmethods="7"/>
+        <metrics statements="155" coveredstatements="143" conditionals="19" coveredconditionals="8" methods="7" coveredmethods="7"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -754,9 +754,9 @@
         <line num="69" count="1" type="stmt"/>
         <line num="70" count="1" type="stmt"/>
         <line num="71" count="1" type="cond" truecount="1" falsecount="0"/>
-        <line num="72" count="1" type="cond" truecount="0" falsecount="1"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="74" count="0" type="stmt"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="74" count="1" type="stmt"/>
         <line num="75" count="1" type="stmt"/>
         <line num="76" count="1" type="cond" truecount="0" falsecount="1"/>
         <line num="77" count="0" type="stmt"/>

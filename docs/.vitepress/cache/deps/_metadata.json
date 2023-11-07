@@ -1,17 +1,23 @@
 {
-  "hash": "e673995d",
-  "browserHash": "9d6a95a3",
+  "hash": "2b5e11be",
+  "browserHash": "36e84373",
   "optimized": {
     "vue": {
-      "src": "../../../../node_modules/.pnpm/vue@3.3.7_typescript@5.2.2/node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "src": "../../../../node_modules/.pnpm/vue@3.3.8_typescript@5.2.2/node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "4858447e",
+      "fileHash": "fa50e698",
+      "needsInterop": false
+    },
+    "vitepress > @vue/devtools-api": {
+      "src": "../../../../node_modules/.pnpm/@vue+devtools-api@6.5.1/node_modules/@vue/devtools-api/lib/esm/index.js",
+      "file": "vitepress___@vue_devtools-api.js",
+      "fileHash": "5e5469c9",
       "needsInterop": false
     },
     "flipclock": {
       "src": "../../../../node_modules/.pnpm/file+/node_modules/flipclock/dist/flipclock.es.js",
       "file": "flipclock.js",
-      "fileHash": "22fdc7df",
+      "fileHash": "59c002da",
       "needsInterop": false
     }
   },

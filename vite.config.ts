@@ -6,7 +6,7 @@ import { extractTypes } from './.bin/extractTypes';
 import { css } from './src/themes/flipclock/flipclock.css';
 
 const writeCssFiles = {
-    'flipclock.css': css.toString()
+    'flipclock.css': css.toRaw()
 };
 
 export default defineConfig({

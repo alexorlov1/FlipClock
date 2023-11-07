@@ -72,6 +72,7 @@ export type UseCss = {
     hash: Ref<string>;
     merge: (target: CSSProperties) => UseCss;
     extend: (target: CSSProperties) => UseCss;
+    toRaw: () => string
     toString: () => string
 }
 
@@ -117,6 +118,9 @@ export function useCss(source: CSSProperties): UseCss {
         },
         extend(target: CSSProperties) {
             return useCss(mergeCss(css.value, target));
+        },
+        toRaw() {
+            return jsToCss(css.value, ' ');
         },
         toString() {
             return cachedHashedCss[hash.value];

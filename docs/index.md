@@ -5,7 +5,6 @@ layout: home
 hero:
   name: "FlipClock.js"
   tagline: "A TypeScript library for building fun animated clocks, timers, tickers, and countdowns with zero dependencies."
-  image: false
   actions:
     - theme: brand
       text: Getting Started

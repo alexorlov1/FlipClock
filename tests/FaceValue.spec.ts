@@ -17,4 +17,9 @@ test('various functions on faceValue()', () => {
     expect(value.copy(2).value).toBe(2);
 
     expect(faceValue([1, [2, [3]]]).length).toBe(3);
+
+
+    expect(faceValue([['hello wold'], ['nice to meet you']]).compare(
+        faceValue([['hello wold'], ['nice to meet you']])
+    )).toBe(true);
 });
