@@ -1,0 +1,1 @@
+beforeMount?(instance: FlipClock<T>): void;

@@ -1,5 +1,7 @@
 class EventEmitter<T> {
     /**
+     * The registered events.
+     *
      * @protected
      */
     protected events: Event<T, any>[];

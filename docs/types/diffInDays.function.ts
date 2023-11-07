@@ -1,0 +1,1 @@
+function diffInDays(left: Date, right: Date): number;

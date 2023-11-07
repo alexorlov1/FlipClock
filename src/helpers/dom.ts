@@ -85,24 +85,13 @@ export function el<T extends keyof HTMLElementTagNameMap>(options: ElementOption
 
     // Set the style attribute
     if (styleAttr) {
-        const value = style(styleAttr);
-
-        if (value) {
-            subject.setAttribute('style', value);
-        }
-        else {
-            subject.removeAttribute('style');
-        }
+        subject.setAttribute('style', style(styleAttr));
     }
 
     // Bind the events
     if (events) {
         for (const key in events) {
             const fn = events[key as keyof GlobalEventHandlers];
-
-            if (!fn) {
-                continue;
-            }
 
             subject.addEventListener(key.replace(/^on/, ''), (event) => {
                 // @ts-ignore
@@ -138,7 +127,7 @@ export function el<T extends keyof HTMLElementTagNameMap>(options: ElementOption
             }
         }
 
-        while (subject.childNodes.length > (childrenNodes?.length ?? 0)) {
+        while (subject.childNodes.length > childrenNodes?.length) {
             subject.childNodes[subject.childNodes.length - 1]?.remove();
         }
     }

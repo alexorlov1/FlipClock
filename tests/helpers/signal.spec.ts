@@ -1,7 +1,7 @@
 import { createSignal, watchEffect } from '../../src/helpers/signal';
 
 test('using a signal', () => {
-    const [ getCount, setCount ] = createSignal(0);
+    const [ getCount, setCount, resetCount ] = createSignal(0);
 
     let calls = 0;
 
@@ -21,5 +21,11 @@ test('using a signal', () => {
 
     expect(getCount()).toBe(3);
 
+    expect(calls).toBe(3);
+
+    resetCount();
+
+    setCount(4);
+    
     expect(calls).toBe(3);
 });

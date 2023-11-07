@@ -199,15 +199,6 @@ export function castDigitizedGroup(value?: DigitizedValue | DigitizedValues): Di
 }
 
 /**
- * Determines if the value is an array of digitized strings.
- * 
- * @public
- */
-export function isDigitizedValues(value: DigitizedValue | DigitizedValues): boolean {
-    return Array.isArray(value) && !isDigitizedGroup(value);
-}   
-
-/**
  * Determines if the value is a digitized group, which is an array of digitized
  * values.
  * 
@@ -236,7 +227,7 @@ export function count(values: DigitizedValues) {
     function recurse(values: DigitizedValues, count: number = 0) {
         for (const value of values) {
             if (Array.isArray(value)) {
-                count += recurse(value, count);
+                count += recurse(value);
             }
             else {
                 count += value.length;

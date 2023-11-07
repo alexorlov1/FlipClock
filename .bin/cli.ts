@@ -17,8 +17,7 @@ program.command('css')
   .action(async (input, output) => {
     const css = (await readFile(input)).toString();
 
-    const wrapper = `import { useCss } from "flipclock";\n\nexport const css = useCss(${JSON.stringify(cssToJs(css) as CSSProperties)});
-    `;
+    const wrapper = `import { useCss } from "flipclock";\n\nexport const css = useCss(${JSON.stringify(cssToJs(css) as CSSProperties)});`;
 
     writeFile(output, wrapper)
 

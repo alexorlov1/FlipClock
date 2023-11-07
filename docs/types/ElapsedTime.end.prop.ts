@@ -1,1 +1,1 @@
-end?: Date;
+end: Ref<Date>;

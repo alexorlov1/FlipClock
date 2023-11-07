@@ -1,10 +1,16 @@
 class ElapsedTime implements Face {
     /**
+     * The date used to calculate the current.
+     *
+     * @protected
+     */
+    protected current: Ref<Date>;
+    /**
      * The ending date used to calculate the elsapsed time.
      *
      * @public
      */
-    end?: Date;
+    end: Ref<Date>;
     /**
      * The format string.
      *
@@ -22,7 +28,7 @@ class ElapsedTime implements Face {
      *
      * @public
      */
-    start?: Date;
+    start: Ref<Date>;
     /**
      * The current face value.
      *
@@ -36,15 +42,6 @@ class ElapsedTime implements Face {
      */
     constructor(props: ElapsedTimeProps);
     /**
-     * Get the start and end date.
-     *
-     * @public
-     */
-    get span(): {
-        start: Date;
-        end: Date;
-    };
-    /**
      * The face's current value.
      *
      * @public
@@ -55,5 +52,5 @@ class ElapsedTime implements Face {
      *
      * @public
      */
-    interval(): void;
+    interval(instance: FlipClock<ElapsedTime>): void;
 }

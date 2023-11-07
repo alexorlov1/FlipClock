@@ -31,8 +31,15 @@ class FlipClock<T extends Face<T>> extends EventEmitter<T> {
     readonly timer: Timer;
     /**
      * Construct the FlipClock.
+     *
+     * @public
      */
     constructor(props: FlipClockProps<T>);
+    /**
+     * Get the animation rate of the clock.
+     *
+     * @public
+     */
     get animationRate(): number;
     /**
      * Mount the clock instance to the DOM.

@@ -1,1 +1,0 @@
-function differenceInHours(left: Date, right: Date): number;

@@ -1,0 +1,1 @@
+function diffInYears(dirtyLeft: Date, dirtyRight: Date): number;

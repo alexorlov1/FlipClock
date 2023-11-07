@@ -1,0 +1,1 @@
+function diffInHours(left: Date, right: Date): number;

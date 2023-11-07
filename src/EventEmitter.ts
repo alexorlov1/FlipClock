@@ -83,6 +83,7 @@ export class EventEmitter<T> {
      * @public
      */
     off<K extends keyof Required<T>>(key: K): void
+    off<K extends keyof Required<T>>(key: K, fn: T[K]): void
     off<K extends keyof Required<T>>(key: K, fn?: T[K]): void {
         for (const event of this.events) {
             if (event.key === key && (!fn || fn === event.fn)) {
@@ -97,8 +98,6 @@ export class EventEmitter<T> {
      * @public
      */
     reset(): void {
-        for (const { unwatch } of this.events) {
-            unwatch();
-        }
+        this.events = [];
     }
 }

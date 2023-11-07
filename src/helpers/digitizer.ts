@@ -60,10 +60,6 @@ export function useDigitizer(): UseDigitizer {
             const index = value.indexOf(item);
             const response = digitize(item);
 
-            if (response === undefined) {
-                continue;
-            }
-
             if (typeof item == 'string') {
                 value.splice(index, 1, ...response);
             }
@@ -72,7 +68,7 @@ export function useDigitizer(): UseDigitizer {
             }
         }
 
-        return value.filter(Boolean) ?? [];
+        return value.filter(Boolean);
     }
 
     /**

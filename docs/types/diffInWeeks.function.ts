@@ -1,0 +1,1 @@
+function diffInWeeks(dirtyLeft: Date, dirtyRight: Date): number;

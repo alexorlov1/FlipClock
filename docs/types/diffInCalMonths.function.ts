@@ -1,0 +1,1 @@
+function diffInCalMonths(left: Date, right: Date): number;

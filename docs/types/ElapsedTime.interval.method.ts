@@ -1,1 +1,1 @@
-interval(): void;
+interval(instance: FlipClock<ElapsedTime>): void;

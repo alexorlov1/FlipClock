@@ -1,1 +1,0 @@
-beforeInterval?: (instance: FlipClock<T>) => void;

@@ -1,0 +1,1 @@
+function diffInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number;

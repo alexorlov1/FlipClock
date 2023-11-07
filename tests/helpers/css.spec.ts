@@ -1,4 +1,4 @@
-import { cssToJs, jsToCss, mergeCss } from '../../src/helpers/css';
+import { cssToJs, jsToCss, mergeCss, sheet, useCss } from '../../src/helpers/css';
 
 test('converting from string to object and back to string', () => {
     expect(cssToJs('')).toStrictEqual({});
@@ -72,4 +72,36 @@ test('merging two css objects', () => {
         height: '50%',
         width: '50%',
     });
+});
+
+test('creating sheets()', () => {
+    const foo = useCss({
+        '@font-face': {
+            fontFamily: 'sans-serif'
+        },
+
+        '.foo': {
+            color: 'red'
+        }
+    });
+
+    expect(foo.toString()).toBe('@font-face{font-family:sans-serif;}.fc209888310 .foo{color:red;}');
+
+    expect(sheet().innerHTML).toBe('@font-face{font-family:sans-serif;}.fc209888310 .foo{color:red;}');
+   
+    foo.merge({
+        '.foo': {
+            color: 'blue'
+        }
+    });
+
+    expect(sheet().innerHTML).toBe('@font-face{font-family:sans-serif;}.fc209888310 .foo{color:red;}@font-face{font-family:sans-serif;}.fc4002438535 .foo{color:blue;}');
+
+    const bar = foo.extend({
+        '.bar': {
+            color: 'red'
+        }
+    });
+
+    expect(sheet().innerHTML).toBe('@font-face{font-family:sans-serif;}.fc209888310 .foo{color:red;}@font-face{font-family:sans-serif;}.fc4002438535 .foo{color:blue;}@font-face{font-family:sans-serif;}.fc1828510312 .foo{color:blue;}.fc1828510312 .bar{color:red;}');
 });

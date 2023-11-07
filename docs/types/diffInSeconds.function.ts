@@ -1,0 +1,1 @@
+function diffInSeconds(left: Date, right: Date): number;

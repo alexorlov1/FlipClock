@@ -4,6 +4,7 @@ import { useDigitizer } from '../../src/helpers/digitizer';
 test('digitizing and undigitizing values', () => {
     const { digitize } = useDigitizer();
 
+    expect(digitize(undefined)).toEqual([]);
     expect(digitize(' ')).toEqual([' ']);
     expect(digitize('  ')).toEqual([' ', ' ']);
     expect(digitize('a ')).toEqual(['a', ' ']);

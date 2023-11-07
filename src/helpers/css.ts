@@ -22,9 +22,6 @@ export function sheet(): HTMLStyleElement {
     if (existing && existing instanceof HTMLStyleElement) {
         return existing as HTMLStyleElement;
     }
-    else if (existing) {
-        existing.remove();
-    }
 
     const el = document.createElement('style');
 
@@ -46,34 +43,10 @@ const cachedStringifiedCss: Record<string, string> = {};
 const cachedHashedCss: Record<string, string> = {};
 
 /**
- * Convert a `CSSProperties` into a class name and append the css to the style
- * element in the document head.
+ * Merge the target object into the source.
  * 
  * @public
  */
-export function css(value: CSSProperties) {
-    const stringified = stringify(value);
-
-    let hash: string;
-
-    if (cachedStringifiedCss[stringified]) {
-        hash = cachedStringifiedCss[stringified];
-    }
-    else {
-        hash = toHash(stringified);
-
-        cachedStringifiedCss[stringified] = hash;
-    }
-
-    if (!cachedHashedCss[hash]) {
-        cachedHashedCss[hash] = jsToCss(value, `.${hash}`);
-    }
-
-    sheet().innerHTML = Object.values(cachedHashedCss).join('');
-
-    return hash;
-}
-
 export function mergeCss(source: CSSProperties, target: CSSProperties): CSSProperties {
     for (const key in target) {
         if (typeof source[key] === 'object' && typeof target[key] === 'object') {
@@ -125,15 +98,13 @@ export function useCss(source: CSSProperties): UseCss {
     });
 
     watchEffect(() => {
-        if (!cachedHashedCss[hash.value]) {
-            cachedHashedCss[hash.value] = jsToCss(css.value, `.${hash.value}`);
-        }
-        
-        if (typeof document === 'undefined') {
-            return;
-        }
+        if (typeof document === 'object') {
+            if (!cachedHashedCss[hash.value]) {
+                cachedHashedCss[hash.value] = jsToCss(css.value, `.${hash.value}`);
+            }
 
-        sheet().innerHTML = Object.values(cachedHashedCss).join('');
+            sheet().innerHTML = Object.values(cachedHashedCss).join('');
+        }
     });
 
     const context: UseCss = {
@@ -222,7 +193,7 @@ export function camelCaseProps(values: CSSProperties) {
  * 
  * @public 
  */
-export function cssToJs(val: string, sanitize: boolean = true): object {
+export function cssToJs(val: string): object {
     const newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?)(?:;|\n)|([^;}{]*?) *{)|(}\s*)/g;
     const ruleClean = /\/\*[^]*?\*\/|  +/g;
     const ruleNewline = /\n+/g;
@@ -242,7 +213,7 @@ export function cssToJs(val: string, sanitize: boolean = true): object {
         }
     }
 
-    return sanitize ? camelCaseProps(tree[0]) : tree[0];
+    return camelCaseProps(tree[0]);
 };
 
 /**

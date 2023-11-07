@@ -1,1 +1,0 @@
-function differenceInMilliseconds(dirtyLeft: Date, dirtyRight: Date): number;

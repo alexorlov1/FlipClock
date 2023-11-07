@@ -1,10 +1,9 @@
-import { diffInSeconds } from '../..';
-import { Ref } from '../../dist/src/helpers/ref';
 import { type Face } from '../Face';
 import { faceValue, type FaceValue } from '../FaceValue';
 import { FlipClock } from '../FlipClock';
+import { diffInSeconds } from '../helpers/date';
 import { useDurationFormats, type UseDurationFormatOptions, type UseDurationFormats } from '../helpers/duration';
-import { ref } from '../helpers/ref';
+import { Ref, ref } from '../helpers/ref';
 import { watchEffect } from '../helpers/signal';
 
 /**

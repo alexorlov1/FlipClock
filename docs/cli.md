@@ -16,9 +16,25 @@ Arguments:
 
 Simply run the command and replace the file paths to correlate with your own.
 
-```
+::: code-group
+
+```bash [npm]
 npm flipclock css ~/my-file.css ~/my-file.css.ts
 ```
+
+```bash [pnpm]
+pnpm flipclock css ~/my-file.css ~/my-file.css.ts
+```
+
+```bash [yarn]
+yarn flipclock css ~/my-file.css ~/my-file.css.ts
+```
+
+```bash [bun]
+bun flipclock css ~/my-file.css ~/my-file.css.ts
+```
+
+:::
 
 ### Input
 
@@ -46,14 +62,14 @@ import { useCss } from 'flipclock';
 export const css = useCss({
     '.my-css': {
         color: 'black',
-        '.my-css.red': {
+        '&.red': {
             color: 'red'
         }
     }
 })
 ```
 
-### Usage in FlipClock.
+### Using your CSS in FlipClock
 
 Once you get the `.css.ts` file, you can import this directly and just pass it
 to your theme.
@@ -66,4 +82,6 @@ import { css } from 'my-file.css';
 const myTheme = theme({
     css
 });
+
+// The rest of your FlipClock code here...
 ```

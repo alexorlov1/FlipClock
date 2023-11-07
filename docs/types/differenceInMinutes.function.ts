@@ -1,1 +1,0 @@
-function differenceInMinutes(left: Date, right: Date): number;

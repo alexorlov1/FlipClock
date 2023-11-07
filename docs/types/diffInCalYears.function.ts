@@ -1,0 +1,1 @@
+function diffInCalYears(left: Date, right: Date): number;

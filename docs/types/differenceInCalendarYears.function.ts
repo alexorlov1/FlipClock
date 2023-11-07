@@ -1,1 +1,0 @@
-function differenceInCalendarYears(left: Date, right: Date): number;

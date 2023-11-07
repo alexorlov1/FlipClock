@@ -1,1 +1,0 @@
-beforeStart?: (instance: FlipClock<T>) => void;

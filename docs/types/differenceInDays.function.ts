@@ -1,1 +1,0 @@
-function differenceInDays(left: Date, right: Date): number;

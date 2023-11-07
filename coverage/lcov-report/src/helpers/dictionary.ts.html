@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>80/80</span>
+                <span class='fraction'>89/89</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>80/80</span>
+                <span class='fraction'>89/89</span>
             </div>
         
             
@@ -142,7 +142,16 @@
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a>
 <a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -162,8 +171,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
@@ -175,8 +184,6 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
@@ -194,6 +201,17 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -227,40 +245,38 @@ export type DictionaryRecord = Record&lt;string, string | Translator&gt;
 export type DictionaryMap = Map&lt;string, string | Translator&gt;
 export type DefinitionTerms = Record&lt;string, string | Translator&gt;;
 &nbsp;
-export type DefineFunction&lt;V&gt; = (key: string | Record&lt;string,V&gt;, value?: V) =&gt; void;
+export type DefineFunction&lt;V&gt; = (key: string | Record&lt;string, V&gt;, value?: V) =&gt; void;
 &nbsp;
 export type UnsetFunction = (key: string | string[]) =&gt; void;
 &nbsp;
 export type UseDefinitionMap&lt;V&gt; = {
-    map: Map&lt;string,V&gt;
+    map: Map&lt;string, V&gt;
     define: (key: string | Record&lt;string, V&gt;, value?: V) =&gt; void
     unset: (keys: string | string[]) =&gt; void
 }
 &nbsp;
 /**
  * A definition map is a reusable interface to create key/value pairs.
+ * 
+ * @public
  */
 export function useDefinitionMap&lt;V&gt;(items: [string, V][]): UseDefinitionMap&lt;V&gt; {
     const map = new Map(items);
 &nbsp;
-    // function define(key: Record&lt;string,V&gt;): void
-    // function define(key: string, value: V): void
     function define(key: string | Record&lt;string, V&gt;, value?: V): void {
-        if(typeof key === 'string' &amp;&amp; value) {
+        if (typeof key === 'string' &amp;&amp; value) {
             map.set(key, value);
         }
-        else if(typeof key === 'object') {
+        else if (typeof key === 'object') {
             for (const entry of Object.entries(key)) {
                 map.set(entry[0], entry[1]);
             }
-        }        
+        }
     }
 &nbsp;
-    // function unset(keys: string): void
-    // function unset(keys: string[]): void
-    function unset(keys: string|string[]): void {
+    function unset(keys: string | string[]): void {
         if (Array.isArray(keys)) {
-            for(const key of keys) {
+            for (const key of keys) {
                 map.delete(key);
             }
         }
@@ -271,15 +287,26 @@ export function useDefinitionMap&lt;V&gt;(items: [string, V][]): UseDefinitionMa
 &nbsp;
     return {
         map, define, unset
-    }
+    };
 }
 &nbsp;
 /**
- * Create a new date string formatter.
+ * The return type for `useDictionary()`.
+ * 
+ * @public
  */
-export function useDictionary(definitions: DefinitionTerms = {}) {
-    const { map, define, unset } = useDefinitionMap(Object.entries(definitions));
-    
+export type UseDictionary = UseDefinitionMap&lt;string | Translator&gt; &amp; {
+    translate: Translator
+}
+&nbsp;
+/**
+ * Use the provided terms to create a reusable translation dictionary.
+ * 
+ * @public
+ */
+export function useDictionary(terms: DefinitionTerms = {}): UseDictionary {
+    const { map, define, unset } = useDefinitionMap(Object.entries(terms));
+&nbsp;
     function translate(key: string): string {
         const term = map.get(key);
 &nbsp;
@@ -299,7 +326,7 @@ export function useDictionary(definitions: DefinitionTerms = {}) {
         define,
         translate,
         unset,
-    }
+    };
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -307,7 +334,7 @@ export function useDictionary(definitions: DefinitionTerms = {}) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-10-26T03:40:38.729Z
+                at 2023-11-07T02:48:26.930Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

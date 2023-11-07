@@ -6,11 +6,17 @@ class FaceValue<T> {
      */
     readonly digitizer: UseDigitizer;
     /**
-     * The reactive value.
+     * The value ref.
      *
      * @protected
      */
     protected $value: Ref<T>;
+    /**
+     * The digits ref.
+     *
+     * @protected
+     */
+    protected $digits: Ref<DigitizedValues>;
     /**
      * Instantiate the face value.
      *
@@ -24,7 +30,9 @@ class FaceValue<T> {
      */
     get digits(): DigitizedValues;
     /**
-     * Set the value from a digitized value.
+     * Set the digits from a `DigitizedValue`. It's possible the digits differ
+     * than the value, if a sequencer or something else is iterating on the
+     * digits.
      *
      * @public
      */
