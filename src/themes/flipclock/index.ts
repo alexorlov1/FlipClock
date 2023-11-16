@@ -27,14 +27,34 @@ export type FlipClockThemeOptions = {
  * @public
  */
 export function theme(options: FlipClockThemeOptions = {}) {
+    let debouncer: [number, Function];
+    
     return {
-        render: (instance: FlipClock<any>) => render({
-            css: options.css,
-            dividers: options.dividers,
-            el: instance.el,
-            labels: options.labels,
-            value: instance.face.faceValue(),
-        })
+        render: (instance: FlipClock<any>) => {
+            const debounceRate = instance.el && parseInt(
+                getComputedStyle(instance.el)
+                    .getPropertyValue('--animation-duration')
+                    .replace('ms', '') ?? '0'
+            ) || 0;
+        
+            if (!debouncer || debouncer[0] !== debounceRate) {
+                debouncer = [debounceRate, debounce((fn: Function, ...args: any[]) => {
+                    console.log(123);
+
+                    fn(...args);
+                }, debounceRate / 2)];
+            }
+            
+            
+            return render({
+                debounceRate,
+                css: options.css,
+                dividers: options.dividers,
+                el: instance.el,
+                labels: options.labels,
+                value: instance.face.faceValue(),
+            });
+        }
     };
 }
 
@@ -43,6 +63,7 @@ export function theme(options: FlipClockThemeOptions = {}) {
  */
 export type ClockOptions = {
     css?: UseCss,
+    debounceRate: number,
     dividers?: Dividers,
     el?: Element | null,
     labels?: DigitizedValues | string,
@@ -108,6 +129,7 @@ export function render(options: ClockOptions) {
 
         return card({
             el,
+            debounceRate: options.debounceRate,
             value: digits
         });
     }
@@ -129,6 +151,7 @@ export function render(options: ClockOptions) {
             labels
         ))
     });
+
 }
 
 /**
@@ -172,6 +195,7 @@ export function group(options: FlipClockGroupOptions): Element {
  * @public
  */
 export type CardOptions = {
+    debounceRate: number,
     el?: Element | null,
     value: string
 }
@@ -195,8 +219,15 @@ export function card(options: CardOptions): Element {
             'animate': lastValue !== options.value
         },
         events: {
+            onanimationcancel() {
+                element.classList.remove('animate');
+            },
             onanimationend() {
-                debounced();
+                debouncer(() => {
+                    window.requestAnimationFrame(() => {
+                        element.classList.remove('animate');
+                    });
+                });
             }
         },
         children: parent => {
@@ -219,9 +250,9 @@ export function card(options: CardOptions): Element {
         }
     });
 
-    const debounced = debounce(() => {
-        element.classList.remove('animate');
-    }, 100);
+    const debouncer = debounce((fn: Function, ...args: any) => {
+        fn(...args);
+    }, options.debounceRate / 2);
 
     return element;
 }

@@ -54,6 +54,8 @@ export function mergeCss(source: CSSProperties, target: CSSProperties): CSSPrope
                 source[key] as CSSProperties,
                 target[key] as CSSProperties,
             );
+        } else if (typeof target[key] === 'object') {
+            source[key] = mergeCss({}, target[key] as CSSProperties); 
         } else {
             source[key] = target[key];
         }
@@ -81,7 +83,7 @@ export type UseCss = {
  * 
  * @public
  */
-export function useCss(source: CSSProperties): UseCss {
+export function useCss(source: CSSProperties, prefix: string = ' '): UseCss {
     const css = ref(source);
 
     const hash = computed(() => {
@@ -117,10 +119,10 @@ export function useCss(source: CSSProperties): UseCss {
             return context;
         },
         extend(target: CSSProperties) {
-            return useCss(mergeCss(css.value, target));
+            return useCss(mergeCss(mergeCss(css.value, {}), target));
         },
         toRaw() {
-            return jsToCss(css.value, ' ');
+            return jsToCss(css.value, prefix);
         },
         toString() {
             return cachedHashedCss[hash.value];

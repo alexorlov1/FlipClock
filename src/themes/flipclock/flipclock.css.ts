@@ -6,12 +6,17 @@ import { useCss } from '../../helpers/css';
  * @public
  */
 export const css = useCss({
-    '&.flip-clock': {
+    '&': {
         '--border-radius': '.75rem',
+        '--font-size': '4.5em',
+        '--font-family': '"Helvetica Neue", Helvetica, sans-serif',
         '--width': '1em',
         '--height': '1.45em',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSize: '4.5em',
+        '--animation-duration': '500ms',
+        '--animation-delay': 'var(--animation-duration)',
+
+        fontFamily: 'var(--font-family)',
+        fontSize: 'var(--font-size)',
         userSelect: 'none',
         textAlign: 'center',
         position: 'relative',
@@ -137,8 +142,8 @@ export const css = useCss({
             } 
         },
         '&.animate': {
-            animationDuration: '250ms',
-            animationDelay: '250ms',
+            animationDuration: 'var(--animation-duration)',
+            animationDelay: 'var(--animation-delay)',
             '.flip-clock-card-item-inner': {
                 perspective: '15em' 
             },
@@ -241,5 +246,5 @@ export const css = useCss({
             opacity: '0' 
         } 
     } 
-});
+}, '.flip-clock');
     

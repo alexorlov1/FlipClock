@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.99% </span>
+                <span class="strong">75.94% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>173/237</span>
+                <span class='fraction'>180/237</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/14</span>
+                <span class='fraction'>9/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/10</span>
+                <span class='fraction'>6/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.99% </span>
+                <span class="strong">75.94% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>173/237</span>
+                <span class='fraction'>180/237</span>
             </div>
         
             
@@ -462,18 +462,18 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -512,20 +512,20 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -697,19 +697,19 @@ export class FlipClock&lt;T extends Face&lt;T&gt;&gt; extends EventEmitter&lt;T&
      * 
      * @public
      */
-    public <span class="fstat-no" title="function not covered" >stop(fn?: (instance: FlipClock&lt;T&gt;) =&gt; void): this {</span>
-<span class="cstat-no" title="statement not covered" >        this.hook('beforeStop', this);</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >        this.timer.stop(() =&gt; {</span>
+    public stop(fn?: (instance: FlipClock&lt;T&gt;) =&gt; void): this {
+        this.hook('beforeStop', this);
+&nbsp;
+        this.timer.stop(() =&gt; {
 <span class="cstat-no" title="statement not covered" >            if (typeof fn === 'function') {</span>
 <span class="cstat-no" title="statement not covered" >                fn(this);</span>
 <span class="cstat-no" title="statement not covered" >            }</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >            this.hook('afterStop', this);</span>
-<span class="cstat-no" title="statement not covered" >        });</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >        return this;</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
+        });
+&nbsp;
+        return this;
+    }
 &nbsp;
     /**
      * Toggle starting/stopping the clock instance.
@@ -778,7 +778,7 @@ export function flipClock&lt;T extends Face&lt;T&gt;&gt;(props: FlipClockProps&l
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-11-07T02:52:09.424Z
+                at 2023-11-13T19:36:25.913Z
             </div>
         <script src="../prettify.js"></script>
         <script>

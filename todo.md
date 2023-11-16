@@ -17,3 +17,11 @@ Tests
 - write test for duration.
 - Need better coverage of new code. Goal is > 95% test coverage.
 - Clean up any unsed code
+
+
+Neon border/background effect
+https://codepen.io/gayane-gasparyan/pen/jOmaBQK
+
+Neon line glowing effect
+https://codepen.io/ashhishGptcode/pen/eYJzGYg
+https://codepen.io/giana/pen/qmKNeE
